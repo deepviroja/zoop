@@ -1,0 +1,666 @@
+import { Request, Response } from 'express';
+import { db, auth } from '../config/firebase';
+import { User, Role } from '../../../../shared/types';
+import * as admin from 'firebase-admin';
+import {
+  generateOTP,
+  storeOTP,
+  verifyOTP as verifyOTPService,
+} from "../services/otpService";
+import {
+  sendOTPEmail,
+  sendAccountDeletionOTPEmail,
+  sendRetentionEmail,
+  sendAccountDeletedEmail,
+} from "../services/emailService";
+
+type SellerRecord = {
+  id: string;
+  userId: string;
+  businessName: string;
+  businessType: string;
+  gstNumber?: string;
+  panNumber: string;
+  ownerName: string;
+  email: string;
+  phone: string;
+  address: any;
+  banking: any;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+// Add these functions to authController.ts
+
+export const signupWithOTP = async (req: Request, res: Response) => {
+  try {
+    const { email, password, displayName, role, phone, address, city, state, pincode, gender } = req.body;
+
+    // Validate input
+    if (!email || !password || !displayName) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    // Check if user exists in Firebase
+    try {
+      const existingUser = await auth.getUserByEmail(email);
+      if (existingUser) {
+        return res.status(400).json({ error: "This email is already registered. Please login instead." });
+      }
+    } catch (error: any) {
+      // User doesn't exist, continue
+      if (error.code !== 'auth/user-not-found') {
+        console.error('Error checking user:', error);
+      }
+    }
+
+    // Generate and send OTP to a real email channel.
+    const otp = generateOTP();
+    const expiresAt = await storeOTP(email, otp);
+    await sendOTPEmail(email, otp, displayName);
+
+    // Store pending user
+    await db
+      .collection("pending_users")
+      .doc(email)
+      .set({
+        email,
+        password, // Hash this in production!
+        displayName,
+        role: role || "customer",
+        phone: phone || "",
+        address: address || "",
+        city: city || "",
+        state: state || "",
+        pincode: pincode || "",
+        gender: gender || "",
+        createdAt: new Date().toISOString(),
+      });
+
+    res.json({
+      message: "OTP sent successfully",
+      email,
+      expiresAt,
+      resendAfterSec: 60,
+    });
+  } catch (error: any) {
+    console.error('❌ Signup error:', error);
+    res.status(500).json({ error: error.message || "Signup failed" });
+  }
+};
+
+export const verifyOTP = async (req: Request, res: Response) => {
+  try {
+    const { email, otp } = req.body;
+
+    const isValid = await verifyOTPService(email, otp);
+    if (!isValid) {
+      return res.status(400).json({ error: "Invalid or expired OTP" });
+    }
+
+    // Get pending user
+    const pendingUserDoc = await db
+      .collection("pending_users")
+      .doc(email)
+      .get();
+    if (!pendingUserDoc.exists) {
+      return res.status(400).json({ error: "Registration data not found" });
+    }
+
+    const userData = pendingUserDoc.data()!;
+
+    // Create Firebase user
+    const userRecord = await auth.createUser({
+      email: userData.email,
+      password: userData.password,
+      displayName: userData.displayName,
+      emailVerified: true,
+    });
+
+    // Set custom claims
+    await auth.setCustomUserClaims(userRecord.uid, { role: userData.role });
+
+    // Create user document
+    await db.collection("users").doc(userRecord.uid).set({
+      id: userRecord.uid,
+      email: userData.email,
+      displayName: userData.displayName,
+      phone: userData.phone || "",
+      address: userData.address || "",
+      city: userData.city || "",
+      state: userData.state || "",
+      pincode: userData.pincode || "",
+      gender: userData.gender || "",
+      role: userData.role,
+      isEmailVerified: true,
+      createdAt: new Date().toISOString(),
+      ...(userData.role === 'seller' && {
+        isApproved: false,
+        onboardingCompleted: false
+      })
+    });
+
+    // Delete pending user
+    await db.collection("pending_users").doc(email).delete();
+
+    // Generate token
+    const customToken = await auth.createCustomToken(userRecord.uid);
+
+    res.json({
+      message: "Email verified successfully",
+      token: customToken,
+      user: {
+        uid: userRecord.uid,
+        email: userData.email,
+        displayName: userData.displayName,
+        role: userData.role,
+      },
+    });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};
+export const registerCustomer = async (req: Request, res: Response) => {
+  const { email, password, name, phone, city, state, pincode, address } = req.body;
+
+  try {
+    const userRecord = await auth.createUser({
+      email,
+      password,
+      displayName: name,
+      phoneNumber: phone ? phone : undefined,
+    });
+
+    const userData: User & Record<string, any> = {
+      id: userRecord.uid,
+      displayName: name,
+      email,
+      phone,
+      address: address || '',
+      city: city || '',
+      state: state || '',
+      pincode: pincode || '',
+      role: 'customer',
+      isEmailVerified: false,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    await db.collection('users').doc(userRecord.uid).set(userData);
+    
+    // Set custom claims for role-based auth
+    await auth.setCustomUserClaims(userRecord.uid, { role: 'customer' });
+
+    res.status(201).json({ message: 'Customer registered successfully', user: userData });
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+export const login = async (req: Request, res: Response) => {
+  // Login is handled on the client-side with Firebase Auth SDK.
+  // The client then sends the ID token to the backend for verification if needed.
+  // However, for pure API login (without client SDK), we would need a custom flow or use the REST API.
+  // Assuming the client uses the SDK, this endpoint might be for session cookie creation or additional data fetching.
+  
+  // Here we just return a message saying to use the client SDK.
+  res.status(200).json({ message: 'Please use Firebase Client SDK to sign in and get an ID token.' });
+};
+
+export const registerSeller = async (req: Request, res: Response) => {
+  const {
+    businessName,
+    businessType,
+    gstNumber,
+    panNumber,
+    ownerName,
+    email,
+    phone,
+    password,
+    address,
+    banking,
+  } = req.body;
+
+  try {
+    // 1. Create a user (if not exists)
+    let userRecord;
+    try {
+      userRecord = await auth.getUserByEmail(email);
+    } catch (e) {
+      userRecord = await auth.createUser({
+        email,
+        password,
+        displayName: ownerName,
+        phoneNumber: phone,
+      });
+    }
+
+    // 2. Set role to 'seller'
+    await auth.setCustomUserClaims(userRecord.uid, { role: 'seller' });
+
+    // 3. Create Sellers document
+    const sellerId = db.collection('sellers').doc().id;
+    const sellerData: SellerRecord = {
+      id: sellerId,
+      userId: userRecord.uid,
+      businessName,
+      businessType,
+      gstNumber,
+      panNumber,
+      ownerName,
+      email,
+      phone,
+      address,
+      banking,
+      status: 'pending',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    await db.collection('sellers').doc(sellerId).set(sellerData);
+
+    // 4. Update user document with role + seller onboarding details so Admin can verify
+    const userData: Record<string, any> = {
+      id: userRecord.uid,
+      displayName: ownerName,
+      email,
+      role: 'seller',
+      verificationStatus: 'pending',
+      businessName,
+      businessType,
+      gstNumber: gstNumber || '',
+      panNumber,
+      phone,
+      addressLine1: address?.addressLine1 || '',
+      addressLine2: address?.addressLine2 || '',
+      city: address?.city || '',
+      state: address?.state || '',
+      pincode: address?.pincode || '',
+      address: address ? `${address.addressLine1 || ''}, ${address.city || ''}, ${address.state || ''} - ${address.pincode || ''}` : '',
+      bankName: banking?.bankName || '',
+      accountHolderName: banking?.accountHolderName || '',
+      accountNumber: banking?.accountNumber || '',
+      ifscCode: banking?.ifscCode || '',
+      onboardingCompletedAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    await db.collection('users').doc(userRecord.uid).set(userData, { merge: true });
+
+    res.status(201).json({ message: 'Seller registration submitted successfully', sellerId });
+  } catch (error: any) {
+    console.error('Error registering seller:', error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const getSellerDashboard = async (req: Request, res: Response) => {
+  // Stub for dashboard data
+  res.json({
+    message: 'Welcome to Seller Dashboard',
+    stats: {
+      products: 10,
+      orders: 5,
+      revenue: 15000,
+    },
+  });
+};
+
+export const syncUser = async (req: Request, res: Response) => {
+  const user = (req as any).user; // Decoded token from middleware
+  if (!user) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  try {
+    const userDoc = await db.collection('users').doc(user.uid).get();
+    
+    if (!userDoc.exists) {
+      // Create user if not exists (e.g. first time Google login)
+      const requestedRole = req.body.role === 'seller' ? 'seller' : 'customer';
+      
+      const userData: User & Record<string, any> = {
+        id: user.uid,
+        name: user.name || user.email?.split('@')[0] || 'User',
+        email: user.email || '',
+        phone: user.phone_number,
+        address: '',
+        city: '',
+        state: '',
+        pincode: '',
+        addresses: [],
+        wishlistIds: [],
+        role: requestedRole,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        ...(requestedRole === 'seller' && {
+            isApproved: false,
+            onboardingCompleted: false
+        })
+      };
+      await db.collection('users').doc(user.uid).set(userData);
+      // Set custom claims
+      await auth.setCustomUserClaims(user.uid, { role: requestedRole });
+      return res.json({ user: userData });
+    }
+
+    let userData = userDoc.data() as User;
+
+    // Special Case: Auto-promote admin email to admin role
+    if (user.email === 'admin@zoop.com' && userData.role !== 'admin') {
+      userData.role = 'admin';
+      await db.collection('users').doc(user.uid).update({ role: 'admin' });
+      await auth.setCustomUserClaims(user.uid, { role: 'admin' });
+    }
+
+    // Check if role in custom claims matches db role, if not update claims
+    if (user.role !== userData.role) {
+       await auth.setCustomUserClaims(user.uid, { role: userData.role });
+    }
+
+    res.json({ user: userData });
+  } catch (error: any) {
+    console.error('Error syncing user:', error);
+    res.status(500).json({ error: error.message });
+  }
+};
+export const adminCreateUser = async (req: Request, res: Response) => {
+  const { email, password, displayName, role } = req.body;
+
+  try {
+    const requester = (req as any).user;
+    if (
+      String(role || "").toLowerCase() === "admin" &&
+      String(requester?.email || "").toLowerCase() !== "admin@zoop.com"
+    ) {
+      return res.status(403).json({
+        error: "Only super admin (admin@zoop.com) can add admins",
+      });
+    }
+    if (String(email || "").toLowerCase() === "admin@zoop.com") {
+      return res.status(409).json({
+        error: "admin@zoop.com is reserved for super admin",
+      });
+    }
+
+    const userRecord = await auth.createUser({
+      email,
+      password,
+      displayName,
+      emailVerified: true,
+    });
+
+    await auth.setCustomUserClaims(userRecord.uid, { role: role || 'customer' });
+
+    const userData: User = {
+      id: userRecord.uid,
+      displayName: displayName,
+      email,
+      role: (role as Role) || 'customer',
+      isEmailVerified: true,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    await db.collection('users').doc(userRecord.uid).set(userData);
+
+    res.status(201).json({ message: 'User created successfully', user: userData });
+  } catch (error: any) {
+    console.error('Error in adminCreateUser:', error);
+    const message = String(error?.message || '');
+    if (message.includes('ENOTFOUND accounts.google.com') || message.includes('app/invalid-credential')) {
+      return res.status(503).json({
+        error: 'Admin user creation requires valid Firebase server credentials with network access. Please configure a service account JSON locally.',
+      });
+    }
+    res.status(400).json({ error: error.message });
+  }
+};
+
+export const requestDeleteAccountOTP = async (req: Request, res: Response) => {
+  try {
+    const user = (req as any).user;
+    const email = String(user?.email || "").trim().toLowerCase();
+    if (!email) return res.status(400).json({ error: "Email not found for user" });
+
+    const profileDoc = await db.collection("users").doc(user.uid).get();
+    if (!profileDoc.exists) {
+      return res.status(404).json({ error: "Profile not found" });
+    }
+    const profile = profileDoc.data() as any;
+    if (profile?.isDeleted) {
+      return res.status(400).json({ error: "Account already deleted" });
+    }
+
+    const otp = generateOTP();
+    const key = `delete:${email}`;
+    const expiresAt = await storeOTP(key, otp);
+    await Promise.all([
+      sendAccountDeletionOTPEmail(
+        email,
+        otp,
+        profile?.displayName || profile?.name || user?.name,
+      ),
+      sendRetentionEmail(email, profile?.displayName || profile?.name || user?.name),
+    ]);
+
+    res.json({
+      message: "Deletion OTP sent to your email",
+      expiresAt,
+      resendAfterSec: 60,
+    });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message || "Could not send deletion OTP" });
+  }
+};
+
+export const confirmDeleteAccount = async (req: Request, res: Response) => {
+  try {
+    const user = (req as any).user;
+    const email = String(user?.email || "").trim().toLowerCase();
+    const otp = String(req.body?.otp || "").trim();
+    const reason = String(req.body?.reason || "").trim();
+    if (!email || !otp) {
+      return res.status(400).json({ error: "Email and OTP are required" });
+    }
+
+    const valid = await verifyOTPService(`delete:${email}`, otp);
+    if (!valid) {
+      return res.status(400).json({ error: "Invalid or expired OTP" });
+    }
+
+    const userRef = db.collection("users").doc(user.uid);
+    const userDoc = await userRef.get();
+    const role = (userDoc.data() as any)?.role || user.role || "customer";
+    await userRef.set(
+      {
+        isDeleted: true,
+        deletedAt: new Date().toISOString(),
+        deletedBy: user.uid,
+        deletionReason: reason || "Self-requested account deletion",
+        disabled: true,
+        status: "deleted",
+        updatedAt: new Date().toISOString(),
+      },
+      { merge: true },
+    );
+
+    // Disable auth account to prevent further login while preserving audit trail.
+    await auth.updateUser(user.uid, { disabled: true });
+    if (String(role) === "seller") {
+      const products = await db.collection("products").where("sellerId", "==", user.uid).get();
+      const batch = db.batch();
+      products.docs.forEach((d) => {
+        batch.set(
+          d.ref,
+          {
+            moderationStatus: "removed",
+            updatedAt: new Date().toISOString(),
+          },
+          { merge: true },
+        );
+      });
+      await batch.commit();
+    }
+    await sendAccountDeletedEmail(email, role);
+    res.json({ message: "Account deleted successfully" });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message || "Could not delete account" });
+  }
+};
+
+export const requestLoginOTP = async (req: Request, res: Response) => {
+  try {
+    const email = String(req.body?.email || "").trim().toLowerCase();
+    if (!email) return res.status(400).json({ error: "Email is required" });
+
+    const userRecord = await auth.getUserByEmail(email);
+    if (!userRecord?.uid) {
+      return res.status(404).json({ error: "No account found for this email" });
+    }
+
+    const otp = generateOTP();
+    const otpKey = `login:${email}`;
+    const expiresAt = await storeOTP(otpKey, otp);
+    await sendOTPEmail(email, otp, userRecord.displayName || "User");
+
+    res.json({
+      message: "Login OTP sent successfully",
+      email,
+      expiresAt,
+      resendAfterSec: 60,
+    });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message || "Could not send login OTP" });
+  }
+};
+
+export const verifyLoginOTP = async (req: Request, res: Response) => {
+  try {
+    const email = String(req.body?.email || "").trim().toLowerCase();
+    const otp = String(req.body?.otp || "").trim();
+    if (!email || !otp) return res.status(400).json({ error: "Email and OTP are required" });
+
+    const otpKey = `login:${email}`;
+    const isValid = await verifyOTPService(otpKey, otp);
+    if (!isValid) {
+      return res.status(400).json({ error: "Invalid or expired OTP" });
+    }
+
+    const userRecord = await auth.getUserByEmail(email);
+    const customToken = await auth.createCustomToken(userRecord.uid);
+    const userDoc = await db.collection("users").doc(userRecord.uid).get();
+    const userData = userDoc.exists ? (userDoc.data() as any) : {};
+
+    res.json({
+      message: "Login successful",
+      token: customToken,
+      user: {
+        uid: userRecord.uid,
+        email: userRecord.email,
+        displayName: userRecord.displayName || userData?.displayName || "",
+        role: userData?.role || "customer",
+      },
+    });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message || "Could not verify login OTP" });
+  }
+};
+export const resendOTP = async (req: Request, res: Response) => {
+  try {
+    const email = String(req.body?.email || '').trim().toLowerCase();
+    if (!email) return res.status(400).json({ error: 'Email is required' });
+
+    const pendingDoc = await db.collection('pending_users').doc(email).get();
+    if (!pendingDoc.exists) {
+      return res.status(404).json({ error: 'No pending signup found for this email' });
+    }
+
+    const pending = pendingDoc.data() as any;
+    const otp = generateOTP();
+    const expiresAt = await storeOTP(email, otp);
+    await sendOTPEmail(email, otp, pending?.displayName || 'User');
+
+    res.json({
+      message: 'OTP resent successfully',
+      expiresAt,
+      resendAfterSec: 60,
+    });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const getMyProfile = async (req: Request, res: Response) => {
+  try {
+    const user = (req as any).user;
+    const userDoc = await db.collection('users').doc(user.uid).get();
+    if (!userDoc.exists) return res.status(404).json({ error: 'Profile not found' });
+    res.json({ id: userDoc.id, ...(userDoc.data() as any) });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const updateMyProfile = async (req: Request, res: Response) => {
+  try {
+    const user = (req as any).user;
+    const payload = req.body || {};
+    const allowedCommon = [
+      'displayName',
+      'name',
+      'phone',
+      'altPhone',
+      'address',
+      'addressLine1',
+      'addressLine2',
+      'city',
+      'state',
+      'pincode',
+      'landmark',
+      'gender',
+      'dateOfBirth',
+      'photoURL',
+    ];
+    const allowedSeller = [
+      'businessName',
+      'businessType',
+      'gstNumber',
+      'panNumber',
+      'bankName',
+      'accountHolderName',
+      'accountNumber',
+      'ifscCode',
+      'bio',
+      'panCardUrl',
+      'gstCertificateUrl',
+      'cancelledChequeUrl',
+      'storeSettings',
+      'notificationPreferences',
+      'vacationMode',
+      'autoRestock',
+      'orderNotifications',
+      'lowStockAlerts',
+      'customerMessages',
+      'weeklyReports',
+      'payoutPreference',
+      'upiId',
+    ];
+    const allowed = new Set([
+      ...allowedCommon,
+      ...(user.role === 'seller' ? allowedSeller : []),
+    ]);
+
+    const updates: Record<string, any> = {};
+    Object.keys(payload).forEach((key) => {
+      if (allowed.has(key)) updates[key] = payload[key];
+    });
+    updates.updatedAt = new Date().toISOString();
+
+    await db.collection('users').doc(user.uid).set(updates, { merge: true });
+    const updated = await db.collection('users').doc(user.uid).get();
+    res.json({ message: 'Profile updated', profile: { id: updated.id, ...(updated.data() as any) } });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};

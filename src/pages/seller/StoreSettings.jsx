@@ -1,0 +1,259 @@
+import React, { useEffect, useState } from "react";
+import { authApi } from "../../services/api";
+import { useToast } from "../../context/ToastContext";
+
+const defaultSettings = {
+  orderNotifications: true,
+  lowStockAlerts: true,
+  customerMessages: true,
+  weeklyReports: true,
+  vacationMode: false,
+  autoRestock: false,
+  payoutPreference: "bank_transfer",
+  upiId: "",
+};
+
+const StoreSettings = () => {
+  const { showToast } = useToast();
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [form, setForm] = useState(defaultSettings);
+
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      try {
+        const profile = await authApi.getProfile();
+        if (cancelled) return;
+        const notificationPreferences = profile?.notificationPreferences || {};
+        const storeSettings = profile?.storeSettings || {};
+        setForm({
+          orderNotifications:
+            notificationPreferences.orderNotifications ??
+            profile?.orderNotifications ??
+            defaultSettings.orderNotifications,
+          lowStockAlerts:
+            notificationPreferences.lowStockAlerts ??
+            profile?.lowStockAlerts ??
+            defaultSettings.lowStockAlerts,
+          customerMessages:
+            notificationPreferences.customerMessages ??
+            profile?.customerMessages ??
+            defaultSettings.customerMessages,
+          weeklyReports:
+            notificationPreferences.weeklyReports ??
+            profile?.weeklyReports ??
+            defaultSettings.weeklyReports,
+          vacationMode:
+            storeSettings.vacationMode ??
+            profile?.vacationMode ??
+            defaultSettings.vacationMode,
+          autoRestock:
+            storeSettings.autoRestock ??
+            profile?.autoRestock ??
+            defaultSettings.autoRestock,
+          payoutPreference:
+            storeSettings.payoutPreference ||
+            profile?.payoutPreference ||
+            defaultSettings.payoutPreference,
+          upiId: storeSettings.upiId || profile?.upiId || "",
+        });
+      } catch (e) {
+        showToast(e?.message || "Failed to load store settings", "error");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+    void load();
+    return () => {
+      cancelled = true;
+    };
+  }, [showToast]);
+
+  const handleToggle = (key) => {
+    setForm((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const handleSave = async () => {
+    if (form.payoutPreference === "upi" && form.upiId && !/^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}$/.test(form.upiId)) {
+      showToast("Please enter a valid UPI ID", "warning");
+      return;
+    }
+    setSaving(true);
+    try {
+      await authApi.updateProfile({
+        notificationPreferences: {
+          orderNotifications: form.orderNotifications,
+          lowStockAlerts: form.lowStockAlerts,
+          customerMessages: form.customerMessages,
+          weeklyReports: form.weeklyReports,
+        },
+        storeSettings: {
+          vacationMode: form.vacationMode,
+          autoRestock: form.autoRestock,
+          payoutPreference: form.payoutPreference,
+          upiId: form.payoutPreference === "upi" ? form.upiId : "",
+        },
+        orderNotifications: form.orderNotifications,
+        lowStockAlerts: form.lowStockAlerts,
+        customerMessages: form.customerMessages,
+        weeklyReports: form.weeklyReports,
+        vacationMode: form.vacationMode,
+        autoRestock: form.autoRestock,
+        payoutPreference: form.payoutPreference,
+        upiId: form.payoutPreference === "upi" ? form.upiId : "",
+      });
+      showToast("Store settings updated", "success");
+    } catch (e) {
+      showToast(e?.message || "Could not save settings", "error");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-[50vh] bg-gray-50 rounded-2xl border border-gray-100 flex items-center justify-center">
+        <p className="text-sm font-bold text-gray-500">Loading store settings...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-5xl mx-auto space-y-6">
+        <div>
+          <h1 className="text-4xl font-900 tracking-tighter italic text-zoop-obsidian uppercase">
+            Store_Settings
+          </h1>
+          <p className="text-gray-400 font-bold text-xs uppercase tracking-widest mt-1">
+            Configure operations, notifications, and payout preferences
+          </p>
+        </div>
+
+        <div className="bg-white rounded-3xl p-6 md:p-8 border border-gray-100 shadow-sm space-y-6">
+          <h2 className="text-xl font-black text-zoop-obsidian">Notifications</h2>
+          {[
+            { key: "orderNotifications", label: "Order Notifications", desc: "Get alerts for new and updated orders" },
+            { key: "lowStockAlerts", label: "Low Stock Alerts", desc: "Get notified when inventory is running low" },
+            { key: "customerMessages", label: "Customer Messages", desc: "Receive buyer message notifications" },
+            { key: "weeklyReports", label: "Weekly Reports", desc: "Receive weekly business reports via email" },
+          ].map((item) => (
+            <div key={item.key} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+              <div>
+                <p className="font-bold text-zoop-obsidian">{item.label}</p>
+                <p className="text-sm text-gray-500">{item.desc}</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={Boolean(form[item.key])}
+                  onChange={() => handleToggle(item.key)}
+                  className="sr-only peer"
+                />
+                <div className="w-14 h-7 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-zoop-moss" />
+              </label>
+            </div>
+          ))}
+        </div>
+
+        <div className="bg-white rounded-3xl p-6 md:p-8 border border-gray-100 shadow-sm space-y-6">
+          <h2 className="text-xl font-black text-zoop-obsidian">Operations</h2>
+          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+            <div>
+              <p className="font-bold text-zoop-obsidian">Vacation Mode</p>
+              <p className="text-sm text-gray-500">
+                Temporarily pause store operations for new orders
+              </p>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={form.vacationMode}
+                onChange={() => handleToggle("vacationMode")}
+                className="sr-only peer"
+              />
+              <div className="w-14 h-7 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-zoop-moss" />
+            </label>
+          </div>
+          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+            <div>
+              <p className="font-bold text-zoop-obsidian">Auto Restock Suggestions</p>
+              <p className="text-sm text-gray-500">
+                Suggest restock actions based on order trends
+              </p>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={form.autoRestock}
+                onChange={() => handleToggle("autoRestock")}
+                className="sr-only peer"
+              />
+              <div className="w-14 h-7 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-zoop-moss" />
+            </label>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-3xl p-6 md:p-8 border border-gray-100 shadow-sm space-y-6">
+          <h2 className="text-xl font-black text-zoop-obsidian">Payout Preference</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <button
+              type="button"
+              onClick={() => setForm((prev) => ({ ...prev, payoutPreference: "bank_transfer" }))}
+              className={`p-4 border rounded-xl text-left ${
+                form.payoutPreference === "bank_transfer"
+                  ? "border-zoop-moss bg-zoop-moss/10"
+                  : "border-gray-200 bg-white"
+              }`}
+            >
+              <p className="font-black text-zoop-obsidian">Bank Transfer</p>
+              <p className="text-sm text-gray-500 mt-1">
+                Default method, uses bank details from seller profile
+              </p>
+            </button>
+            <button
+              type="button"
+              onClick={() => setForm((prev) => ({ ...prev, payoutPreference: "upi" }))}
+              className={`p-4 border rounded-xl text-left ${
+                form.payoutPreference === "upi"
+                  ? "border-zoop-moss bg-zoop-moss/10"
+                  : "border-gray-200 bg-white"
+              }`}
+            >
+              <p className="font-black text-zoop-obsidian">UPI</p>
+              <p className="text-sm text-gray-500 mt-1">Use UPI ID for payout reference records</p>
+            </button>
+          </div>
+          {form.payoutPreference === "upi" && (
+            <div>
+              <label className="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">
+                UPI ID
+              </label>
+              <input
+                type="text"
+                value={form.upiId}
+                onChange={(e) => setForm((prev) => ({ ...prev, upiId: e.target.value }))}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-zoop-moss"
+                placeholder="example@upi"
+              />
+            </div>
+          )}
+        </div>
+
+        <div className="flex justify-end">
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={saving}
+            className="px-8 py-3 rounded-xl bg-zoop-obsidian text-white font-black text-xs uppercase tracking-widest hover:bg-zoop-moss hover:text-zoop-obsidian transition-all disabled:opacity-70"
+          >
+            {saving ? "Saving..." : "Save Store Settings"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default StoreSettings;

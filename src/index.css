@@ -1,0 +1,60 @@
+@import "tailwindcss";
+
+* {
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: #c9c9c9 #f3f3f3;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 0px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #f3f3f3;
+  border-radius: 10px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #c9c9c9;
+  border-radius: 10px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+/* 1. THEME VARIABLES (Only Variables Here) */
+@theme {
+  --color-zoop-obsidian: #1a1a1a;
+  --color-zoop-ink: #2d2d2d;
+  --color-zoop-moss: #a3e635;
+  --color-zoop-clay: #e6d6cc;
+  --color-zoop-copper: #a65e46;
+  --color-zoop-canvas: #fbf9f7;
+
+  --radius-zoop: 16px;
+  --font-900: 900;
+}
+
+/* 3. OPTIONAL: BASE STYLES */
+body {
+  @apply bg-zoop-canvas text-zoop-obsidian;
+  font-family: "Plus Jakarta Sans", sans-serif; /* If you installed it */
+}
+
+/* Toast Animations */
+@keyframes slide-in {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in {
+  animation: slide-in 0.3s ease-out;
+}
