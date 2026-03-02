@@ -9,6 +9,6 @@
     "skipLibCheck": true,
     "outDir": "./dist",
     "types": ["node"]           /* આ લાઈન ઉમેરો - process એરર માટે */
-  },
+  },  
   "include": ["src/**/*", "../../shared/**/*"]
 }
