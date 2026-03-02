@@ -2,55 +2,37 @@ import * as admin from 'firebase-admin';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
 
-// Ensure env vars are loaded before we try to use them
+// Load env vars first
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
-const fs = require('fs');
+// ─── Firebase Credential Resolution ──────────────────────────────────────────
+// Priority 1: FIREBASE_SERVICE_ACCOUNT  – full service-account JSON as a string
+// Priority 2: Individual env vars       – FIREBASE_PROJECT_ID + CLIENT_EMAIL + PRIVATE_KEY
+// No file-system lookups so this works identically on Render and locally.
 
-// Find service account file dynamically
-const projectRoot = path.resolve(__dirname, '../../');
-const files = fs.readdirSync(projectRoot);
-const serviceAccountFile = files.find((file: string) => file.endsWith('.json') && file.includes('firebase-adminsdk'));
+let credential: admin.credential.Credential;
 
-let credential;
 try {
-  const projectIdFromEnv = process.env.FIREBASE_PROJECT_ID || '';
-  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL || '';
-  const privateKey = process.env.FIREBASE_PRIVATE_KEY
-    ? process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n')
-    : '';
-  const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT_JSON || '';
+  const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT || '';
+  const projectId          = process.env.FIREBASE_PROJECT_ID      || '';
+  const clientEmail        = process.env.FIREBASE_CLIENT_EMAIL    || '';
+  const privateKey         = (process.env.FIREBASE_PRIVATE_KEY    || '').replace(/\\n/g, '\n');
 
   if (serviceAccountJson) {
+    // Full JSON blob stored as env var (recommended for Render)
     const parsed = JSON.parse(serviceAccountJson);
     credential = admin.credential.cert(parsed as admin.ServiceAccount);
-  } else if (clientEmail && privateKey && projectIdFromEnv) {
-    credential = admin.credential.cert({
-      projectId: projectIdFromEnv,
-      clientEmail,
-      privateKey,
-    } as admin.ServiceAccount);
-  }
-
-  let serviceAccountPath;
-  if (!credential && serviceAccountFile) {
-    serviceAccountPath = path.join(projectRoot, serviceAccountFile);
-    console.log(`Loading Firebase credentials from: ${serviceAccountFile}`);
+    console.log('🔑 Firebase: using FIREBASE_SERVICE_ACCOUNT env var');
+  } else if (projectId && clientEmail && privateKey) {
+    // Individual credential fields
+    credential = admin.credential.cert({ projectId, clientEmail, privateKey } as admin.ServiceAccount);
+    console.log('🔑 Firebase: using individual credential env vars');
   } else {
-    serviceAccountPath = path.join(projectRoot, 'service-account.json');
-    if (!credential && fs.existsSync(serviceAccountPath)) {
-      console.log('Loading Firebase credentials from service-account.json');
-    } else {
-       console.log('No service account file found, falling back to application default credentials');
-       serviceAccountPath = null;
-    }
-  }
-
-  if (!credential && serviceAccountPath) {
-    const serviceAccount = require(serviceAccountPath);
-    credential = admin.credential.cert(serviceAccount);
-  } else if (!credential) {
-    credential = admin.credential.applicationDefault();
+    throw new Error(
+      'Firebase credentials not configured. ' +
+      'Set FIREBASE_SERVICE_ACCOUNT (full JSON string) ' +
+      'or FIREBASE_PROJECT_ID + FIREBASE_CLIENT_EMAIL + FIREBASE_PRIVATE_KEY.'
+    );
   }
 
   if (admin.apps.length === 0) {
@@ -59,15 +41,14 @@ try {
       projectId: process.env.FIREBASE_PROJECT_ID,
       storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
     });
-    console.log('Firebase Admin Initialized Successfully');
+    console.log('✅ Firebase Admin Initialized Successfully');
   }
 } catch (error) {
-  console.error('Firebase Admin Initialization Failed:', error);
-  process.exit(1); // Exit if critical failure
+  console.error('❌ Firebase Admin Initialization Failed:', error);
+  process.exit(1);
 }
 
 export const db = admin.firestore();
 db.settings({ ignoreUndefinedProperties: true });
-export const auth = admin.auth();
+export const auth    = admin.auth();
 export const storage = admin.storage();
-
