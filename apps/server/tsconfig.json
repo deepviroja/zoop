@@ -8,9 +8,9 @@
     "noImplicitAny": false,
     "skipLibCheck": true,
     "outDir": "./dist",
-    "rootDir": "src",              /* આ લાઈન ઉમેરો: આનાથી dist માં src ફોલ્ડર નહીં બને, સીધી ફાઈલો આવશે */
-    "baseUrl": ".",                /* પ્રોજેક્ટનો રૂટ પાથ સેટ કરવા માટે */
-    "types": ["node"]
+    "baseUrl": ".",
+    "types": ["node"],
+    "rootDirs": ["src", "../../shared"] 
   },
   "include": ["src/**/*", "../../shared/**/*"]
 }
