@@ -5,10 +5,12 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "noImplicitAny": false,     /* આ લાઈન ઉમેરો - any ટાઇપની એરર બંધ થશે */
+    "noImplicitAny": false,
     "skipLibCheck": true,
     "outDir": "./dist",
-    "types": ["node"]           /* આ લાઈન ઉમેરો - process એરર માટે */
-  },  
+    "rootDir": "src",              /* આ લાઈન ઉમેરો: આનાથી dist માં src ફોલ્ડર નહીં બને, સીધી ફાઈલો આવશે */
+    "baseUrl": ".",                /* પ્રોજેક્ટનો રૂટ પાથ સેટ કરવા માટે */
+    "types": ["node"]
+  },
   "include": ["src/**/*", "../../shared/**/*"]
 }

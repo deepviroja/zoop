@@ -15,21 +15,26 @@ dotenv.config();
 
 const app = express();
 
+// Security Headers
 app.use(helmet());
-const allowedOrigins = new Set(
-  [
-    'https://zoop-88df6.web.app',
-    'http://localhost:5173',
-    process.env.FRONTEND_URL || '',
-    ...(String(process.env.ALLOWED_ORIGINS || '')
-      .split(',')
-      .map((v) => v.trim())
-      .filter(Boolean)),
-  ].filter(Boolean),
-);
+
+// Dynamic CORS Configuration
+const allowedOrigins = new Set([
+  'https://zoop-88df6.web.app',
+  'http://localhost:5173',
+  process.env.FRONTEND_URL || '',
+  ...(String(process.env.ALLOWED_ORIGINS || '')
+    .split(',')
+    .map((v) => v.trim())
+    .filter(Boolean)),
+].filter(Boolean));
+
 const corsOptions: CorsOptions = {
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.has(origin)) return callback(null, true);
+    // allow requests with no origin (like mobile apps or curl requests)
+    if (!origin || allowedOrigins.has(origin)) {
+      return callback(null, true);
+    }
     return callback(new Error(`CORS blocked for origin: ${origin}`));
   },
   credentials: true,
@@ -37,19 +42,18 @@ const corsOptions: CorsOptions = {
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   optionsSuccessStatus: 204,
 };
+
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
-app.use((_req, res, next) => {
-  res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
-  next();
-});
+
+// Logging and Parsing
 app.use(morgan('dev'));
 app.use(express.json({ limit: '10mb' }));
 
 // ─── Routes ──────────────────────────────────────────────────────────────────
 app.use('/api', (req, res, next) => {
-  if (req.path === '/') return res.json({ message: 'Zoop API v2', status: 'running' });
+  if (req.path === '/' || req.path === '') {
+    return res.json({ message: 'Zoop API v2', status: 'running' });
+  }
   next();
 });
 
@@ -59,27 +63,37 @@ app.use('/api/commerce', commerceRoutes);
 app.use('/api/upload',   uploadRoutes);
 app.use('/api/content',  contentRoutes);
 
-// Health check
+// Health checks for Render
 app.get('/', (_req, res) => res.send('Zoop API v2 is running ✅'));
-app.get('/health', (_req, res) => res.json({ status: 'ok', timestamp: new Date().toISOString() }));
+app.get('/health', (_req, res) => res.json({ 
+  status: 'ok', 
+  timestamp: new Date().toISOString(),
+  env: process.env.NODE_ENV 
+}));
 
 // 404 handler
 app.use((_req, res) => res.status(404).json({ error: 'Route not found' }));
 
-// Error handler
+// Global Error handler
 app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error('Unhandled error:', err);
-  res.status(500).json({ error: 'Internal server error' });
+  res.status(err.status || 500).json({ 
+    error: err.message || 'Internal server error' 
+  });
 });
 
+// Render dynamic port binding
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, async () => {
-  console.log(`🚀 Zoop Server running on port ${PORT}`);
-  // Seed content data on startup (no-op if already seeded)
+// Important: Listen on '0.0.0.0' for Render to detect the port
+app.listen(Number(PORT), '0.0.0.0', async () => {
+  console.log(`🚀 Zoop Server running on http://0.0.0.0:${PORT}`);
+  
+  // Seed content data on startup
   try {
     await seedContentData();
+    console.log('✅ Content seeding completed');
   } catch (err) {
-    console.error('⚠️  Content seeding failed (non-fatal):', err);
+    console.error('⚠️ Content seeding failed (non-fatal):', err);
   }
 });
