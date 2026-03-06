@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: zoop-api
+    env: node
+    rootDir: apps/server
+    buildCommand: npm install && npm run build
+    startCommand: npm start

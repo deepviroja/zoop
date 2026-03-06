@@ -210,7 +210,7 @@ const Home = () => {
   }
 
   return (
-    <div className="max-w-[1400px] mx-auto px-3 py-4 md:p-4 space-y-8">
+    <div className="max-w-[1400px] mx-auto px-3 py-4 md:p-4 space-y-6 md:space-y-8 overflow-x-hidden">
       <Seo
         title="Zoop | Same-Day Local Shopping Across India"
         description="Shop local-first products, same-day city delivery, trending collections, and curated categories on Zoop."
@@ -229,7 +229,7 @@ const Home = () => {
         }}
       />
       {/* HERO SLIDER */}
-      <section className="relative group min-h-[520px] sm:min-h-[600px] md:h-[700px] w-full rounded-3xl overflow-hidden shadow-2xl">
+      <section className="relative group min-h-[460px] sm:min-h-[560px] md:h-[700px] w-full rounded-[1.75rem] md:rounded-3xl overflow-hidden shadow-2xl">
         {/* Background */}
         <div className="absolute inset-0 bg-gradient-to-br from-zoop-obsidian via-zoop-ink to-black">
           <div
@@ -275,11 +275,11 @@ const Home = () => {
 
         {/* Overlay Content */}
         <div className="absolute inset-0 z-20 flex items-center">
-          <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-12">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
-              <div className="space-y-4 md:space-y-6 text-white">
+          <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-12 py-8 md:py-0">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 items-center">
+              <div className="space-y-4 md:space-y-6 text-white max-w-2xl">
                 {/* Live badge */}
-                <div className="inline-flex items-center gap-2 bg-zoop-moss/20 backdrop-blur-xl border border-zoop-moss/30 rounded-full px-4 py-2">
+                <div className="inline-flex max-w-full items-center gap-2 bg-zoop-moss/20 backdrop-blur-xl border border-zoop-moss/30 rounded-full px-3 py-2 sm:px-4">
                   <div className="relative flex h-3 w-3">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-zoop-moss opacity-75" />
                     <span className="relative inline-flex rounded-full h-full w-full bg-zoop-moss" />
@@ -296,19 +296,19 @@ const Home = () => {
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    <h1 className="text-4xl sm:text-5xl md:text-8xl font-black tracking-tighter leading-none">
+                    <h1 className="text-3xl sm:text-5xl md:text-8xl font-black tracking-tighter leading-[0.95]">
                       <span className="block text-white">ZOOP</span>
                         <span className="text-zoop-moss italic">
                         {activeSlide.city || localCity}
                       </span>
                     </h1>
-                    <p className="text-base sm:text-xl md:text-3xl font-bold text-white/90 max-w-xl leading-tight">
+                    <p className="text-sm sm:text-xl md:text-3xl font-bold text-white/90 max-w-xl leading-tight">
                       {activeSlide.title || "Discover Local Gems"}
                     </p>
                   </div>
                 )}
 
-                <p className="hidden sm:block text-sm md:text-lg text-white/70 max-w-md leading-relaxed">
+                <p className="text-xs sm:text-sm md:text-lg text-white/70 max-w-md leading-relaxed">
                   {activeSlide.desc ||
                       "Curated by local experts and national stylists"}
                 </p>
@@ -336,7 +336,7 @@ const Home = () => {
                 </div>
 
                 {/* Quick Stats */}
-                <div className="flex gap-4 md:gap-8 pt-4 border-t border-white/10">
+                <div className="flex flex-wrap gap-x-4 gap-y-3 md:gap-8 pt-4 border-t border-white/10">
                   <div>
                     <p className="text-xl md:text-3xl font-black text-zoop-moss">
                       4-6hrs
@@ -406,13 +406,13 @@ const Home = () => {
           <>
             <button
               onClick={prevSlide}
-              className="absolute left-6 top-1/2 -translate-y-1/2 z-30 bg-white/10 backdrop-blur-xl p-3 rounded-full text-white opacity-0 group-hover:opacity-100 hover:bg-white/20 transition-all border border-white/20"
+              className="absolute left-3 top-1/2 -translate-y-1/2 z-30 hidden md:flex bg-white/10 backdrop-blur-xl p-3 rounded-full text-white opacity-0 group-hover:opacity-100 hover:bg-white/20 transition-all border border-white/20"
             >
               <ChevronLeft stroke="#fff" width={24} height={24} />
             </button>
             <button
               onClick={nextSlide}
-              className="absolute right-6 top-1/2 -translate-y-1/2 z-30 bg-white/10 backdrop-blur-xl p-3 rounded-full text-white opacity-0 group-hover:opacity-100 hover:bg-white/20 transition-all border border-white/20"
+              className="absolute right-3 top-1/2 -translate-y-1/2 z-30 hidden md:flex bg-white/10 backdrop-blur-xl p-3 rounded-full text-white opacity-0 group-hover:opacity-100 hover:bg-white/20 transition-all border border-white/20"
             >
               <ChevronRight stroke="#fff" width={24} height={24} />
             </button>

@@ -2,9 +2,9 @@
   "name": "@zoop/server",
   "version": "1.0.0",
   "description": "Zoop API Server",
-  "main": "dist/index.js",
+  "main": "dist/apps/server/src/index.js",
   "scripts": {
-    "start": "node dist/index.js",
+    "start": "node dist/apps/server/src/index.js",
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "build": "tsc"
   },

@@ -22,6 +22,8 @@ import Loader from "../../components/ui/Loader";
 import { OTPInput } from "../../components/auth/OTPInput";
 import Seo from "../../components/shared/Seo";
 import { sendFirebasePhoneOtp, resetPhoneRecaptcha } from "../../utils/firebasePhoneAuth";
+import CountryPhoneField from "../../components/common/CountryPhoneField";
+import { isValidInternationalPhone } from "../../utils/liveValidation";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -47,6 +49,8 @@ const Login = () => {
   const [otpChannel, setOtpChannel] = useState("email");
   const [otpRecipient, setOtpRecipient] = useState("");
   const [phoneConfirmation, setPhoneConfirmation] = useState(null);
+  const [phoneValue, setPhoneValue] = useState("");
+  const [phoneMeta, setPhoneMeta] = useState({ dialCode: "91", countryCode: "in", format: "" });
 
   useEffect(() => {
     if (!(loginMode === "otp" && otpStep)) return;
@@ -134,19 +138,42 @@ const Login = () => {
     }
   };
 
+  const validateOtpEntry = () => {
+    const nextErrors = {};
+    if (!validateEmail(formData.email)) {
+      nextErrors.email = "Please enter your account email address";
+    }
+    if (otpChannel === "phone") {
+      if (!phoneValue) {
+        nextErrors.phone = "Please enter your registered mobile number";
+      } else if (!isValidInternationalPhone(phoneValue, phoneMeta)) {
+        nextErrors.phone = "Please enter a valid mobile number";
+      }
+    }
+    setErrors((prev) => ({ ...prev, ...nextErrors }));
+    return Object.keys(nextErrors).length === 0;
+  };
+
   const handleRequestOTP = async () => {
     setGeneralError("");
     setSuccessMsg("");
-    if (!validateEmail(formData.email)) {
-      setErrors((prev) => ({ ...prev, email: "Please enter a valid email address" }));
+    if (!validateOtpEntry()) {
       return;
     }
     setLoading(true);
     try {
       const response = await authApi.requestLoginOTP(formData.email, otpChannel);
       setOtpRecipient(response?.otpRecipient || formData.email);
+      if (
+        otpChannel === "phone" &&
+        phoneValue &&
+        response?.otpRecipient &&
+        response.otpRecipient !== phoneValue
+      ) {
+        throw new Error("This mobile number does not match the selected account.");
+      }
       if (otpChannel === "phone") {
-        const confirmation = await sendFirebasePhoneOtp(response?.otpRecipient || "");
+        const confirmation = await sendFirebasePhoneOtp(response?.otpRecipient || phoneValue);
         setPhoneConfirmation(confirmation);
         setOtpExpiresAt(new Date(Date.now() + 5 * 60 * 1000).toISOString());
         setResendAvailableAt(new Date(Date.now() + 60 * 1000).toISOString());
@@ -296,7 +323,7 @@ const Login = () => {
           <div className="relative flex items-center justify-center mb-6">
             <div className="absolute inset-0 bg-gray-200 h-px w-full top-1/2" />
             <span className="relative bg-white px-4 text-xs font-bold text-gray-400 uppercase tracking-widest">
-              Or login with email
+              Or login with Zoop
             </span>
           </div>
 
@@ -325,7 +352,7 @@ const Login = () => {
                   loginMode === "otp" ? "bg-white text-zoop-obsidian shadow-sm" : "text-gray-500"
                 }`}
               >
-                Email OTP
+                OTP Login
               </button>
             </div>
 
@@ -415,9 +442,32 @@ const Login = () => {
             {loginMode === "otp" && (
               <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
                 <div className="mb-3 grid grid-cols-2 gap-2 rounded-xl bg-white p-1">
-                  <button type="button" onClick={() => setOtpChannel("email")} className={`rounded-lg py-2 text-xs font-black uppercase ${otpChannel === "email" ? "bg-zoop-obsidian text-white" : "text-gray-500"}`}>Email OTP</button>
-                  <button type="button" onClick={() => setOtpChannel("phone")} className={`rounded-lg py-2 text-xs font-black uppercase ${otpChannel === "phone" ? "bg-zoop-obsidian text-white" : "text-gray-500"}`}>Mobile OTP</button>
+                  <button type="button" onClick={() => { setOtpChannel("email"); setOtpStep(false); setPhoneConfirmation(null); setErrors((prev) => ({ ...prev, phone: "" })); }} className={`rounded-lg py-2 text-xs font-black uppercase ${otpChannel === "email" ? "bg-zoop-obsidian text-white" : "text-gray-500"}`}>Email OTP</button>
+                  <button type="button" onClick={() => { setOtpChannel("phone"); setOtpStep(false); }} className={`rounded-lg py-2 text-xs font-black uppercase ${otpChannel === "phone" ? "bg-zoop-obsidian text-white" : "text-gray-500"}`}>Mobile OTP</button>
                 </div>
+                {otpChannel === "phone" && (
+                  <div className="mb-3">
+                    <CountryPhoneField
+                      label="Registered Mobile Number"
+                      value={phoneValue}
+                      onChange={(value, countryData) => {
+                        setPhoneValue(value);
+                        setPhoneMeta(countryData || phoneMeta);
+                        setErrors((prev) => ({
+                          ...prev,
+                          phone:
+                            value && !isValidInternationalPhone(value, countryData || phoneMeta)
+                              ? "Please enter a valid mobile number"
+                              : "",
+                        }));
+                        setGeneralError("");
+                      }}
+                      onMetaChange={(meta) => setPhoneMeta(meta || phoneMeta)}
+                      error={errors.phone}
+                      defaultCountry="in"
+                    />
+                  </div>
+                )}
                 {otpStep ? (
                   <>
                     <p className="text-sm font-bold text-zoop-obsidian mb-3">Enter the OTP sent to your {otpChannel === "phone" ? "phone number" : "email"}</p>
@@ -443,7 +493,7 @@ const Login = () => {
                     </p>
                     {otpChannel === "phone" && (
                       <p className="text-xs text-gray-500">
-                        Phone OTP requires Firebase Phone Authentication to be enabled for this domain.
+                        Use the email of the same account and its registered mobile number. Phone OTP requires Firebase Phone Authentication on this domain.
                       </p>
                     )}
                   </div>
@@ -487,7 +537,7 @@ const Login = () => {
                     : "bg-zoop-obsidian hover:bg-zoop-moss hover:text-zoop-obsidian"
                 }`}
               >
-                {otpStep ? "Submit OTP" : loading ? "Sending OTP..." : "Send OTP"}
+                {loading ? "Sending OTP..." : otpStep ? "Resend / Continue" : "Send OTP"}
               </button>
             )}
 

@@ -36,24 +36,29 @@ const ProductFilterSidebar = ({
   return (
     <aside
       className={`
-      lg:block lg:w-64 flex-shrink-0
+      lg:block lg:w-72 flex-shrink-0
       ${
         showFilters
-          ? "fixed inset-0 z-[100] bg-white lg:relative lg:z-0 lg:bg-transparent"
+          ? "fixed inset-0 z-[100] bg-black/45 backdrop-blur-[2px] lg:relative lg:z-0 lg:bg-transparent lg:backdrop-blur-none"
           : "hidden"
       }
     `}
     >
       <div
         ref={sidebarRef}
-        className={`lg:sticky bg-white lg:bg-white/80 lg:backdrop-blur-xl rounded-2xl p-6 shadow-sm h-full lg:h-[calc(100vh-8rem)] overflow-y-auto custom-scrollbar transition-[top] duration-300 ${
+        className={`ml-auto flex h-full w-full max-w-[24rem] flex-col bg-white px-4 pb-0 pt-4 shadow-xl lg:sticky lg:max-w-none lg:rounded-[1.75rem] lg:border lg:border-[#e7dfd4] lg:bg-white/88 lg:px-5 lg:pb-5 lg:pt-5 lg:shadow-[0_18px_42px_rgba(41,32,18,0.08)] lg:backdrop-blur-xl lg:h-[calc(100vh-8rem)] lg:overflow-y-auto custom-scrollbar transition-[top] duration-300 ${
           headerVisible ? "lg:top-40" : "lg:top-24"
         }`}
       >
         {/* Mobile Header */}
-        <div className="lg:hidden flex justify-between items-center mb-6">
-          <h2 className="text-xl font-black text-zoop-obsidian">Filters</h2>
-          <button onClick={() => setShowFilters(false)}>
+        <div className="lg:hidden flex justify-between items-center border-b border-gray-100 pb-4 mb-4">
+          <div>
+            <h2 className="text-xl font-black text-zoop-obsidian">Filters</h2>
+            <p className="text-xs font-medium text-gray-500">
+              Refine products without leaving the page
+            </p>
+          </div>
+          <button onClick={() => setShowFilters(false)} className="rounded-full border border-gray-200 p-2">
             <X width={24} height={24} />
           </button>
         </div>
@@ -73,7 +78,7 @@ const ProductFilterSidebar = ({
           )}
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-6 overflow-y-auto pb-6 lg:pb-0">
           {/* Category Filter - Collapsible */}
           <div>
             <button
@@ -372,10 +377,18 @@ const ProductFilterSidebar = ({
         </div>
 
         {/* Mobile Apply Button */}
-        <div className="lg:hidden sticky bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-100 mt-6">
+        <div className="lg:hidden sticky bottom-0 left-0 right-0 -mx-4 mt-auto border-t border-gray-100 bg-white px-4 py-4">
+          <div className="mb-3 flex items-center justify-between text-xs font-bold uppercase tracking-[0.18em] text-gray-500">
+            <span>{activeFiltersCount} active filters</span>
+            {activeFiltersCount > 0 && (
+              <button onClick={clearAllFilters} className="text-red-500">
+                Clear all
+              </button>
+            )}
+          </div>
           <button
             onClick={() => setShowFilters(false)}
-            className="w-full bg-zoop-moss text-zoop-obsidian py-3 rounded-xl font-black"
+            className="w-full rounded-xl bg-zoop-moss py-3 font-black text-zoop-obsidian"
           >
             Show Results
           </button>
