@@ -8,13 +8,13 @@ import { useToast } from "../../context/ToastContext";
 import { authApi, contentApi, ordersApi } from "../../services/api";
 import CountryPhoneField from "../../components/common/CountryPhoneField";
 import CountryStateCityFieldset from "../../components/common/CountryStateCityFieldset";
-import { Country, State } from "country-state-city";
 import {
   isValidEmail,
   isValidInternationalPhone,
   isValidPincode,
   getPincodeValidationMessage,
 } from "../../utils/liveValidation";
+import { getCountryByCode, getStateByCodeAndCountry, getStatesOfCountry } from "../../utils/locationData";
 
 const RAZORPAY_CHECKOUT_SRC = "https://checkout.razorpay.com/v1/checkout.js";
 
@@ -64,6 +64,8 @@ const Checkout = () => {
   const [blockedItems, setBlockedItems] = useState([]);
   const [showBlockedPopup, setShowBlockedPopup] = useState(false);
   const [notifySubmitting, setNotifySubmitting] = useState(false);
+  const [offers, setOffers] = useState([]);
+  const [selectedOfferId, setSelectedOfferId] = useState("");
 
   React.useEffect(() => {
     let cancelled = false;
@@ -83,7 +85,7 @@ const Checkout = () => {
           landmark: profile.landmark || prev.landmark,
         }));
         if (profile?.state) {
-          const states = State.getStatesOfCountry("IN");
+          const states = getStatesOfCountry("IN");
           const matchedState = states.find(
             (item) => item.name.toLowerCase() === String(profile.state || "").toLowerCase(),
           );
@@ -100,6 +102,21 @@ const Checkout = () => {
       cancelled = true;
     };
   }, [user]);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    contentApi
+      .getOffers()
+      .then((items) => {
+        if (!cancelled) setOffers(Array.isArray(items) ? items : []);
+      })
+      .catch(() => {
+        if (!cancelled) setOffers([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // Redirect if cart is empty
   React.useEffect(() => {
@@ -219,7 +236,21 @@ const Checkout = () => {
   const subtotal = getCartTotal();
   const shipping = cartItems.some((item) => item.type === "National") ? 150 : 0;
   const tax = Math.round(subtotal * 0.05);
-  const currentTotal = subtotal + shipping + tax;
+  const selectedOffer = offers.find((offer) => offer.id === selectedOfferId) || null;
+  const selectedOfferDiscount = React.useMemo(() => {
+    if (!selectedOffer) return 0;
+    if (subtotal < Number(selectedOffer.minOrderAmount || 0)) return 0;
+    const baseAmount = selectedOffer.scope === "shipping" ? shipping : subtotal;
+    const rawDiscount =
+      selectedOffer.discountType === "flat"
+        ? Number(selectedOffer.discountValue || 0)
+        : Math.round((baseAmount * Number(selectedOffer.discountValue || 0)) / 100);
+    const capped = selectedOffer.maxDiscountAmount
+      ? Math.min(rawDiscount, Number(selectedOffer.maxDiscountAmount || 0))
+      : rawDiscount;
+    return Math.max(0, Math.min(baseAmount, capped));
+  }, [selectedOffer, shipping, subtotal]);
+  const currentTotal = Math.max(0, subtotal + shipping + tax - selectedOfferDiscount);
 
   const handlePlaceOrder = async () => {
     const validation = validateStep(2);
@@ -248,6 +279,15 @@ const Checkout = () => {
           phone: formData.phone,
         },
         paymentMethod: formData.paymentMethod || "cod",
+        appliedOffer: selectedOffer
+          ? {
+              id: selectedOffer.id,
+              code: selectedOffer.code || "",
+              title: selectedOffer.title,
+              discountAmount: selectedOfferDiscount,
+              scope: selectedOffer.scope || "order",
+            }
+          : undefined,
       };
 
       let response;
@@ -533,7 +573,7 @@ const Checkout = () => {
                         city: formErrors.city,
                       }}
                       onCountryChange={(countryCode) => {
-                        const country = Country.getCountryByCode(countryCode);
+                        const country = getCountryByCode(countryCode);
                         setFormData((prev) => ({
                           ...prev,
                           countryCode,
@@ -550,7 +590,7 @@ const Checkout = () => {
                         }));
                       }}
                       onStateChange={(stateCode) => {
-                        const selected = State.getStateByCodeAndCountry(
+                        const selected = getStateByCodeAndCountry(
                           stateCode,
                           formData.countryCode,
                         );
@@ -775,7 +815,7 @@ const Checkout = () => {
 
           {/* Right: Order Summary */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl p-6 shadow-sm sticky top-24">
+            <div className="bg-white rounded-2xl p-6 shadow-sm lg:sticky lg:top-24">
               <h3 className="font-900 text-lg text-zoop-obsidian mb-4">
                 Order Summary
               </h3>
@@ -800,6 +840,68 @@ const Checkout = () => {
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Tax (5%)</span>
                   <span className="font-bold">₹{tax}</span>
+                </div>
+                {selectedOfferDiscount > 0 && (
+                  <div className="flex justify-between text-sm text-green-700">
+                    <span>{selectedOffer?.title || "Offer"} discount</span>
+                    <span className="font-bold">-₹{selectedOfferDiscount.toLocaleString()}</span>
+                  </div>
+                )}
+              </div>
+
+              <div className="mt-4 rounded-xl border border-gray-200 bg-gray-50 p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-black text-zoop-obsidian">Offers & Coupons</p>
+                    <p className="text-xs text-gray-500">Choose any active order or shipping discount.</p>
+                  </div>
+                  {selectedOfferId && (
+                    <button
+                      type="button"
+                      onClick={() => setSelectedOfferId("")}
+                      className="text-xs font-bold text-gray-500 hover:text-gray-700"
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
+                <div className="mt-3 space-y-2">
+                  {offers.length === 0 ? (
+                    <p className="text-xs text-gray-500">No offers available right now.</p>
+                  ) : (
+                    offers.map((offer) => {
+                      const disabled = subtotal < Number(offer.minOrderAmount || 0);
+                      return (
+                        <label
+                          key={offer.id}
+                          className={`flex cursor-pointer items-start gap-3 rounded-xl border px-3 py-3 ${
+                            selectedOfferId === offer.id
+                              ? "border-zoop-moss bg-zoop-moss/10"
+                              : "border-gray-200 bg-white"
+                          } ${disabled ? "opacity-50" : ""}`}
+                        >
+                          <input
+                            type="radio"
+                            name="selectedOffer"
+                            checked={selectedOfferId === offer.id}
+                            disabled={disabled}
+                            onChange={() => setSelectedOfferId(offer.id)}
+                            className="mt-1"
+                          />
+                          <div className="flex-1">
+                            <p className="text-sm font-black text-zoop-obsidian">
+                              {offer.title} {offer.code ? `(${offer.code})` : ""}
+                            </p>
+                            <p className="text-xs text-gray-500">{offer.description}</p>
+                            <p className="mt-1 text-[11px] font-bold uppercase tracking-wider text-[#8b5e3c]">
+                              {offer.discountType === "flat" ? `Flat ₹${offer.discountValue}` : `${offer.discountValue}% off`} on {offer.scope || "order"}
+                              {offer.minOrderAmount ? ` • Min ₹${offer.minOrderAmount}` : ""}
+                            </p>
+                          </div>
+                        </label>
+                      );
+                    })
+                  )}
                 </div>
               </div>
 

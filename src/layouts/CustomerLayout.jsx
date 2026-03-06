@@ -793,7 +793,7 @@ const CustomerLayout = () => {
         )}
       </header>
       {/* --- SUB NAV --- */}
-      <nav className="bg-white border-b border-gray-200 shadow-sm top-[94px] md:top-[70px] z-30">
+      <nav className="bg-white border-b border-gray-200 shadow-sm z-30">
         <div className="max-w-[1400px] mx-auto px-4 py-3">
           <div className="flex gap-4 md:gap-8 items-center overflow-x-auto whitespace-nowrap no-scrollbar text-sm">
             <NavLink
@@ -905,6 +905,9 @@ const CustomerLayout = () => {
               </Link>
               <p className="text-white/40 text-xs mt-4">
                 The bridge between local craftsmanship and global standards.
+              </p>
+              <p className="mt-3 text-[11px] leading-relaxed text-white/50">
+                Demo storefront only. Prices, offers, stock, payments, and deliveries shown here are for demonstration and testing.
               </p>
             </div>
 

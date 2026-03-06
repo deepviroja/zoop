@@ -11,6 +11,7 @@ import { SearchIcon } from "../../assets/icons/SearchIcon";
 import { X } from "../../assets/icons/X";
 import AdBanner from "../../components/shared/AdBanner";
 import Pagination from "../../components/shared/Pagination";
+import Seo from "../../components/shared/Seo";
 
 const CategoryPage = () => {
   const { categoryName } = useParams();
@@ -89,6 +90,18 @@ const CategoryPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Seo
+        title={`${category.name} | Zoop Category`}
+        description={`Browse ${category.name} products on Zoop with curated listings, filters, and fast delivery options.`}
+        keywords={`${category.name}, Zoop ${category.name}, buy ${category.name} online`}
+        canonicalPath={`/category/${categoryName}`}
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          name: `${category.name} on Zoop`,
+          description: `Browse ${category.name} products on Zoop.`,
+        }}
+      />
       {/* Hero Banner */}
       <div className="relative h-[350px] md:h-[450px] bg-zoop-obsidian w-full overflow-hidden flex items-center justify-center">
         {/* Abstract Typographic Background */}

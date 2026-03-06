@@ -12,7 +12,6 @@ const AdminWebsiteControl = () => {
     brandFontWeight: "900",
     announcementBanner: "",
     subNavCategories: "",
-    maintenanceMode: false,
     homeSameDayCutoffText: "Order before 6 PM for same-day delivery",
     homeHeroHeadline: "Discover Local Gems",
   });
@@ -51,7 +50,6 @@ const AdminWebsiteControl = () => {
           .split(",")
           .map((v) => v.trim())
           .filter(Boolean),
-        maintenanceMode: !!config.maintenanceMode,
       });
       alert("Website controls published.");
     } catch (e) {
@@ -185,24 +183,6 @@ const AdminWebsiteControl = () => {
               className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-zoop-moss outline-none"
               placeholder="Electronics, Fashion, Handmade, Home"
             />
-          </div>
-
-          <div className="p-4 border border-amber-200 bg-amber-50 rounded-xl">
-            <label className="inline-flex items-center gap-3">
-              <input
-                type="checkbox"
-                checked={!!config.maintenanceMode}
-                onChange={(e) =>
-                  setConfig((prev) => ({ ...prev, maintenanceMode: e.target.checked }))
-                }
-                className="w-4 h-4 accent-zoop-obsidian"
-              />
-              <span className="text-sm font-bold text-gray-800">Maintenance Mode</span>
-            </label>
-            <p className="text-xs text-gray-600 mt-2">
-              Maintenance Mode temporarily blocks regular users from shopping while admins update
-              the website safely.
-            </p>
           </div>
 
           <button

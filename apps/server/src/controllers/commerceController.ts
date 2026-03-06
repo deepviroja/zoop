@@ -36,6 +36,15 @@ const createOrderSchema = z.object({
       razorpaySignature: z.string().min(1),
     })
     .optional(),
+  appliedOffer: z
+    .object({
+      id: z.string().min(1).optional(),
+      code: z.string().optional(),
+      title: z.string().optional(),
+      discountAmount: z.number().min(0).optional(),
+      scope: z.enum(['order', 'shipping']).optional(),
+    })
+    .optional(),
 });
 
 const reserveCheckoutSchema = z.object({
@@ -529,7 +538,34 @@ export const createOrder = async (req: Request, res: Response) => {
 
       const shippingAmount = hasNationalShipping ? 150 : 0;
       const taxAmount = Math.round(itemSubtotal * 0.05);
-      const totalAmount = itemSubtotal + shippingAmount + taxAmount;
+      let offerDiscountAmount = 0;
+      let appliedOffer: any = null;
+      if (orderData.appliedOffer?.id) {
+        const offerDoc = await tx.get(db.collection('offers').doc(orderData.appliedOffer.id));
+        if (offerDoc.exists) {
+          const offer = offerDoc.data() as any;
+          if (offer?.active !== false && itemSubtotal >= Number(offer?.minOrderAmount || 0)) {
+            const baseAmount =
+              String(offer?.scope || 'order') === 'shipping' ? shippingAmount : itemSubtotal;
+            const rawDiscount =
+              String(offer?.discountType || 'percent') === 'flat'
+                ? Number(offer?.discountValue || 0)
+                : Math.round((baseAmount * Number(offer?.discountValue || 0)) / 100);
+            const cappedDiscount = offer?.maxDiscountAmount
+              ? Math.min(rawDiscount, Number(offer.maxDiscountAmount || 0))
+              : rawDiscount;
+            offerDiscountAmount = Math.max(0, Math.min(baseAmount, cappedDiscount));
+            appliedOffer = {
+              id: offerDoc.id,
+              code: offer.code || '',
+              title: offer.title || '',
+              scope: offer.scope || 'order',
+              discountAmount: offerDiscountAmount,
+            };
+          }
+        }
+      }
+      const totalAmount = Math.max(0, itemSubtotal + shippingAmount + taxAmount - offerDiscountAmount);
 
       if (onlinePaymentMethods.has(paymentMethod)) {
         const expectedAmount = Math.round(totalAmount * 100);
@@ -552,6 +588,8 @@ export const createOrder = async (req: Request, res: Response) => {
         itemSubtotal,
         shippingAmount,
         taxAmount,
+        offerDiscountAmount,
+        appliedOffer,
         totalAmount,
         status: 'pending',
         paymentStatus: paymentMethod === 'cod' ? 'pending' : 'paid',

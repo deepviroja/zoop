@@ -65,6 +65,7 @@ export const contentApi = {
   getCollections: () => get<any[]>('/content/collections'),
   getFooterLinks: () => get<any>('/content/footer-links'),
   getSiteConfig:  () => get<any>('/content/site-config'),
+  getOffers: () => get<any[]>('/content/offers'),
   createSupportTicket: (data: unknown) => post<any>('/content/support-tickets', data),
   getMySupportTickets: () => get<any[]>('/content/support-tickets/my'),
   subscribeStockAlert: (productId: string) => post<any>('/content/stock-alerts', { productId }),
@@ -131,9 +132,13 @@ export const wishlistApi = {
 export const authApi = {
   signupOTP:  (data: unknown) => post<any>('/auth/signup', data),
   verifyOTP:  (data: unknown) => post<any>('/auth/verify-otp', data),
-  resendOTP:  (email: string) => post<any>('/auth/resend-otp', { email }),
-  requestLoginOTP: (email: string) => post<any>('/auth/login/request-otp', { email }),
+  verifyPhoneSignup: (data: { email: string; idToken: string }) =>
+    post<any>('/auth/verify-phone-signup', data),
+  resendOTP:  (email: string, otpChannel = 'email') => post<any>('/auth/resend-otp', { email, otpChannel }),
+  requestLoginOTP: (email: string, otpChannel = 'email') => post<any>('/auth/login/request-otp', { email, otpChannel }),
   verifyLoginOTP: (data: { email: string; otp: string }) => post<any>('/auth/login/verify-otp', data),
+  verifyPhoneLogin: (data: { email: string; idToken: string }) =>
+    post<any>('/auth/login/verify-phone', data),
   syncUser:   (data?: unknown) => post<any>('/auth/sync', data || {}),
   registerSeller: (data: unknown) => post<any>('/auth/register-seller', data),
   getProfile: () => get<any>('/auth/profile'),
@@ -171,6 +176,9 @@ export const adminApi = {
     put<any>(`/content/admin/products/${id}/moderation`, { moderationStatus, moderationNote }),
   getSupportTickets: () => get<any[]>('/content/admin/support-tickets'),
   getSiteConfig: () => get<any>('/content/site-config'),
+  getOffers: () => get<any[]>('/content/admin/offers'),
+  createOffer: (data: any) => post<any>('/content/admin/offers', data),
+  updateOffer: (id: string, data: any) => put<any>(`/content/admin/offers/${id}`, data),
   updateSupportTicketStatus: (id: string, status: string, reply?: string) =>
     put<any>(`/content/admin/support-tickets/${id}/status`, { status, reply }),
   getMonetizationOverview: () => get<any>('/content/admin/monetization'),

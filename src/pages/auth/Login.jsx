@@ -7,6 +7,7 @@ import {
   signInWithPopup,
   signInWithCustomToken,
   sendPasswordResetEmail,
+  signOut,
 } from "firebase/auth";
 import { apiClient } from "../../api/client";
 import { authApi } from "../../services/api";
@@ -19,6 +20,8 @@ import { Mail } from "../../assets/icons/Mail";
 import { Lock } from "../../assets/icons/Lock";
 import Loader from "../../components/ui/Loader";
 import { OTPInput } from "../../components/auth/OTPInput";
+import Seo from "../../components/shared/Seo";
+import { sendFirebasePhoneOtp, resetPhoneRecaptcha } from "../../utils/firebasePhoneAuth";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -41,6 +44,9 @@ const Login = () => {
   const [otpExpiresAt, setOtpExpiresAt] = useState("");
   const [resendAvailableAt, setResendAvailableAt] = useState("");
   const [nowTs, setNowTs] = useState(Date.now());
+  const [otpChannel, setOtpChannel] = useState("email");
+  const [otpRecipient, setOtpRecipient] = useState("");
+  const [phoneConfirmation, setPhoneConfirmation] = useState(null);
 
   useEffect(() => {
     if (!(loginMode === "otp" && otpStep)) return;
@@ -137,14 +143,22 @@ const Login = () => {
     }
     setLoading(true);
     try {
-      const response = await authApi.requestLoginOTP(formData.email);
-      const expiresAt =
-        response?.expiresAt || new Date(Date.now() + 5 * 60 * 1000).toISOString();
-      const resendAfterSec = Number(response?.resendAfterSec || 60);
-      setOtpExpiresAt(expiresAt);
-      setResendAvailableAt(new Date(Date.now() + resendAfterSec * 1000).toISOString());
+      const response = await authApi.requestLoginOTP(formData.email, otpChannel);
+      setOtpRecipient(response?.otpRecipient || formData.email);
+      if (otpChannel === "phone") {
+        const confirmation = await sendFirebasePhoneOtp(response?.otpRecipient || "");
+        setPhoneConfirmation(confirmation);
+        setOtpExpiresAt(new Date(Date.now() + 5 * 60 * 1000).toISOString());
+        setResendAvailableAt(new Date(Date.now() + 60 * 1000).toISOString());
+      } else {
+        const expiresAt =
+          response?.expiresAt || new Date(Date.now() + 5 * 60 * 1000).toISOString();
+        const resendAfterSec = Number(response?.resendAfterSec || 60);
+        setOtpExpiresAt(expiresAt);
+        setResendAvailableAt(new Date(Date.now() + resendAfterSec * 1000).toISOString());
+      }
       setOtpStep(true);
-      setSuccessMsg(`OTP sent to ${formData.email}`);
+      setSuccessMsg(`OTP sent to your ${otpChannel === "phone" ? "mobile" : "email"}`);
     } catch (error) {
       setGeneralError(getFriendlyError(error));
     } finally {
@@ -156,12 +170,28 @@ const Login = () => {
     setGeneralError("");
     setLoading(true);
     try {
-      const response = await authApi.verifyLoginOTP({
-        email: formData.email,
-        otp,
-      });
+      let response;
+      if (otpChannel === "phone") {
+        if (!phoneConfirmation) {
+          throw new Error("Mobile OTP session expired. Please request a new OTP.");
+        }
+        const phoneResult = await phoneConfirmation.confirm(otp);
+        const idToken = await phoneResult.user.getIdToken();
+        response = await authApi.verifyPhoneLogin({
+          email: formData.email,
+          idToken,
+        });
+      } else {
+        response = await authApi.verifyLoginOTP({
+          email: formData.email,
+          otp,
+          otpChannel,
+          otpRecipient,
+        });
+      }
       if (response?.token) {
         localStorage.setItem("authToken", response.token);
+        await signOut(auth).catch(() => {});
         await signInWithCustomToken(auth, response.token);
       }
       setRedirecting(true);
@@ -172,6 +202,8 @@ const Login = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => () => resetPhoneRecaptcha(), []);
 
   const handleForgotPassword = async () => {
     setGeneralError("");
@@ -192,10 +224,16 @@ const Login = () => {
 
   return (
     <>
+      <Seo
+        title="Login | Zoop"
+        description="Access your Zoop account."
+        robots="noindex,nofollow"
+        canonicalPath="/login"
+      />
       {redirecting && <Loader fullScreen />}
-    <div className="min-h-screen rounded-3xl bg-gradient-to-br from-zoop-moss/20 to-white flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-zoop-moss/20 to-white flex items-center justify-center p-3 sm:p-4">
       <div className="w-full max-w-md">
-        <div className="bg-white rounded-3xl shadow-2xl p-8">
+        <div className="bg-white rounded-[1.75rem] sm:rounded-3xl shadow-2xl p-5 sm:p-8">
           {/* Header */}
           <div className="text-center mb-8">
             <Link
@@ -374,23 +412,42 @@ const Login = () => {
             </div>
             )}
 
-            {loginMode === "otp" && otpStep && (
+            {loginMode === "otp" && (
               <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
-                <p className="text-sm font-bold text-zoop-obsidian mb-3">Enter the OTP sent to your email</p>
-                <OTPInput length={6} onComplete={handleVerifyOTP} disabled={loading} />
-                <p className="text-xs text-gray-500 mt-3">
-                  OTP expires in {formatMMSS(otpSecondsLeft)}
-                </p>
-                <button
-                  type="button"
-                  onClick={handleRequestOTP}
-                  disabled={loading || resendSecondsLeft > 0}
-                  className="mt-3 text-zoop-moss text-sm font-bold hover:underline disabled:opacity-60"
-                >
-                  {resendSecondsLeft > 0
-                    ? `Resend in ${formatMMSS(resendSecondsLeft)}`
-                    : "Resend OTP"}
-                </button>
+                <div className="mb-3 grid grid-cols-2 gap-2 rounded-xl bg-white p-1">
+                  <button type="button" onClick={() => setOtpChannel("email")} className={`rounded-lg py-2 text-xs font-black uppercase ${otpChannel === "email" ? "bg-zoop-obsidian text-white" : "text-gray-500"}`}>Email OTP</button>
+                  <button type="button" onClick={() => setOtpChannel("phone")} className={`rounded-lg py-2 text-xs font-black uppercase ${otpChannel === "phone" ? "bg-zoop-obsidian text-white" : "text-gray-500"}`}>Mobile OTP</button>
+                </div>
+                {otpStep ? (
+                  <>
+                    <p className="text-sm font-bold text-zoop-obsidian mb-3">Enter the OTP sent to your {otpChannel === "phone" ? "phone number" : "email"}</p>
+                    <OTPInput length={6} onComplete={handleVerifyOTP} disabled={loading} />
+                    <p className="text-xs text-gray-500 mt-3">
+                      OTP expires in {formatMMSS(otpSecondsLeft)}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={handleRequestOTP}
+                      disabled={loading || resendSecondsLeft > 0}
+                      className="mt-3 text-zoop-moss text-sm font-bold hover:underline disabled:opacity-60"
+                    >
+                      {resendSecondsLeft > 0
+                        ? `Resend in ${formatMMSS(resendSecondsLeft)}`
+                        : "Resend OTP"}
+                    </button>
+                  </>
+                ) : (
+                  <div className="space-y-2">
+                    <p className="text-sm text-gray-600">
+                      Choose where the OTP should be delivered, then send it.
+                    </p>
+                    {otpChannel === "phone" && (
+                      <p className="text-xs text-gray-500">
+                        Phone OTP requires Firebase Phone Authentication to be enabled for this domain.
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
             )}
 

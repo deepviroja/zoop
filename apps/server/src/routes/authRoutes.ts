@@ -11,6 +11,8 @@ import {
   resendOTP,
   requestLoginOTP,
   verifyLoginOTP,
+  verifyPhoneLogin,
+  verifyPhoneSignup,
   requestDeleteAccountOTP,
   confirmDeleteAccount,
 } from '../controllers/authController';
@@ -21,9 +23,11 @@ const router = express.Router();
 
 router.post("/signup", signupWithOTP);
 router.post("/verify-otp", verifyOTP);
+router.post("/verify-phone-signup", verifyPhoneSignup);
 router.post("/resend-otp", resendOTP);
 router.post("/login/request-otp", requestLoginOTP);
 router.post("/login/verify-otp", verifyLoginOTP);
+router.post("/login/verify-phone", verifyPhoneLogin);
 router.post('/register-customer', registerCustomer);
 router.post('/login', login);
 router.post('/register-seller', registerSeller);

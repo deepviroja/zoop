@@ -10,10 +10,13 @@ import {
   getCollections,
   getFooterLinks,
   getSiteConfig,
+  getPublicOffers,
   // Admin content management
   updateCity,
   updateHeroSlide,
   updateSiteConfig,
+  getAdminOffers,
+  upsertOffer,
   createHeroSlide,
   deleteHeroSlide,
   // Admin analytics
@@ -82,6 +85,7 @@ router.get('/categories',   getCategories);
 router.get('/collections',  getCollections);
 router.get('/footer-links', getFooterLinks);
 router.get('/site-config',  getSiteConfig);
+router.get('/offers', getPublicOffers);
 
 // ─── ADMIN CONTENT MANAGEMENT ─────────────────────────────────────────────────
 router.put('/cities/:id',      authenticate, authorize(['admin']), updateCity);
@@ -90,6 +94,9 @@ router.post('/hero-slides',    authenticate, authorize(['admin']), createHeroSli
 router.put('/hero-slides/:id', authenticate, authorize(['admin']), updateHeroSlide);
 router.delete('/hero-slides/:id', authenticate, authorize(['admin']), deleteHeroSlide);
 router.put('/site-config',     authenticate, authorize(['admin']), updateSiteConfig);
+router.get('/admin/offers', authenticate, authorize(['admin']), getAdminOffers);
+router.post('/admin/offers', authenticate, authorize(['admin']), upsertOffer);
+router.put('/admin/offers/:id', authenticate, authorize(['admin']), upsertOffer);
 
 // ─── ADMIN ANALYTICS ─────────────────────────────────────────────────────────
 router.get('/admin/analytics', authenticate, authorize(['admin']), getAdminAnalytics);

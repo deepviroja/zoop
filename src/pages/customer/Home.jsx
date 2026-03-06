@@ -10,6 +10,7 @@ import ProductCard from "../../components/product/ProductCard";
 import AdBanner from "../../components/shared/AdBanner";
 import { contentApi, productsApi } from "../../services/api";
 import { optimizeCloudinaryUrl } from "../../utils/cloudinary";
+import Seo from "../../components/shared/Seo";
 import men_cat from "../../assets/images/men_cat.png";
 import women_cat from "../../assets/images/women_cat.png";
 import kids_cat from "../../assets/images/kids_cat.png";
@@ -115,9 +116,11 @@ const Home = () => {
     .slice(0, 8);
   const citySpecificProducts = products.filter(
     (p) =>
-      String(p.city || "").toLowerCase() === localCity.toLowerCase() ||
-      String(p.city || "").toLowerCase() === "all" ||
-      p.type === "Local",
+      Boolean(p.isSameDayEligible) &&
+      Array.isArray(p.cityAvailability) &&
+      p.cityAvailability.some(
+        (city) => String(city).toLowerCase() === localCity.toLowerCase(),
+      ),
   );
   const displayLocalProducts =
     citySpecificProducts.length > 0
@@ -144,8 +147,24 @@ const Home = () => {
     return map;
   }, [products]);
 
+  const liveCategoryIds = React.useMemo(() => {
+    const ids = new Set();
+    products.forEach((p) => {
+      const id = String(p.categoryId || p.category || "")
+        .toLowerCase()
+        .trim();
+      if (id) ids.add(id);
+    });
+    return ids;
+  }, [products]);
+
   const collectionCategories = React.useMemo(() => {
-    if (categories.length > 0) return categories;
+    if (categories.length > 0) {
+      const filtered = categories.filter((cat) =>
+        liveCategoryIds.has(String(cat.id || "").toLowerCase()),
+      );
+      if (filtered.length > 0) return filtered;
+    }
     const seen = new Set();
     const fromProducts = products
       .map((p) => {
@@ -169,7 +188,7 @@ const Home = () => {
       { id: "men", name: "Men", path: "/category/men", desc: "Everyday to occasion essentials", icon: "👔" },
       { id: "women", name: "Women", path: "/category/women", desc: "Modern trends with artisan details", icon: "👜" },
     ];
-  }, [categories, products]);
+  }, [categories, products, liveCategoryIds]);
 
   const activeSlide = heroSlides[currentSlide] || {};
 
@@ -191,9 +210,26 @@ const Home = () => {
   }
 
   return (
-    <div className="max-w-[1400px] mx-auto p-4 space-y-8">
+    <div className="max-w-[1400px] mx-auto px-3 py-4 md:p-4 space-y-8">
+      <Seo
+        title="Zoop | Same-Day Local Shopping Across India"
+        description="Shop local-first products, same-day city delivery, trending collections, and curated categories on Zoop."
+        keywords="Zoop, same-day delivery, local shopping, ecommerce India, online marketplace"
+        canonicalPath="/"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "Zoop",
+          url: "https://zoop-88df6.web.app/",
+          potentialAction: {
+            "@type": "SearchAction",
+            target: "https://zoop-88df6.web.app/search?q={search_term_string}",
+            "query-input": "required name=search_term_string",
+          },
+        }}
+      />
       {/* HERO SLIDER */}
-      <section className="relative group h-[550px] sm:h-[600px] md:h-[700px] w-full rounded-3xl overflow-hidden shadow-2xl">
+      <section className="relative group min-h-[520px] sm:min-h-[600px] md:h-[700px] w-full rounded-3xl overflow-hidden shadow-2xl">
         {/* Background */}
         <div className="absolute inset-0 bg-gradient-to-br from-zoop-obsidian via-zoop-ink to-black">
           <div

@@ -41,6 +41,26 @@
 body {
   @apply bg-zoop-canvas text-zoop-obsidian;
   font-family: "Plus Jakarta Sans", sans-serif; /* If you installed it */
+  overflow-x: hidden;
+}
+
+html,
+#root {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+img,
+video,
+canvas,
+svg {
+  max-width: 100%;
+}
+
+input,
+textarea,
+select {
+  min-width: 0;
 }
 
 /* Toast Animations */

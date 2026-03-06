@@ -17,6 +17,7 @@ import ProductCard from "../../components/product/ProductCard";
 import { ProductDetailSkeleton } from "../../components/shared/Skeletons";
 import { frequentlyBoughtTogether } from "../../utils/recommendations";
 import { optimizeCloudinaryUrl } from "../../utils/cloudinary";
+import Seo from "../../components/shared/Seo";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -240,6 +241,11 @@ const ProductDetail = () => {
   }, [allProducts, product]);
 
   const displaySimilar = relatedProducts.length > 0 ? relatedProducts : fbtProducts;
+  const comboProducts = [product, ...fbtProducts.slice(0, 2)].filter(Boolean);
+  const comboTotal = comboProducts.reduce(
+    (sum, item) => sum + Number(item?.price || 0),
+    0,
+  );
 
   if (loading) return <ProductDetailSkeleton />;
 
@@ -271,6 +277,41 @@ const ProductDetail = () => {
 
   return (
     <div className="min-h-screen bg-white">
+      <Seo
+        title={`${product.name} | Zoop`}
+        description={(product.aboutItem || product.description || "").slice(0, 160)}
+        keywords={`${product.name}, ${product.brand || "Zoop"}, buy online, ${product.category || ""}`}
+        image={product.image || product.thumbnailUrl || "/vite.svg"}
+        canonicalPath={`/product/${product.id}`}
+        type="product"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "Product",
+          name: product.name,
+          image: [product.image || product.thumbnailUrl].filter(Boolean),
+          description: product.aboutItem || product.description || "",
+          brand: {
+            "@type": "Brand",
+            name: product.brand || "Zoop",
+          },
+          offers: {
+            "@type": "Offer",
+            priceCurrency: "INR",
+            price: Number(product.price || 0),
+            availability: product.inStock
+              ? "https://schema.org/InStock"
+              : "https://schema.org/OutOfStock",
+          },
+          aggregateRating:
+            Number(product.reviews || 0) > 0
+              ? {
+                  "@type": "AggregateRating",
+                  ratingValue: Number(product.rating || 0),
+                  reviewCount: Number(product.reviews || 0),
+                }
+              : undefined,
+        }}
+      />
       {/* Breadcrumb */}
       <div className="bg-gray-50 border-b border-gray-200">
         <div className="max-w-[1400px] mx-auto px-4 py-3">
@@ -457,7 +498,7 @@ const ProductDetail = () => {
                     Size Guide
                   </button>
                 </div>
-                <div className="grid grid-cols-4 md:grid-cols-6 gap-2">
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
                   {product.sizes.map((size) => (
                     <button
                       key={size}
@@ -568,11 +609,16 @@ const ProductDetail = () => {
                 Buy Now
               </button>
               {showFbtPanel && fbtProducts.length > 0 && (
-                <div className="bg-zoop-canvas border border-zoop-moss/30 rounded-xl p-4">
-                  <div className="flex items-center justify-between gap-3 mb-3">
-                    <p className="text-sm font-black text-zoop-obsidian">
-                      Frequently Bought Together
-                    </p>
+                <div className="rounded-[1.75rem] border border-[#e4dccf] bg-gradient-to-br from-[#fbf7ef] via-white to-[#f3eee4] p-5 shadow-[0_18px_44px_rgba(42,32,15,0.08)]">
+                  <div className="flex items-start justify-between gap-3 mb-4">
+                    <div>
+                      <p className="text-xs font-black uppercase tracking-[0.28em] text-[#8b5e3c]">
+                        Buy Together
+                      </p>
+                      <p className="text-lg font-black text-zoop-obsidian">
+                        Similar picks bundled for one checkout
+                      </p>
+                    </div>
                     <button
                       type="button"
                       onClick={() => setShowFbtPanel(false)}
@@ -581,12 +627,48 @@ const ProductDetail = () => {
                       Hide
                     </button>
                   </div>
-                  <div className="flex gap-3 overflow-x-auto pb-2">
-                    {fbtProducts.map((item) => (
-                      <div key={item.id} className="min-w-[180px] max-w-[180px]">
-                        <ProductCard product={item} />
-                      </div>
+                  <div className="grid gap-3 md:grid-cols-[1fr_auto_1fr_auto_1fr] items-center">
+                    {comboProducts.map((item, index) => (
+                      <React.Fragment key={item.id}>
+                        <div className="rounded-2xl border border-white bg-white p-3 shadow-sm">
+                          <img
+                            src={optimizeCloudinaryUrl(item.thumbnailUrl || item.image, { width: 500 })}
+                            alt={item.title || item.name}
+                            className="h-28 w-full rounded-xl object-cover"
+                          />
+                          <p className="mt-3 line-clamp-2 text-sm font-black text-zoop-obsidian">
+                            {item.title || item.name}
+                          </p>
+                          <p className="mt-1 text-sm text-gray-500">
+                            ₹{Number(item.price || 0).toLocaleString("en-IN")}
+                          </p>
+                        </div>
+                        {index < comboProducts.length - 1 && (
+                          <div className="mx-auto text-2xl font-black text-[#8b5e3c]">+</div>
+                        )}
+                      </React.Fragment>
                     ))}
+                  </div>
+                  <div className="mt-4 flex flex-col gap-3 rounded-2xl bg-[#111111] px-4 py-4 text-white md:flex-row md:items-center md:justify-between">
+                    <div>
+                      <p className="text-xs font-black uppercase tracking-[0.24em] text-zoop-moss">
+                        Bundle total
+                      </p>
+                      <p className="text-2xl font-black">₹{comboTotal.toLocaleString("en-IN")}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        comboProducts.forEach((item, idx) => {
+                          if (idx === 0) return;
+                          addToCart(item, 1);
+                        });
+                        navigate("/cart");
+                      }}
+                      className="rounded-full bg-zoop-moss px-5 py-3 text-sm font-black uppercase tracking-[0.22em] text-black"
+                    >
+                      Buy Together
+                    </button>
                   </div>
                 </div>
               )}
@@ -664,7 +746,7 @@ const ProductDetail = () => {
 
         {/* Tabs: Description, Specifications, Reviews */}
         <div className="border-t border-gray-200 pt-12">
-          <div className="flex gap-8 border-b border-gray-200 mb-8">
+          <div className="flex gap-6 overflow-x-auto border-b border-gray-200 mb-8 no-scrollbar">
             {["description", "specifications", "reviews"].map((tab) => (
               <button
                 key={tab}

@@ -11,12 +11,25 @@ import { useProductFiltering } from "../../hooks/useProductFiltering";
 import AdBanner from "../../components/shared/AdBanner";
 import Pagination from "../../components/shared/Pagination";
 import { shuffleProductsForUser } from "../../utils/shuffleProducts";
+import { useUser } from "../../context/UserContext";
+import Seo from "../../components/shared/Seo";
 
 const Products = () => {
+  const { location } = useUser();
   const [searchParams] = useSearchParams();
   const { scrollDir } = useOutletContext() || { scrollDir: "up" };
   const categoryParam = searchParams.get("category");
   const typeParam = searchParams.get("type");
+  const seoTitle = categoryParam
+    ? `${categoryParam} Products | Zoop Marketplace`
+    : typeParam
+      ? `${typeParam} Delivery Products in ${location || "India"} | Zoop`
+      : "All Products | Zoop Marketplace";
+  const seoDescription = typeParam?.toLowerCase() === "local"
+    ? `Browse same-day delivery products available in ${location || "your city"} on Zoop.`
+    : categoryParam
+      ? `Explore ${categoryParam} products on Zoop with fast delivery and smart filters.`
+      : "Browse all products on Zoop with filters for price, rating, availability, and category.";
 
   const [apiProducts, setApiProducts] = useState([]);
   const [apiLoading, setApiLoading] = useState(true);
@@ -34,7 +47,17 @@ const Products = () => {
     apiClient
       .get(`/products${qs}`)
       .then((data) => {
-        const products = Array.isArray(data) ? data : [];
+        let products = Array.isArray(data) ? data : [];
+        if (String(typeParam || "").toLowerCase() === "local") {
+          products = products.filter(
+            (product) =>
+              Boolean(product.isSameDayEligible) &&
+              Array.isArray(product.cityAvailability) &&
+              product.cityAvailability.some(
+                (city) => String(city).toLowerCase() === String(location || "").toLowerCase(),
+              ),
+          );
+        }
         setApiProducts(shuffleProductsForUser(products));
       })
       .catch((err) => {
@@ -42,7 +65,7 @@ const Products = () => {
         setApiProducts([]);
       })
       .finally(() => setApiLoading(false));
-  }, [categoryParam, typeParam]);
+  }, [categoryParam, typeParam, location]);
 
   const {
     view,
@@ -74,6 +97,18 @@ const Products = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Seo
+        title={seoTitle}
+        description={seoDescription}
+        keywords={`Zoop products, ecommerce catalog, online shopping India${categoryParam ? `, ${categoryParam}` : ""}${typeParam ? `, ${typeParam}` : ""}`}
+        canonicalPath={`/products${searchParams.toString() ? `?${searchParams.toString()}` : ""}`}
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          name: seoTitle,
+          description: seoDescription,
+        }}
+      />
       <div className="max-w-[1600px] mx-auto px-4 py-6 z-999">
         <ProductListHeader
           productCount={filteredProducts.length}

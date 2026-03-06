@@ -8,6 +8,19 @@ import { useToast } from '../../hooks/useToast';
 import { ChevronLeft } from '../../assets/icons/ChevronLeft';
 import { Package } from '../../assets/icons/Package';
 
+type VariantOption = {
+    id: string;
+    label: string;
+    type: string;
+    value: string;
+    price: string;
+    mrp: string;
+    stock: string;
+    imageUrl: string;
+    videoUrl: string;
+    sku: string;
+};
+
 export const SellerAddProduct = () => {
     const navigate = useNavigate();
     const { productId } = useParams<{ productId?: string }>();
@@ -18,6 +31,7 @@ export const SellerAddProduct = () => {
     const [loading, setLoading] = useState(false);
     const [fetchingProduct, setFetchingProduct] = useState(isEditMode);
     const [profileChecked, setProfileChecked] = useState(false);
+    const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
     const [formData, setFormData] = useState({
         title: '',
@@ -51,8 +65,10 @@ export const SellerAddProduct = () => {
         thumbnailUrl: '',
         imageUrls: [] as string[],
         videoUrls: [] as string[],
+        descriptionMedia: [] as Array<{ url: string; type: 'image' | 'video'; alt?: string }>,
         discountPercent: '',
-        tags: ''
+        tags: '',
+        variantOptions: [] as VariantOption[],
     });
     const [colorInput, setColorInput] = useState('');
     const [sizeInput, setSizeInput] = useState('');
@@ -60,6 +76,18 @@ export const SellerAddProduct = () => {
     const [attributeValueInput, setAttributeValueInput] = useState('');
     const [categorySearch, setCategorySearch] = useState("");
     const [subcategorySearch, setSubcategorySearch] = useState("");
+    const [variantDraft, setVariantDraft] = useState<VariantOption>({
+        id: '',
+        label: '',
+        type: 'Size',
+        value: '',
+        price: '',
+        mrp: '',
+        stock: '',
+        imageUrl: '',
+        videoUrl: '',
+        sku: '',
+    });
 
     const stateToCities: Record<string, string[]> = {
         Gujarat: ["Ahmedabad", "Surat", "Vadodara", "Rajkot"],
@@ -108,9 +136,22 @@ export const SellerAddProduct = () => {
                 cityAvailability: (product.cityAvailability || []).join(', '),
                 thumbnailUrl: product.thumbnailUrl || '',
                 imageUrls: product.imageUrls || [],
-                videoUrls: product.videoUrls || [],
-                discountPercent: String(product.discountPercent || ''),
-                tags: (product.tags || []).join(', ')
+                    videoUrls: product.videoUrls || [],
+                    descriptionMedia: product.descriptionMedia || [],
+                    discountPercent: String(product.discountPercent || ''),
+                    tags: (product.tags || []).join(', '),
+                    variantOptions: (product.variantOptions || []).map((variant: any) => ({
+                        id: variant.id || '',
+                        label: variant.label || '',
+                        type: variant.type || 'Size',
+                        value: variant.value || '',
+                        price: String(variant.price ?? ''),
+                        mrp: String(variant.mrp ?? ''),
+                        stock: String(variant.stock ?? ''),
+                        imageUrl: variant.imageUrl || '',
+                        videoUrl: variant.videoUrl || '',
+                        sku: variant.sku || '',
+                    })),
                 });
                 setCategorySearch(product.categoryId || product.category || "");
                 setSubcategorySearch(product.subcategory || "");
@@ -184,6 +225,13 @@ export const SellerAddProduct = () => {
     };
     const categories = Object.entries(categoryTree).map(([id, v]) => ({ id, name: v.name }));
     const subcategories = formData.categoryId ? categoryTree[formData.categoryId]?.subcategories || [] : [];
+    const normalizedCategory = String(formData.categoryId || '').toLowerCase();
+    const electronicsCategories = ['electronics'];
+    const electronicsSubcategories = ['mobiles', 'laptops', 'smart-home', 'wearables', 'audio', 'cameras', 'accessories'];
+    const showTechSpecs =
+        electronicsCategories.includes(normalizedCategory) ||
+        electronicsSubcategories.includes(String(formData.subcategory || '').toLowerCase().replace(/\s+/g, '-'));
+    const showMaterialField = !showTechSpecs;
 
     const normalizeCategoryId = (value: string) =>
       String(value || "")
@@ -216,10 +264,17 @@ export const SellerAddProduct = () => {
 
             if (name === 'categoryId') {
                 nextData.subcategory = '';
+                if (electronicsCategories.includes(String(value).toLowerCase())) {
+                    nextData.material = '';
+                } else {
+                    nextData.ram = '';
+                    nextData.storage = '';
+                }
             }
 
             return nextData;
         });
+        setFieldErrors((prev) => ({ ...prev, [name]: '' }));
     };
 
     const isVideoUrl = (url: string) =>
@@ -233,6 +288,54 @@ export const SellerAddProduct = () => {
             thumbnailUrl: imageUrls[0] || prev.thumbnailUrl || '',
             imageUrls,
             videoUrls,
+            descriptionMedia: [
+                ...imageUrls.map((url) => ({ url, type: 'image' as const })),
+                ...videoUrls.map((url) => ({ url, type: 'video' as const })),
+            ],
+        }));
+    };
+
+    const addVariantOption = () => {
+        const label = variantDraft.label.trim();
+        const value = variantDraft.value.trim();
+        const type = variantDraft.type.trim();
+        if (!label || !value || !type) {
+            setFieldErrors((prev) => ({ ...prev, variantOptions: 'Variant label, type and value are required.' }));
+            return;
+        }
+        const id = `${type}-${value}-${Date.now()}`.toLowerCase().replace(/\s+/g, '-');
+        setFormData((prev) => ({
+            ...prev,
+            variantOptions: [
+                ...prev.variantOptions,
+                {
+                    ...variantDraft,
+                    id,
+                    label,
+                    type,
+                    value,
+                },
+            ],
+        }));
+        setVariantDraft({
+            id: '',
+            label: '',
+            type: 'Size',
+            value: '',
+            price: '',
+            mrp: '',
+            stock: '',
+            imageUrl: '',
+            videoUrl: '',
+            sku: '',
+        });
+        setFieldErrors((prev) => ({ ...prev, variantOptions: '' }));
+    };
+
+    const removeVariantOption = (id: string) => {
+        setFormData((prev) => ({
+            ...prev,
+            variantOptions: prev.variantOptions.filter((variant) => variant.id !== id),
         }));
     };
 
@@ -296,6 +399,22 @@ export const SellerAddProduct = () => {
             return;
         }
 
+        const nextErrors: Record<string, string> = {};
+        if (formData.title.trim().length < 3) nextErrors.title = 'Title must be at least 3 characters.';
+        if (formData.description.trim().length < 10) nextErrors.description = 'Description must be at least 10 characters.';
+        if (showTechSpecs && !formData.ram && !formData.storage && formData.variantOptions.length === 0) {
+            nextErrors.ram = 'Add RAM, storage, or variant options for this device category.';
+        }
+        if (!showTechSpecs && !formData.material && !formData.aboutItem) {
+            nextErrors.material = 'Add material or about-item details for this category.';
+        }
+        if (Object.keys(nextErrors).length > 0) {
+            setFieldErrors(nextErrors);
+            showToast('Please review the highlighted product fields.', 'error');
+            setLoading(false);
+            return;
+        }
+
         try {
             const cityAvailability = formData.cityAvailability
                 .split(',')
@@ -312,6 +431,7 @@ export const SellerAddProduct = () => {
                 thumbnailUrl: formData.thumbnailUrl,
                 imageUrls: formData.imageUrls,
                 videoUrls: formData.videoUrls,
+                descriptionMedia: formData.descriptionMedia,
                 brand: formData.brand,
                 sku: formData.sku,
                 material: formData.material,
@@ -337,6 +457,13 @@ export const SellerAddProduct = () => {
                 cityAvailability: formData.isSameDayEligible ? cityAvailability : [],
                 discountPercent: formData.discountPercent ? Number(formData.discountPercent) : 0,
                 tags: formData.tags.split(',').map(t => t.trim()).filter(Boolean)
+                    ,
+                variantOptions: formData.variantOptions.map((variant) => ({
+                    ...variant,
+                    price: variant.price ? Number(variant.price) : undefined,
+                    mrp: variant.mrp ? Number(variant.mrp) : undefined,
+                    stock: variant.stock ? Number(variant.stock) : undefined,
+                })),
             };
 
             if (isEditMode && productId) {
@@ -357,6 +484,15 @@ export const SellerAddProduct = () => {
                 showToast(`Complete seller profile first: ${missing.join(", ")}`, 'warning');
                 setTimeout(() => navigate('/seller/profile'), 1000);
             } else {
+                const issues = err?.data?.error || err?.error;
+                if (Array.isArray(issues)) {
+                    const mappedErrors: Record<string, string> = {};
+                    issues.forEach((issue: any) => {
+                        const key = Array.isArray(issue?.path) ? issue.path.join('.') : issue?.path || 'form';
+                        if (!mappedErrors[key]) mappedErrors[key] = issue?.message || 'Invalid value';
+                    });
+                    setFieldErrors(mappedErrors);
+                }
                 showToast(err.message || "Failed to save product", 'error');
             }
         } finally {
@@ -428,9 +564,10 @@ export const SellerAddProduct = () => {
                                     required
                                     value={formData.title}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-zoop-moss focus:ring-2 focus:ring-zoop-moss/20 transition-all font-medium"
+                                    className={`w-full px-4 py-3 rounded-xl border ${fieldErrors.title ? 'border-red-400 bg-red-50' : 'border-gray-200'} focus:border-zoop-moss focus:ring-2 focus:ring-zoop-moss/20 transition-all font-medium`}
                                     placeholder="e.g. Handwoven Silk Saree"
                                 />
+                                {fieldErrors.title && <p className="mt-1 text-xs font-bold text-red-600">{fieldErrors.title}</p>}
                             </div>
 
                             <div className="col-span-2">
@@ -441,9 +578,11 @@ export const SellerAddProduct = () => {
                                     rows={4}
                                     value={formData.description}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-zoop-moss focus:ring-2 focus:ring-zoop-moss/20 transition-all font-medium"
+                                    className={`w-full px-4 py-3 rounded-xl border ${fieldErrors.description ? 'border-red-400 bg-red-50' : 'border-gray-200'} focus:border-zoop-moss focus:ring-2 focus:ring-zoop-moss/20 transition-all font-medium`}
                                     placeholder="Describe your product details, materials, care instructions..."
                                 />
+                                <p className="mt-1 text-xs text-gray-500">{formData.description.length}/5000 characters</p>
+                                {fieldErrors.description && <p className="mt-1 text-xs font-bold text-red-600">{fieldErrors.description}</p>}
                             </div>
 
                             <div>
@@ -560,6 +699,7 @@ export const SellerAddProduct = () => {
                                 />
                             </div>
 
+                            {showMaterialField && (
                             <div>
                                 <label className="block text-sm font-bold text-gray-700 mb-2">Material (Optional)</label>
                                 <input
@@ -567,11 +707,14 @@ export const SellerAddProduct = () => {
                                     name="material"
                                     value={formData.material}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-zoop-moss focus:ring-2 focus:ring-zoop-moss/20 transition-all font-medium"
+                                    className={`w-full px-4 py-3 rounded-xl border ${fieldErrors.material ? 'border-red-400 bg-red-50' : 'border-gray-200'} focus:border-zoop-moss focus:ring-2 focus:ring-zoop-moss/20 transition-all font-medium`}
                                     placeholder="Cotton, Metal, Wood, etc."
                                 />
+                                {fieldErrors.material && <p className="mt-1 text-xs font-bold text-red-600">{fieldErrors.material}</p>}
                             </div>
+                            )}
 
+                            {showTechSpecs && (
                             <div>
                                 <label className="block text-sm font-bold text-gray-700 mb-2">RAM (Optional)</label>
                                 <input
@@ -579,11 +722,14 @@ export const SellerAddProduct = () => {
                                     name="ram"
                                     value={formData.ram}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-zoop-moss focus:ring-2 focus:ring-zoop-moss/20 transition-all font-medium"
+                                    className={`w-full px-4 py-3 rounded-xl border ${fieldErrors.ram ? 'border-red-400 bg-red-50' : 'border-gray-200'} focus:border-zoop-moss focus:ring-2 focus:ring-zoop-moss/20 transition-all font-medium`}
                                     placeholder="8GB"
                                 />
+                                {fieldErrors.ram && <p className="mt-1 text-xs font-bold text-red-600">{fieldErrors.ram}</p>}
                             </div>
+                            )}
 
+                            {showTechSpecs && (
                             <div>
                                 <label className="block text-sm font-bold text-gray-700 mb-2">Storage (Optional)</label>
                                 <input
@@ -595,6 +741,7 @@ export const SellerAddProduct = () => {
                                     placeholder="128GB"
                                 />
                             </div>
+                            )}
 
                             <div className="col-span-2">
                                 <label className="block text-sm font-bold text-gray-700 mb-2">Highlights (One per line)</label>
@@ -619,7 +766,7 @@ export const SellerAddProduct = () => {
                         
                         <ImageUpload onUpload={handleImageUpload} maxFiles={20} initialUrls={[...(formData.imageUrls || []), ...(formData.videoUrls || [])]} />
                         <p className="text-xs text-gray-500">
-                            You can upload images and videos. First image is used as thumbnail.
+                            You can upload images and videos. First image is used as thumbnail, and uploaded media is also shown inside the product description gallery.
                         </p>
                     </div>
 
@@ -679,6 +826,42 @@ export const SellerAddProduct = () => {
                                     onChange={handleChange}
                                     className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-zoop-moss focus:ring-2 focus:ring-zoop-moss/20 transition-all font-medium"
                                 />
+                            </div>
+
+                            <div className="md:col-span-3 rounded-2xl border border-dashed border-zoop-moss/40 bg-zoop-moss/5 p-4">
+                                <div className="flex items-center justify-between gap-3">
+                                    <div>
+                                        <h3 className="text-sm font-black text-zoop-obsidian">Variant Pricing & Media</h3>
+                                        <p className="text-xs text-gray-500">Add separate prices, stock, and image/video links for sizes, colors, RAM, storage, or other options.</p>
+                                    </div>
+                                </div>
+                                <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-3">
+                                    <input value={variantDraft.label} onChange={(e) => setVariantDraft((prev) => ({ ...prev, label: e.target.value }))} className="px-4 py-3 rounded-xl border border-gray-200" placeholder="Display label e.g. Blue / 8GB" />
+                                    <input value={variantDraft.type} onChange={(e) => setVariantDraft((prev) => ({ ...prev, type: e.target.value }))} className="px-4 py-3 rounded-xl border border-gray-200" placeholder="Type e.g. Color" />
+                                    <input value={variantDraft.value} onChange={(e) => setVariantDraft((prev) => ({ ...prev, value: e.target.value }))} className="px-4 py-3 rounded-xl border border-gray-200" placeholder="Value e.g. Blue" />
+                                    <input type="number" min="0" value={variantDraft.price} onChange={(e) => setVariantDraft((prev) => ({ ...prev, price: e.target.value }))} className="px-4 py-3 rounded-xl border border-gray-200" placeholder="Selling price" />
+                                    <input type="number" min="0" value={variantDraft.mrp} onChange={(e) => setVariantDraft((prev) => ({ ...prev, mrp: e.target.value }))} className="px-4 py-3 rounded-xl border border-gray-200" placeholder="MRP" />
+                                    <input type="number" min="0" value={variantDraft.stock} onChange={(e) => setVariantDraft((prev) => ({ ...prev, stock: e.target.value }))} className="px-4 py-3 rounded-xl border border-gray-200" placeholder="Variant stock" />
+                                    <input value={variantDraft.imageUrl} onChange={(e) => setVariantDraft((prev) => ({ ...prev, imageUrl: e.target.value }))} className="px-4 py-3 rounded-xl border border-gray-200 md:col-span-2" placeholder="Variant image URL (optional)" />
+                                    <input value={variantDraft.videoUrl} onChange={(e) => setVariantDraft((prev) => ({ ...prev, videoUrl: e.target.value }))} className="px-4 py-3 rounded-xl border border-gray-200" placeholder="Variant video URL" />
+                                </div>
+                                <div className="mt-3 flex items-center justify-between gap-3">
+                                    {fieldErrors.variantOptions ? <p className="text-xs font-bold text-red-600">{fieldErrors.variantOptions}</p> : <span />}
+                                    <button type="button" onClick={addVariantOption} className="rounded-xl bg-gray-900 px-4 py-3 text-xs font-black uppercase text-white">Add Variant</button>
+                                </div>
+                                {formData.variantOptions.length > 0 && (
+                                    <div className="mt-4 space-y-2">
+                                        {formData.variantOptions.map((variant) => (
+                                            <div key={variant.id} className="flex flex-col gap-2 rounded-xl border border-gray-100 bg-white p-3 md:flex-row md:items-center md:justify-between">
+                                                <div>
+                                                    <p className="font-black text-zoop-obsidian">{variant.label}</p>
+                                                    <p className="text-xs text-gray-500">{variant.type}: {variant.value} • ₹{variant.price || formData.price || 0} • Stock {variant.stock || formData.stock || 0}</p>
+                                                </div>
+                                                <button type="button" onClick={() => removeVariantOption(variant.id)} className="text-xs font-black text-red-600">Remove</button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
 
                             <div>

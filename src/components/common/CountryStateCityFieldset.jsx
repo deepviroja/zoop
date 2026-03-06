@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Country, State, City } from "country-state-city";
+import { getAllCountries, getStatesOfCountry } from "../../utils/locationData";
 
 const CountryStateCityFieldset = ({
   country = "",
@@ -11,15 +11,11 @@ const CountryStateCityFieldset = ({
   errors = {},
   required = false,
 }) => {
-  const countries = useMemo(() => Country.getAllCountries(), []);
+  const countries = useMemo(() => getAllCountries(), []);
   const states = useMemo(() => {
     if (!country) return [];
-    return State.getStatesOfCountry(country);
+    return getStatesOfCountry(country);
   }, [country]);
-  const cities = useMemo(() => {
-    if (!country || !state) return [];
-    return City.getCitiesOfState(country, state);
-  }, [country, state]);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2 relative z-10">
@@ -52,23 +48,38 @@ const CountryStateCityFieldset = ({
         <label className="block text-sm font-bold text-gray-700 mb-2">
           State {required ? "*" : ""}
         </label>
-        <select
-          value={state}
-          onChange={(e) => onStateChange?.(e.target.value)}
-          disabled={!country}
-          className={`w-full px-4 py-3 rounded-xl border-2 outline-none transition-all mt-1 disabled:bg-gray-100 disabled:cursor-not-allowed ${
-            errors.state
-              ? "border-red-500 bg-red-50"
-              : "border-gray-200 focus:border-zoop-moss"
-          }`}
-        >
-          <option value="">Select State</option>
-          {states.map((item) => (
-            <option key={item.isoCode} value={item.isoCode}>
-              {item.name}
-            </option>
-          ))}
-        </select>
+        {states.length > 0 ? (
+          <select
+            value={state}
+            onChange={(e) => onStateChange?.(e.target.value)}
+            disabled={!country}
+            className={`w-full px-4 py-3 rounded-xl border-2 outline-none transition-all mt-1 disabled:bg-gray-100 disabled:cursor-not-allowed ${
+              errors.state
+                ? "border-red-500 bg-red-50"
+                : "border-gray-200 focus:border-zoop-moss"
+            }`}
+          >
+            <option value="">Select State</option>
+            {states.map((item) => (
+              <option key={item.isoCode} value={item.isoCode}>
+                {item.name}
+              </option>
+            ))}
+          </select>
+        ) : (
+          <input
+            type="text"
+            value={state}
+            onChange={(e) => onStateChange?.(e.target.value)}
+            disabled={!country}
+            placeholder="Enter state or region"
+            className={`w-full px-4 py-3 rounded-xl border-2 outline-none transition-all mt-1 disabled:bg-gray-100 disabled:cursor-not-allowed ${
+              errors.state
+                ? "border-red-500 bg-red-50"
+                : "border-gray-200 focus:border-zoop-moss"
+            }`}
+          />
+        )}
         {errors.state && (
           <p className="text-red-500 text-xs mt-1 font-bold">{errors.state}</p>
         )}
@@ -78,23 +89,18 @@ const CountryStateCityFieldset = ({
         <label className="block text-sm font-bold text-gray-700 mb-2">
           City {required ? "*" : ""}
         </label>
-        <select
+        <input
+          type="text"
           value={city}
           onChange={(e) => onCityChange?.(e.target.value)}
           disabled={!country || !state}
+          placeholder="Enter city"
           className={`w-full px-4 py-3 rounded-xl border-2 outline-none transition-all mt-1 disabled:bg-gray-100 disabled:cursor-not-allowed ${
             errors.city
               ? "border-red-500 bg-red-50"
               : "border-gray-200 focus:border-zoop-moss"
           }`}
-        >
-          <option value="">Select City</option>
-          {cities.map((item) => (
-            <option key={item.name} value={item.name}>
-              {item.name}
-            </option>
-          ))}
-        </select>
+        />
         {errors.city && (
           <p className="text-red-500 text-xs mt-1 font-bold">{errors.city}</p>
         )}

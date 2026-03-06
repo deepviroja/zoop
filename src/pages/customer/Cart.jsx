@@ -362,7 +362,7 @@ const Cart = () => {
 
         {/* RIGHT: ORDER SUMMARY */}
         <div className="lg:col-span-4">
-          <div className="bg-white rounded-2xl md:rounded-[2.5rem] p-6 md:p-8 sticky top-24 shadow-lg border border-gray-100">
+          <div className="bg-white rounded-2xl md:rounded-[2.5rem] p-6 md:p-8 shadow-lg border border-gray-100 lg:sticky lg:top-24">
             <div className="mb-6 md:mb-8">
               <h2 className="text-xl md:text-2xl font-900 uppercase tracking-tight text-zoop-obsidian">
                 Order Summary

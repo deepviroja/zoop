@@ -6,6 +6,7 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   signInWithCustomToken,
+  signOut,
 } from "firebase/auth";
 import { apiClient } from "../../api/client";
 import { authApi } from "../../services/api";
@@ -26,13 +27,15 @@ import { User } from "../../assets/icons/User";
 import { Lock } from "../../assets/icons/Lock";
 import CountryPhoneField from "../../components/common/CountryPhoneField";
 import CountryStateCityFieldset from "../../components/common/CountryStateCityFieldset";
-import { Country, State } from "country-state-city";
 import {
   hasUppercase,
   isValidInternationalPhone,
   isValidPincode,
   getPincodeValidationMessage,
 } from "../../utils/liveValidation";
+import Seo from "../../components/shared/Seo";
+import { sendFirebasePhoneOtp, resetPhoneRecaptcha } from "../../utils/firebasePhoneAuth";
+import { getCountryByCode, getStateByCodeAndCountry } from "../../utils/locationData";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -65,6 +68,9 @@ const Signup = () => {
   const [otpExpiresAt, setOtpExpiresAt] = useState("");
   const [resendAvailableAt, setResendAvailableAt] = useState("");
   const [nowTs, setNowTs] = useState(Date.now());
+  const [otpChannel, setOtpChannel] = useState("email");
+  const [otpRecipient, setOtpRecipient] = useState("");
+  const [phoneConfirmation, setPhoneConfirmation] = useState(null);
 
   useEffect(() => {
     if (step !== 2) return;
@@ -195,15 +201,22 @@ const Signup = () => {
 
     setLoading(true);
     try {
-      // Send OTP to email
-      const response = await apiClient.post("/auth/signup", formData);
-      const expiresAt =
-        response?.expiresAt || new Date(Date.now() + 5 * 60 * 1000).toISOString();
-      const resendAfterSec = Number(response?.resendAfterSec || 60);
-      setOtpExpiresAt(expiresAt);
-      setResendAvailableAt(new Date(Date.now() + resendAfterSec * 1000).toISOString());
-      showToast("OTP sent to your email!", "success");
-      setSubmitStatus({ type: "success", message: "OTP sent. Please verify your email." });
+      const response = await apiClient.post("/auth/signup", { ...formData, otpChannel });
+      setOtpRecipient(response?.otpRecipient || formData.email);
+      if (otpChannel === "phone") {
+        const confirmation = await sendFirebasePhoneOtp(response?.otpRecipient || formData.phone);
+        setPhoneConfirmation(confirmation);
+        setOtpExpiresAt(new Date(Date.now() + 5 * 60 * 1000).toISOString());
+        setResendAvailableAt(new Date(Date.now() + 60 * 1000).toISOString());
+      } else {
+        const expiresAt =
+          response?.expiresAt || new Date(Date.now() + 5 * 60 * 1000).toISOString();
+        const resendAfterSec = Number(response?.resendAfterSec || 60);
+        setOtpExpiresAt(expiresAt);
+        setResendAvailableAt(new Date(Date.now() + resendAfterSec * 1000).toISOString());
+      }
+      showToast(`OTP sent to your ${otpChannel === "phone" ? "phone" : "email"}!`, "success");
+      setSubmitStatus({ type: "success", message: `OTP sent. Please verify your ${otpChannel}.` });
       setStep(2);
     } catch (error) {
       console.error("Signup error:", error);
@@ -241,10 +254,25 @@ const Signup = () => {
     setGeneralError("");
     setSubmitStatus({ type: "", message: "" });
     try {
-      const response = await apiClient.post("/auth/verify-otp", {
-        email: formData.email,
-        otp,
-      });
+      let response;
+      if (otpChannel === "phone") {
+        if (!phoneConfirmation) {
+          throw new Error("Mobile OTP session expired. Please request a new OTP.");
+        }
+        const phoneResult = await phoneConfirmation.confirm(otp);
+        const idToken = await phoneResult.user.getIdToken();
+        response = await authApi.verifyPhoneSignup({
+          email: formData.email,
+          idToken,
+        });
+      } else {
+        response = await apiClient.post("/auth/verify-otp", {
+          email: formData.email,
+          otp,
+          otpChannel,
+          otpRecipient,
+        });
+      }
 
       showToast("Account created successfully! Welcome to Zoop!", "success");
 
@@ -259,6 +287,7 @@ const Signup = () => {
       if (response.token) {
         localStorage.setItem("authToken", response.token);
         // Authenticate with Firebase Client SDK using the custom token
+        await signOut(auth).catch(() => {});
         await signInWithCustomToken(auth, response.token);
       }
 
@@ -287,13 +316,21 @@ const Signup = () => {
     setGeneralError("");
     setSubmitStatus({ type: "", message: "" });
     try {
-      const response = await authApi.resendOTP(formData.email);
-      const expiresAt =
-        response?.expiresAt || new Date(Date.now() + 5 * 60 * 1000).toISOString();
-      const resendAfterSec = Number(response?.resendAfterSec || 60);
-      setOtpExpiresAt(expiresAt);
-      setResendAvailableAt(new Date(Date.now() + resendAfterSec * 1000).toISOString());
-      showToast("New OTP sent to your email!", "success");
+      const response = await authApi.resendOTP(formData.email, otpChannel);
+      setOtpRecipient(response?.otpRecipient || formData.email);
+      if (otpChannel === "phone") {
+        const confirmation = await sendFirebasePhoneOtp(response?.otpRecipient || formData.phone);
+        setPhoneConfirmation(confirmation);
+        setOtpExpiresAt(new Date(Date.now() + 5 * 60 * 1000).toISOString());
+        setResendAvailableAt(new Date(Date.now() + 60 * 1000).toISOString());
+      } else {
+        const expiresAt =
+          response?.expiresAt || new Date(Date.now() + 5 * 60 * 1000).toISOString();
+        const resendAfterSec = Number(response?.resendAfterSec || 60);
+        setOtpExpiresAt(expiresAt);
+        setResendAvailableAt(new Date(Date.now() + resendAfterSec * 1000).toISOString());
+      }
+      showToast(`New OTP sent to your ${otpChannel === "phone" ? "phone" : "email"}!`, "success");
       setSubmitStatus({ type: "success", message: "A new OTP has been sent." });
     } catch (error) {
       console.error("Resend OTP error:", error);
@@ -305,8 +342,16 @@ const Signup = () => {
     }
   };
 
+  useEffect(() => () => resetPhoneRecaptcha(), []);
+
   return (
-    <div className="min-h-screen rounded-3xl bg-gradient-to-br from-zoop-moss/20 to-white flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-zoop-moss/20 to-white flex items-center justify-center p-3 sm:p-4">
+      <Seo
+        title="Sign Up | Zoop"
+        description="Create your Zoop account."
+        robots="noindex,nofollow"
+        canonicalPath="/signup"
+      />
       {toast.show && (
         <Toast message={toast.message} type={toast.type} onClose={hideToast} />
       )}
@@ -329,7 +374,7 @@ const Signup = () => {
       )}
 
       <div className="w-full max-w-md">
-        <div className="bg-white rounded-3xl shadow-2xl p-8">
+        <div className="bg-white rounded-[1.75rem] sm:rounded-3xl shadow-2xl p-5 sm:p-8">
           {/* Header */}
           <div className="text-center mb-8">
             <Link
@@ -344,7 +389,7 @@ const Signup = () => {
             <p className="text-gray-500 text-sm">
               {step === 1
                 ? "Join Zoop and start shopping locally"
-                : `Enter the OTP sent to ${formData.email}`}
+                : `Enter the OTP sent to your ${otpChannel === "phone" ? "phone number" : "email"}`}
             </p>
           </div>
 
@@ -453,6 +498,21 @@ const Signup = () => {
               {/* No role selector - signup is customer-only */}
               {/* Sellers get a separate entry point below */}
 
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">
+                  OTP Delivery
+                </label>
+                <div className="grid grid-cols-2 gap-2 rounded-xl bg-gray-100 p-1">
+                  <button type="button" onClick={() => setOtpChannel("email")} className={`rounded-lg py-2 text-xs font-black uppercase ${otpChannel === "email" ? "bg-white text-zoop-obsidian shadow-sm" : "text-gray-500"}`}>Email OTP</button>
+                  <button type="button" onClick={() => setOtpChannel("phone")} className={`rounded-lg py-2 text-xs font-black uppercase ${otpChannel === "phone" ? "bg-white text-zoop-obsidian shadow-sm" : "text-gray-500"}`}>Mobile OTP</button>
+                </div>
+                {otpChannel === "phone" && (
+                  <p className="mt-2 text-xs text-gray-500">
+                    Phone OTP requires Firebase Phone Authentication and an authorized domain in Firebase Console.
+                  </p>
+                )}
+              </div>
+
               <CountryPhoneField
                 label="Phone Number"
                 required
@@ -507,7 +567,7 @@ const Signup = () => {
                   city: errors.city,
                 }}
                 onCountryChange={(countryCode) => {
-                  const country = Country.getCountryByCode(countryCode);
+                  const country = getCountryByCode(countryCode);
                   const nextData = {
                     ...formData,
                     phoneMeta,
@@ -526,7 +586,7 @@ const Signup = () => {
                   }));
                 }}
                 onStateChange={(stateCode) => {
-                  const selectedState = State.getStateByCodeAndCountry(
+                  const selectedState = getStateByCodeAndCountry(
                     stateCode,
                     formData.countryCode,
                   );

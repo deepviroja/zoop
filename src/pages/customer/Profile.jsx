@@ -10,7 +10,6 @@ import { Heart } from "../../assets/icons/Heart";
 import { MapPin } from "../../assets/icons/MapPin";
 import CountryPhoneField from "../../components/common/CountryPhoneField";
 import CountryStateCityFieldset from "../../components/common/CountryStateCityFieldset";
-import { Country, State } from "country-state-city";
 import {
   isValidEmail,
   isValidInternationalPhone,
@@ -20,9 +19,10 @@ import {
 import { apiClient } from "../../api/client";
 import { auth } from "../../firebase";
 import { sendPasswordResetEmail } from "firebase/auth";
+import { getCountryByCode, getStateByCodeAndCountry, getStatesOfCountry } from "../../utils/locationData";
 
 const Profile = () => {
-  const { user, logout } = useUser();
+  const { user, logout, updateLocation } = useUser();
   const { showToast } = useToast();
   const location = useLocation();
   const navigate = useNavigate();
@@ -51,6 +51,19 @@ const Profile = () => {
     gender: "",
     dateOfBirth: "",
     photoURL: "",
+    addresses: [],
+  });
+  const [addressDraft, setAddressDraft] = useState({
+    label: "home",
+    fullName: "",
+    addressLine1: "",
+    addressLine2: "",
+    city: "",
+    state: "",
+    postalCode: "",
+    country: "India",
+    phone: "",
+    isDefault: false,
   });
   const [errors, setErrors] = useState({});
   const [phoneMeta, setPhoneMeta] = useState({ dialCode: "91", countryCode: "in", format: "" });
@@ -85,9 +98,10 @@ const Profile = () => {
           gender: data.gender || "",
           dateOfBirth: data.dateOfBirth || "",
           photoURL: data.photoURL || user?.photoURL || "",
+          addresses: Array.isArray(data.addresses) ? data.addresses : [],
         });
         if (data?.state) {
-          const states = State.getStatesOfCountry("IN");
+          const states = getStatesOfCountry("IN");
           const matched = states.find(
             (item) => item.name.toLowerCase() === String(data.state || "").toLowerCase(),
           );
@@ -212,7 +226,13 @@ const Profile = () => {
         gender: formData.gender,
         dateOfBirth: formData.dateOfBirth,
         photoURL: formData.photoURL || "",
+        addresses: formData.addresses || [],
+        defaultLocation:
+          formData.addresses.find((item) => item.isDefault)?.city || formData.city || "",
       });
+      const defaultCity =
+        formData.addresses.find((item) => item.isDefault)?.city || formData.city || "";
+      if (defaultCity) updateLocation(defaultCity);
       showToast("Profile updated successfully", "success");
       setIsEditing(false);
     } catch (e) {
@@ -289,6 +309,57 @@ const Profile = () => {
       color: "from-yellow-400 to-orange-500",
     },
   ];
+
+  const addAddressCard = () => {
+    if (!addressDraft.addressLine1 || !addressDraft.city || !addressDraft.state) {
+      showToast("Address line, city and state are required", "warning");
+      return;
+    }
+    setFormData((prev) => ({
+      ...prev,
+      addresses: [
+        ...prev.addresses.map((item) => ({
+          ...item,
+          isDefault: addressDraft.isDefault ? false : item.isDefault,
+        })),
+        {
+          ...addressDraft,
+          id: `${Date.now()}`,
+          fullName: addressDraft.fullName || formData.name,
+          phone: addressDraft.phone || formData.phone,
+        },
+      ],
+    }));
+    setAddressDraft({
+      label: "home",
+      fullName: "",
+      addressLine1: "",
+      addressLine2: "",
+      city: "",
+      state: "",
+      postalCode: "",
+      country: "India",
+      phone: "",
+      isDefault: false,
+    });
+  };
+
+  const removeAddressCard = (id) => {
+    setFormData((prev) => ({
+      ...prev,
+      addresses: prev.addresses.filter((item) => item.id !== id),
+    }));
+  };
+
+  const makeDefaultAddress = (id) => {
+    setFormData((prev) => ({
+      ...prev,
+      addresses: prev.addresses.map((item) => ({
+        ...item,
+        isDefault: item.id === id,
+      })),
+    }));
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -549,7 +620,7 @@ const Profile = () => {
                       city: errors.city,
                     }}
                     onCountryChange={(countryCode) => {
-                      const country = Country.getCountryByCode(countryCode);
+                      const country = getCountryByCode(countryCode);
                       setFormData((prev) => ({
                         ...prev,
                         countryCode,
@@ -560,7 +631,7 @@ const Profile = () => {
                       }));
                     }}
                     onStateChange={(stateCode) => {
-                      const selected = State.getStateByCodeAndCountry(
+                      const selected = getStateByCodeAndCountry(
                         stateCode,
                         formData.countryCode,
                       );
@@ -710,6 +781,77 @@ const Profile = () => {
                   </p>
                 )}
               </div>
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+              <div className="flex items-center gap-3 mb-6">
+                <MapPin width={24} height={24} className="text-zoop-moss" />
+                <h3 className="text-xl font-black text-zoop-obsidian">Saved Address Book</h3>
+              </div>
+              <div className="space-y-3">
+                {Array.isArray(formData.addresses) && formData.addresses.length > 0 ? (
+                  formData.addresses.map((item) => (
+                    <div key={item.id} className="rounded-2xl border border-gray-100 bg-gray-50 p-4">
+                      <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                        <div>
+                          <p className="text-sm font-black uppercase tracking-wider text-[#8b5e3c]">
+                            {item.label} {item.isDefault ? "• Default" : ""}
+                          </p>
+                          <p className="mt-1 font-bold text-zoop-obsidian">
+                            {item.fullName || formData.name}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            {[item.addressLine1, item.addressLine2, item.city, item.state, item.postalCode]
+                              .filter(Boolean)
+                              .join(", ")}
+                          </p>
+                        </div>
+                        {isEditing && (
+                          <div className="flex gap-2">
+                            {!item.isDefault && (
+                              <button type="button" onClick={() => makeDefaultAddress(item.id)} className="rounded-xl bg-white px-3 py-2 text-xs font-black text-zoop-obsidian">
+                                Make Default
+                              </button>
+                            )}
+                            <button type="button" onClick={() => removeAddressCard(item.id)} className="rounded-xl bg-red-50 px-3 py-2 text-xs font-black text-red-600">
+                              Remove
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm text-gray-500">No saved addresses yet.</p>
+                )}
+              </div>
+
+              {isEditing && (
+                <div className="mt-6 rounded-2xl border border-dashed border-gray-200 p-4">
+                  <p className="text-sm font-black text-zoop-obsidian mb-3">Add another address</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <select value={addressDraft.label} onChange={(e) => setAddressDraft((prev) => ({ ...prev, label: e.target.value }))} className="px-4 py-3 rounded-xl border border-gray-200">
+                      <option value="home">Home</option>
+                      <option value="office">Office</option>
+                      <option value="friend_family">Friend & Family</option>
+                    </select>
+                    <input value={addressDraft.fullName} onChange={(e) => setAddressDraft((prev) => ({ ...prev, fullName: e.target.value }))} className="px-4 py-3 rounded-xl border border-gray-200" placeholder="Receiver name" />
+                    <input value={addressDraft.addressLine1} onChange={(e) => setAddressDraft((prev) => ({ ...prev, addressLine1: e.target.value }))} className="px-4 py-3 rounded-xl border border-gray-200 md:col-span-2" placeholder="Address line 1" />
+                    <input value={addressDraft.addressLine2} onChange={(e) => setAddressDraft((prev) => ({ ...prev, addressLine2: e.target.value }))} className="px-4 py-3 rounded-xl border border-gray-200 md:col-span-2" placeholder="Address line 2" />
+                    <input value={addressDraft.city} onChange={(e) => setAddressDraft((prev) => ({ ...prev, city: e.target.value }))} className="px-4 py-3 rounded-xl border border-gray-200" placeholder="City" />
+                    <input value={addressDraft.state} onChange={(e) => setAddressDraft((prev) => ({ ...prev, state: e.target.value }))} className="px-4 py-3 rounded-xl border border-gray-200" placeholder="State" />
+                    <input value={addressDraft.postalCode} onChange={(e) => setAddressDraft((prev) => ({ ...prev, postalCode: e.target.value }))} className="px-4 py-3 rounded-xl border border-gray-200" placeholder="Pincode" />
+                    <input value={addressDraft.phone} onChange={(e) => setAddressDraft((prev) => ({ ...prev, phone: e.target.value }))} className="px-4 py-3 rounded-xl border border-gray-200" placeholder="Phone number" />
+                  </div>
+                  <label className="mt-3 flex items-center gap-2 text-sm font-bold text-gray-700">
+                    <input type="checkbox" checked={addressDraft.isDefault} onChange={(e) => setAddressDraft((prev) => ({ ...prev, isDefault: e.target.checked }))} />
+                    Make this the default location
+                  </label>
+                  <button type="button" onClick={addAddressCard} className="mt-4 rounded-xl bg-zoop-obsidian px-4 py-3 text-xs font-black uppercase text-white">
+                    Add Address
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Account Settings */}

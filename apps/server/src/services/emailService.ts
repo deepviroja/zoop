@@ -164,3 +164,23 @@ export const sendAccountStatusEmail = async (
     `,
   });
 };
+
+export const sendWelcomeEmail = async (email: string, name?: string) => {
+  ensureEmailProvider();
+  await sgMail.send({
+    to: email,
+    from: {
+      email: SENDGRID_FROM_EMAIL!,
+      name: SENDGRID_FROM_NAME,
+    },
+    subject: "Welcome to Zoop",
+    html: `
+      <div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:20px;background:#f0fdf4;border-radius:12px">
+        <h1 style="margin:0 0 12px;color:#14532d">Welcome to Zoop</h1>
+        <p style="margin:0 0 12px;color:#374151">Hi ${name || "there"},</p>
+        <p style="margin:0 0 12px;color:#374151">Your account is active and ready to explore local-first shopping.</p>
+        <p style="margin:0;color:#6b7280">Thanks for joining Zoop.</p>
+      </div>
+    `,
+  });
+};

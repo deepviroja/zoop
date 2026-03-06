@@ -9,14 +9,29 @@ const Monetization = () => {
   const [saving, setSaving] = useState(false);
   const [overview, setOverview] = useState({ totals: {}, commissionStructure: [], payouts: [] });
   const [commission, setCommission] = useState([]);
+  const [offers, setOffers] = useState([]);
+  const [offerDraft, setOfferDraft] = useState({
+    title: "",
+    description: "",
+    type: "coupon",
+    discountType: "percent",
+    discountValue: 10,
+    code: "",
+    minOrderAmount: 0,
+    maxDiscountAmount: 0,
+    scope: "order",
+    active: true,
+  });
   const [error, setError] = useState("");
 
   const load = async () => {
     setLoading(true);
     try {
       const data = await adminApi.getMonetizationOverview();
+      const offerItems = await adminApi.getOffers();
       setOverview(data || { totals: {}, commissionStructure: [], payouts: [] });
       setCommission(Array.isArray(data?.commissionStructure) ? data.commissionStructure : []);
+      setOffers(Array.isArray(offerItems) ? offerItems : []);
       setError("");
     } catch (e) {
       setError(e?.message || "Failed to load monetization data");
@@ -154,6 +169,88 @@ const Monetization = () => {
         </button>
       </div>
 
+      <div className="bg-white rounded-3xl border border-gray-100 p-6">
+        <div className="flex items-center justify-between gap-3 mb-4">
+          <div>
+            <h2 className="text-2xl font-black text-zoop-obsidian">Offers & Coupons</h2>
+            <p className="text-sm text-gray-500">Manage checkout discounts shown to customers.</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <input value={offerDraft.title} onChange={(e) => setOfferDraft((p) => ({ ...p, title: e.target.value }))} className="px-3 py-2 border border-gray-200 rounded-xl" placeholder="Offer title" />
+          <input value={offerDraft.code} onChange={(e) => setOfferDraft((p) => ({ ...p, code: e.target.value.toUpperCase() }))} className="px-3 py-2 border border-gray-200 rounded-xl" placeholder="Coupon code" />
+          <input value={offerDraft.description} onChange={(e) => setOfferDraft((p) => ({ ...p, description: e.target.value }))} className="px-3 py-2 border border-gray-200 rounded-xl md:col-span-2" placeholder="Short description" />
+          <select value={offerDraft.type} onChange={(e) => setOfferDraft((p) => ({ ...p, type: e.target.value }))} className="px-3 py-2 border border-gray-200 rounded-xl">
+            <option value="coupon">Coupon</option>
+            <option value="offer">Offer</option>
+          </select>
+          <select value={offerDraft.discountType} onChange={(e) => setOfferDraft((p) => ({ ...p, discountType: e.target.value }))} className="px-3 py-2 border border-gray-200 rounded-xl">
+            <option value="percent">Percent</option>
+            <option value="flat">Flat</option>
+          </select>
+          <input type="number" value={offerDraft.discountValue} onChange={(e) => setOfferDraft((p) => ({ ...p, discountValue: Number(e.target.value || 0) }))} className="px-3 py-2 border border-gray-200 rounded-xl" placeholder="Discount value" />
+          <input type="number" value={offerDraft.minOrderAmount} onChange={(e) => setOfferDraft((p) => ({ ...p, minOrderAmount: Number(e.target.value || 0) }))} className="px-3 py-2 border border-gray-200 rounded-xl" placeholder="Minimum order amount" />
+          <input type="number" value={offerDraft.maxDiscountAmount} onChange={(e) => setOfferDraft((p) => ({ ...p, maxDiscountAmount: Number(e.target.value || 0) }))} className="px-3 py-2 border border-gray-200 rounded-xl" placeholder="Max discount amount" />
+          <select value={offerDraft.scope} onChange={(e) => setOfferDraft((p) => ({ ...p, scope: e.target.value }))} className="px-3 py-2 border border-gray-200 rounded-xl">
+            <option value="order">Order</option>
+            <option value="shipping">Shipping</option>
+          </select>
+        </div>
+        <button
+          onClick={async () => {
+            try {
+              await adminApi.createOffer(offerDraft);
+              setOfferDraft({
+                title: "",
+                description: "",
+                type: "coupon",
+                discountType: "percent",
+                discountValue: 10,
+                code: "",
+                minOrderAmount: 0,
+                maxDiscountAmount: 0,
+                scope: "order",
+                active: true,
+              });
+              await load();
+            } catch (e) {
+              setError(e?.message || "Could not save offer");
+            }
+          }}
+          className="mt-4 px-5 py-2.5 bg-zoop-obsidian text-white rounded-xl font-black text-sm"
+        >
+          Save Offer
+        </button>
+        <div className="mt-6 space-y-3">
+          {offers.map((offer) => (
+            <div key={offer.id} className="rounded-2xl border border-gray-100 bg-gray-50 p-4">
+              <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                <div>
+                  <p className="font-black text-zoop-obsidian">{offer.title} {offer.code ? `(${offer.code})` : ""}</p>
+                  <p className="text-sm text-gray-500">{offer.description}</p>
+                  <p className="mt-1 text-xs font-bold uppercase tracking-wider text-[#8b5e3c]">
+                    {offer.discountType === "flat" ? `Flat ₹${offer.discountValue}` : `${offer.discountValue}% off`} • {offer.scope || "order"} • Min ₹{offer.minOrderAmount || 0}
+                  </p>
+                </div>
+                <button
+                  onClick={async () => {
+                    try {
+                      await adminApi.updateOffer(offer.id, { ...offer, active: !offer.active });
+                      await load();
+                    } catch (e) {
+                      setError(e?.message || "Could not update offer");
+                    }
+                  }}
+                  className={`px-4 py-2 rounded-xl text-xs font-black uppercase ${offer.active ? "bg-green-50 text-green-700" : "bg-gray-200 text-gray-700"}`}
+                >
+                  {offer.active ? "Active" : "Inactive"}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       <div className="bg-white rounded-3xl border border-gray-100 overflow-hidden">
         <div className="p-6 border-b border-gray-100">
           <h2 className="text-2xl font-black text-zoop-obsidian">Pending Payout Transfers</h2>
@@ -204,4 +301,3 @@ const Monetization = () => {
 };
 
 export default Monetization;
-

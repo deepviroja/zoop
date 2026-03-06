@@ -11,12 +11,12 @@ import { useToast } from "../../context/ToastContext";
 import { useUser } from "../../context/UserContext";
 import CountryPhoneField from "../../components/common/CountryPhoneField";
 import CountryStateCityFieldset from "../../components/common/CountryStateCityFieldset";
-import { Country, State } from "country-state-city";
 import {
   getPincodeValidationMessage,
   isValidInternationalPhone,
   isValidPincode,
 } from "../../utils/liveValidation";
+import { getCountryByCode, getStateByCodeAndCountry } from "../../utils/locationData";
 
 // Define FormData interface based on the state
 interface OnboardingFormData {
@@ -657,7 +657,7 @@ const SellerOnboarding = () => {
                   city: errors.city,
                 }}
                 onCountryChange={(countryCode) => {
-                  const country = Country.getCountryByCode(countryCode);
+                  const country = getCountryByCode(countryCode);
                   setFormData((prev) => ({
                     ...prev,
                     countryCode,
@@ -675,7 +675,7 @@ const SellerOnboarding = () => {
                   }));
                 }}
                 onStateChange={(stateCode) => {
-                  const selectedState = State.getStateByCodeAndCountry(
+                  const selectedState = getStateByCodeAndCountry(
                     stateCode,
                     formData.countryCode,
                   );

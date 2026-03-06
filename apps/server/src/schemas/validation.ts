@@ -35,7 +35,7 @@ export const sellerProfileSchema = z.object({
 
 export const productSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
-  description: z.string().min(10, "Description must be at least 10 characters"),
+  description: z.string().min(10, "Description must be at least 10 characters").max(5000, "Description must be under 5000 characters"),
   price: z.number().min(0, "Price must be non-negative"),
   mrp: z.number().min(0, "MRP must be non-negative").optional(),
   categoryId: z.string().min(1, "Category is required"),
@@ -44,15 +44,20 @@ export const productSchema = z.object({
   thumbnailUrl: z.string().url("Thumbnail URL is required"),
   imageUrls: z.array(z.string().url()).min(1, "At least one additional image is required (use thumbnail as fallback)"),
   videoUrls: z.array(z.string().url()).optional(),
+  descriptionMedia: z.array(z.object({
+    url: z.string().url(),
+    type: z.enum(['image', 'video']),
+    alt: z.string().max(140).optional(),
+  })).optional(),
   brand: z.string().optional(),
   sku: z.string().max(40).optional(),
-  material: z.string().max(120).optional(),
+  material: z.string().max(240).optional(),
   colorOptions: z.array(z.string()).optional(),
   sizeOptions: z.array(z.string()).optional(),
   weightGrams: z.number().min(0).optional(),
   countryOfOrigin: z.string().optional(),
-  warrantyInfo: z.string().max(500).optional(),
-  aboutItem: z.string().max(2000).optional(),
+  warrantyInfo: z.string().max(1000).optional(),
+  aboutItem: z.string().max(4000).optional(),
   ram: z.string().max(100).optional(),
   storage: z.string().max(100).optional(),
   dimensions: z
@@ -66,8 +71,8 @@ export const productSchema = z.object({
   attributes: z
     .array(
       z.object({
-        key: z.string().min(1).max(80),
-        values: z.array(z.string().min(1).max(80)).min(1),
+        key: z.string().min(1).max(120),
+        values: z.array(z.string().min(1).max(160)).min(1),
       }),
     )
     .optional(),
@@ -75,6 +80,20 @@ export const productSchema = z.object({
   returnPolicy: z.string().optional(),
   deliveryTime: z.string().optional(),
   tags: z.array(z.string()).optional(),
+  variantOptions: z.array(
+    z.object({
+      id: z.string().min(1),
+      label: z.string().min(1).max(120),
+      type: z.string().min(1).max(80),
+      value: z.string().min(1).max(120),
+      price: z.number().min(0).optional(),
+      mrp: z.number().min(0).optional(),
+      stock: z.number().int().min(0).optional(),
+      imageUrl: z.string().url().optional(),
+      videoUrl: z.string().url().optional(),
+      sku: z.string().max(40).optional(),
+    }),
+  ).optional(),
   isSameDayEligible: z.boolean().default(false),
   cityAvailability: z.array(z.string()).default([]), // Cities where same-day is available
   discountPercent: z.number().min(0).max(100).default(0),

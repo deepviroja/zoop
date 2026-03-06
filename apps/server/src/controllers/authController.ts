@@ -12,7 +12,9 @@ import {
   sendAccountDeletionOTPEmail,
   sendRetentionEmail,
   sendAccountDeletedEmail,
+  sendWelcomeEmail,
 } from "../services/emailService";
+import { sendWelcomePhoneMessage } from "../services/smsService";
 
 type SellerRecord = {
   id: string;
@@ -35,7 +37,7 @@ type SellerRecord = {
 
 export const signupWithOTP = async (req: Request, res: Response) => {
   try {
-    const { email, password, displayName, role, phone, address, city, state, pincode, gender } = req.body;
+    const { email, password, displayName, role, phone, address, city, state, pincode, gender, otpChannel } = req.body;
 
     // Validate input
     if (!email || !password || !displayName) {
@@ -56,9 +58,17 @@ export const signupWithOTP = async (req: Request, res: Response) => {
     }
 
     // Generate and send OTP to a real email channel.
-    const otp = generateOTP();
-    const expiresAt = await storeOTP(email, otp);
-    await sendOTPEmail(email, otp, displayName);
+    const channel = String(otpChannel || "email").toLowerCase() === "phone" ? "phone" : "email";
+    const otpRecipient = channel === "phone" ? String(phone || "").trim() : String(email || "").trim().toLowerCase();
+    if (!otpRecipient) {
+      return res.status(400).json({ error: channel === "phone" ? "Phone is required for phone OTP" : "Email is required for OTP" });
+    }
+    let expiresAt: string | null = null;
+    if (channel === "email") {
+      const otp = generateOTP();
+      expiresAt = await storeOTP(otpRecipient, otp);
+      await sendOTPEmail(email, otp, displayName);
+    }
 
     // Store pending user
     await db
@@ -75,14 +85,18 @@ export const signupWithOTP = async (req: Request, res: Response) => {
         state: state || "",
         pincode: pincode || "",
         gender: gender || "",
+        otpChannel: channel,
         createdAt: new Date().toISOString(),
       });
 
     res.json({
-      message: "OTP sent successfully",
+      message: channel === "phone" ? "Phone verification required" : "OTP sent successfully",
       email,
+      otpChannel: channel,
+      otpRecipient,
       expiresAt,
-      resendAfterSec: 60,
+      resendAfterSec: channel === "phone" ? 0 : 60,
+      phoneAuthRequired: channel === "phone",
     });
   } catch (error: any) {
     console.error('❌ Signup error:', error);
@@ -92,9 +106,14 @@ export const signupWithOTP = async (req: Request, res: Response) => {
 
 export const verifyOTP = async (req: Request, res: Response) => {
   try {
-    const { email, otp } = req.body;
+    const { email, otp, otpChannel, otpRecipient } = req.body;
+    const channel = String(otpChannel || "email").toLowerCase() === "phone" ? "phone" : "email";
+    if (channel === "phone") {
+      return res.status(400).json({ error: "Use Firebase phone verification for mobile OTP" });
+    }
+    const recipient = String(otpRecipient || email || "").trim().toLowerCase();
 
-    const isValid = await verifyOTPService(email, otp);
+    const isValid = await verifyOTPService(recipient || email, otp);
     if (!isValid) {
       return res.status(400).json({ error: "Invalid or expired OTP" });
     }
@@ -143,6 +162,11 @@ export const verifyOTP = async (req: Request, res: Response) => {
 
     // Delete pending user
     await db.collection("pending_users").doc(email).delete();
+
+    await Promise.allSettled([
+      sendWelcomeEmail(userData.email, userData.displayName),
+      userData.phone ? sendWelcomePhoneMessage(userData.phone, userData.displayName) : Promise.resolve(),
+    ]);
 
     // Generate token
     const customToken = await auth.createCustomToken(userRecord.uid);
@@ -512,6 +536,7 @@ export const confirmDeleteAccount = async (req: Request, res: Response) => {
 export const requestLoginOTP = async (req: Request, res: Response) => {
   try {
     const email = String(req.body?.email || "").trim().toLowerCase();
+    const channel = String(req.body?.otpChannel || "email").toLowerCase() === "phone" ? "phone" : "email";
     if (!email) return res.status(400).json({ error: "Email is required" });
 
     const userRecord = await auth.getUserByEmail(email);
@@ -519,16 +544,28 @@ export const requestLoginOTP = async (req: Request, res: Response) => {
       return res.status(404).json({ error: "No account found for this email" });
     }
 
-    const otp = generateOTP();
-    const otpKey = `login:${email}`;
-    const expiresAt = await storeOTP(otpKey, otp);
-    await sendOTPEmail(email, otp, userRecord.displayName || "User");
+    const profileDoc = await db.collection("users").doc(userRecord.uid).get();
+    const profile = profileDoc.exists ? (profileDoc.data() as any) : {};
+    const otpRecipient = channel === "phone" ? String(profile?.phone || "").trim() : email;
+    if (!otpRecipient) {
+      return res.status(400).json({ error: "Phone number is not available for this account" });
+    }
+    let expiresAt: string | null = null;
+    if (channel === "email") {
+      const otp = generateOTP();
+      const otpKey = `login:${otpRecipient}`;
+      expiresAt = await storeOTP(otpKey, otp);
+      await sendOTPEmail(email, otp, userRecord.displayName || "User");
+    }
 
     res.json({
-      message: "Login OTP sent successfully",
+      message: channel === "phone" ? "Phone verification required" : "Login OTP sent successfully",
       email,
+      otpChannel: channel,
+      otpRecipient,
       expiresAt,
-      resendAfterSec: 60,
+      resendAfterSec: channel === "phone" ? 0 : 60,
+      phoneAuthRequired: channel === "phone",
     });
   } catch (error: any) {
     res.status(500).json({ error: error.message || "Could not send login OTP" });
@@ -538,10 +575,15 @@ export const requestLoginOTP = async (req: Request, res: Response) => {
 export const verifyLoginOTP = async (req: Request, res: Response) => {
   try {
     const email = String(req.body?.email || "").trim().toLowerCase();
+    const channel = String(req.body?.otpChannel || "email").toLowerCase() === "phone" ? "phone" : "email";
+    if (channel === "phone") {
+      return res.status(400).json({ error: "Use Firebase phone verification for mobile OTP" });
+    }
+    const otpRecipient = String(req.body?.otpRecipient || "").trim();
     const otp = String(req.body?.otp || "").trim();
     if (!email || !otp) return res.status(400).json({ error: "Email and OTP are required" });
 
-    const otpKey = `login:${email}`;
+    const otpKey = `login:${otpRecipient || email}`;
     const isValid = await verifyOTPService(otpKey, otp);
     if (!isValid) {
       return res.status(400).json({ error: "Invalid or expired OTP" });
@@ -569,6 +611,7 @@ export const verifyLoginOTP = async (req: Request, res: Response) => {
 export const resendOTP = async (req: Request, res: Response) => {
   try {
     const email = String(req.body?.email || '').trim().toLowerCase();
+    const channel = String(req.body?.otpChannel || 'email').toLowerCase() === 'phone' ? 'phone' : 'email';
     if (!email) return res.status(400).json({ error: 'Email is required' });
 
     const pendingDoc = await db.collection('pending_users').doc(email).get();
@@ -577,17 +620,152 @@ export const resendOTP = async (req: Request, res: Response) => {
     }
 
     const pending = pendingDoc.data() as any;
-    const otp = generateOTP();
-    const expiresAt = await storeOTP(email, otp);
-    await sendOTPEmail(email, otp, pending?.displayName || 'User');
+    const recipient = channel === 'phone' ? String(pending?.phone || '').trim() : email;
+    if (!recipient) {
+      return res.status(400).json({ error: 'Phone number is not available for this signup' });
+    }
+    let expiresAt: string | null = null;
+    if (channel === 'email') {
+      const otp = generateOTP();
+      expiresAt = await storeOTP(recipient, otp);
+      await sendOTPEmail(email, otp, pending?.displayName || 'User');
+    }
 
     res.json({
-      message: 'OTP resent successfully',
+      message: channel === 'phone' ? 'Phone verification required' : 'OTP resent successfully',
+      otpChannel: channel,
+      otpRecipient: recipient,
       expiresAt,
-      resendAfterSec: 60,
+      resendAfterSec: channel === 'phone' ? 0 : 60,
+      phoneAuthRequired: channel === 'phone',
     });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
+  }
+};
+
+export const verifyPhoneSignup = async (req: Request, res: Response) => {
+  try {
+    const email = String(req.body?.email || '').trim().toLowerCase();
+    const idToken = String(req.body?.idToken || '').trim();
+    if (!email || !idToken) {
+      return res.status(400).json({ error: 'Email and Firebase phone token are required' });
+    }
+
+    const pendingUserDoc = await db.collection('pending_users').doc(email).get();
+    if (!pendingUserDoc.exists) {
+      return res.status(404).json({ error: 'Registration data not found' });
+    }
+    const userData = pendingUserDoc.data() as any;
+    const decoded = await auth.verifyIdToken(idToken);
+    const verifiedPhone = String(decoded.phone_number || '').trim();
+    const expectedPhone = String(userData?.phone || '').trim();
+    if (!verifiedPhone || !expectedPhone || verifiedPhone !== expectedPhone) {
+      return res.status(400).json({ error: 'Verified mobile number does not match signup details' });
+    }
+
+    try {
+      await auth.updateUser(decoded.uid, {
+        email: userData.email,
+        password: userData.password,
+        displayName: userData.displayName,
+        phoneNumber: verifiedPhone,
+      });
+    } catch (error: any) {
+      if (String(error?.code || '') === 'auth/user-not-found') {
+        await auth.createUser({
+          uid: decoded.uid,
+          email: userData.email,
+          password: userData.password,
+          displayName: userData.displayName,
+          phoneNumber: verifiedPhone,
+        });
+      } else {
+        throw error;
+      }
+    }
+
+    await auth.setCustomUserClaims(decoded.uid, { role: userData.role || 'customer' });
+    await db.collection('users').doc(decoded.uid).set({
+      id: decoded.uid,
+      email: userData.email,
+      displayName: userData.displayName,
+      phone: verifiedPhone,
+      address: userData.address || "",
+      city: userData.city || "",
+      state: userData.state || "",
+      pincode: userData.pincode || "",
+      gender: userData.gender || "",
+      role: userData.role || 'customer',
+      isEmailVerified: false,
+      isPhoneVerified: true,
+      createdAt: new Date().toISOString(),
+      ...(userData.role === 'seller' && {
+        isApproved: false,
+        onboardingCompleted: false,
+      }),
+    }, { merge: true });
+
+    await db.collection('pending_users').doc(email).delete();
+    await Promise.allSettled([
+      sendWelcomeEmail(userData.email, userData.displayName),
+      verifiedPhone ? sendWelcomePhoneMessage(verifiedPhone, userData.displayName) : Promise.resolve(),
+    ]);
+
+    const customToken = await auth.createCustomToken(decoded.uid);
+    res.json({
+      message: 'Mobile verified successfully',
+      token: customToken,
+      user: {
+        uid: decoded.uid,
+        email: userData.email,
+        displayName: userData.displayName,
+        role: userData.role || 'customer',
+      },
+    });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message || 'Could not verify mobile signup' });
+  }
+};
+
+export const verifyPhoneLogin = async (req: Request, res: Response) => {
+  try {
+    const email = String(req.body?.email || '').trim().toLowerCase();
+    const idToken = String(req.body?.idToken || '').trim();
+    if (!email || !idToken) {
+      return res.status(400).json({ error: 'Email and Firebase phone token are required' });
+    }
+
+    const userRecord = await auth.getUserByEmail(email);
+    const userDoc = await db.collection('users').doc(userRecord.uid).get();
+    if (!userDoc.exists) {
+      return res.status(404).json({ error: 'Profile not found for this account' });
+    }
+    const profile = userDoc.data() as any;
+    const expectedPhone = String(profile?.phone || userRecord.phoneNumber || '').trim();
+    if (!expectedPhone) {
+      return res.status(400).json({ error: 'Phone number is not available for this account' });
+    }
+
+    const decoded = await auth.verifyIdToken(idToken);
+    const verifiedPhone = String(decoded.phone_number || '').trim();
+    if (!verifiedPhone || verifiedPhone !== expectedPhone) {
+      return res.status(400).json({ error: 'Verified mobile number does not match this account' });
+    }
+
+    const customToken = await auth.createCustomToken(userRecord.uid);
+    res.json({
+      message: 'Login successful',
+      token: customToken,
+      user: {
+        uid: userRecord.uid,
+        email: userRecord.email,
+        displayName: userRecord.displayName || profile?.displayName || "",
+        role: profile?.role || "customer",
+      },
+    });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message || 'Could not verify mobile login' });
   }
 };
 
@@ -618,6 +796,8 @@ export const updateMyProfile = async (req: Request, res: Response) => {
       'state',
       'pincode',
       'landmark',
+      'addresses',
+      'defaultLocation',
       'gender',
       'dateOfBirth',
       'photoURL',

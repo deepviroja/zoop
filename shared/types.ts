@@ -73,6 +73,11 @@ export interface Product {
   thumbnailUrl: string;
   imageUrls: string[];
   videoUrls?: string[];
+  descriptionMedia?: Array<{
+    url: string;
+    type: 'image' | 'video';
+    alt?: string;
+  }>;
   brand?: string;
   sku?: string;
   material?: string;
@@ -101,9 +106,37 @@ export interface Product {
   rating: number;
   ratingCount: number;
   orderedCount?: number;
+  variantOptions?: Array<{
+    id: string;
+    label: string;
+    type: string;
+    value: string;
+    price?: number;
+    mrp?: number;
+    stock?: number;
+    imageUrl?: string;
+    videoUrl?: string;
+    sku?: string;
+  }>;
   moderationStatus?: 'pending' | 'approved' | 'rejected' | 'removed';
   isSameDayEligible: boolean;
   cityAvailability: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface OfferRule {
+  id: string;
+  title: string;
+  description?: string;
+  type: 'coupon' | 'offer';
+  discountType: 'percent' | 'flat';
+  discountValue: number;
+  code?: string;
+  minOrderAmount?: number;
+  maxDiscountAmount?: number;
+  active: boolean;
+  scope?: 'order' | 'shipping';
   createdAt: string;
   updatedAt: string;
 }

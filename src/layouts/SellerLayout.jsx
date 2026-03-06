@@ -227,7 +227,7 @@ const SellerLayout = () => {
             aria-label="Seller notifications"
           >
             <BellRing width={18} height={18} />
-            Notifications
+            <span className="hidden sm:inline">Notifications</span>
             {unreadNotifications > 0 && (
               <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-zoop-moss text-zoop-obsidian text-[10px] font-black flex items-center justify-center">
                 {unreadNotifications > 9 ? "9+" : unreadNotifications}

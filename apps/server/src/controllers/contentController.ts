@@ -93,6 +93,22 @@ const DEFAULT_COMMISSION_STRUCTURE = [
   { categoryId: 'all', categoryName: 'Default', commissionPercent: 12, updatedAt: new Date().toISOString() },
 ];
 
+const normalizeOfferPayload = (payload: any, id: string) => ({
+  id,
+  title: String(payload?.title || 'Offer').trim(),
+  description: String(payload?.description || '').trim(),
+  type: String(payload?.type || 'offer') === 'coupon' ? 'coupon' : 'offer',
+  discountType: String(payload?.discountType || 'percent') === 'flat' ? 'flat' : 'percent',
+  discountValue: Math.max(0, Number(payload?.discountValue || 0)),
+  code: String(payload?.code || '').trim().toUpperCase(),
+  minOrderAmount: Math.max(0, Number(payload?.minOrderAmount || 0)),
+  maxDiscountAmount: Math.max(0, Number(payload?.maxDiscountAmount || 0)),
+  scope: String(payload?.scope || 'order') === 'shipping' ? 'shipping' : 'order',
+  active: payload?.active !== false,
+  createdAt: payload?.createdAt || new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+});
+
 const normalizeCategoryId = (value: any) =>
   String(value || 'all')
     .trim()
@@ -274,6 +290,43 @@ export const getSiteConfig = async (_req: Request, res: Response) => {
       payload.subNavCategories = defaultSubNavCategories;
     }
     res.json(payload);
+  } catch (e: any) {
+    res.status(500).json({ error: e.message });
+  }
+};
+
+export const getPublicOffers = async (_req: Request, res: Response) => {
+  try {
+    const snap = await db.collection('offers').get();
+    const offers = snap.docs
+      .map((d) => ({ id: d.id, ...(d.data() as any) }))
+      .filter((offer) => offer.active !== false)
+      .sort((a, b) => new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime());
+    res.json(offers);
+  } catch (e: any) {
+    res.status(500).json({ error: e.message });
+  }
+};
+
+export const getAdminOffers = async (_req: Request, res: Response) => {
+  try {
+    const snap = await db.collection('offers').get();
+    const offers = snap.docs
+      .map((d) => ({ id: d.id, ...(d.data() as any) }))
+      .sort((a, b) => new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime());
+    res.json(offers);
+  } catch (e: any) {
+    res.status(500).json({ error: e.message });
+  }
+};
+
+export const upsertOffer = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const ref = db.collection('offers').doc(id || db.collection('offers').doc().id);
+    const payload = normalizeOfferPayload(req.body, ref.id);
+    await ref.set(payload, { merge: true });
+    res.json({ message: 'Offer saved', offer: payload });
   } catch (e: any) {
     res.status(500).json({ error: e.message });
   }
@@ -1519,9 +1572,16 @@ export const getPublicAdsBySlot = async (req: Request, res: Response) => {
   try {
     const slotId = String(req.query.slotId || req.params.slotId || 'home_top');
     const now = Date.now();
-    const snap = await db.collection('ads').where('slotId', '==', slotId).where('active', '==', true).get();
-    const items = snap.docs
+    const [adsSnap, slotsSnap] = await Promise.all([
+      db.collection('ads').where('active', '==', true).get(),
+      db.collection('adSlots').get(),
+    ]);
+    const slotPlacementMap = new Map(
+      slotsSnap.docs.map((d) => [d.id, String((d.data() as any)?.placement || d.id)]),
+    );
+    const items = adsSnap.docs
       .map((d) => ({ id: d.id, ...(d.data() as any) }))
+      .filter((ad) => ad.slotId === slotId || slotPlacementMap.get(ad.slotId) === slotId)
       .filter((ad) => {
         const startOk = !ad.startAt || new Date(ad.startAt).getTime() <= now;
         const endOk = !ad.endAt || new Date(ad.endAt).getTime() >= now;

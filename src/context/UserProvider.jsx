@@ -74,6 +74,18 @@ export const UserProvider = ({ children }) => {
               role = role || data.role;
               verificationStatus = data.verificationStatus || "none";
               dbProfile = data;
+              const defaultAddress = Array.isArray(data.addresses)
+                ? data.addresses.find((item) => item?.isDefault) || data.addresses[0]
+                : null;
+              const preferredCity =
+                localStorage.getItem("zoop_city") ||
+                data.defaultLocation ||
+                defaultAddress?.city ||
+                data.city;
+              if (preferredCity) {
+                setLocation(preferredCity);
+                localStorage.setItem("zoop_city", preferredCity);
+              }
             }
           } catch (e) {
             console.warn("Failed to fetch user data from Firestore", e);
@@ -134,6 +146,7 @@ export const UserProvider = ({ children }) => {
   const updateLocation = (city) => {
     setLocation(city);
     localStorage.setItem("zoop_city", city);
+    window.location.reload();
   };
 
   const googleSignIn = () => {
