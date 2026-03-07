@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { db, auth } from '../config/firebase';
-import { User, Role } from '../../../../shared/types';
+import { User, Role } from '../types';
 import * as admin from 'firebase-admin';
 import {
   generateOTP,

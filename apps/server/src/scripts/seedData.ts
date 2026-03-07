@@ -1,5 +1,5 @@
 import { db } from '../config/firebase';
-import { Product } from '../../../../shared/types';
+import { Product } from '../types';
 
 const sampleProducts: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>[] = [
   {

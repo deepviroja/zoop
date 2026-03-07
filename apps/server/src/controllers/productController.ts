@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { db } from '../config/firebase';
-import { Product } from '../../../../shared/types';
+import { Product } from '../types';
 import { productSchema } from '../schemas/validation';
 import { z } from 'zod';
 import * as admin from 'firebase-admin';

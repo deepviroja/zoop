@@ -8,9 +8,9 @@
     "noImplicitAny": false,
     "skipLibCheck": true,
     "outDir": "./dist",
+    "rootDir": "./src",
     "baseUrl": ".",
-    "types": ["node"],
-    "rootDirs": ["src", "../../shared"] 
+    "types": ["node"]
   },
-  "include": ["src/**/*", "../../shared/**/*"]
+  "include": ["src/**/*"]
 }
