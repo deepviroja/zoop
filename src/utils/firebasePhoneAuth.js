@@ -27,9 +27,13 @@ export const sendFirebasePhoneOtp = async (phoneNumber) => {
   }
   const container = getContainer();
   if (!recaptchaVerifier) {
-    recaptchaVerifier = new RecaptchaVerifier(auth, container, {
-      size: "invisible",
-    });
+    // Firebase v10+ expects (container, params, auth). Older builds accepted (auth, container, params).
+    try {
+      recaptchaVerifier = new RecaptchaVerifier(container, { size: "invisible" }, auth);
+    } catch (_) {
+      recaptchaVerifier = new RecaptchaVerifier(auth, container, { size: "invisible" });
+    }
+    await recaptchaVerifier.render();
   }
   try {
     return await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);

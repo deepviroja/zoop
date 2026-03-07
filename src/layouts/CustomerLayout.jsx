@@ -136,6 +136,20 @@ const CustomerLayout = () => {
         return;
       }
       const currentScrollY = window.scrollY;
+      const delta = Math.abs(currentScrollY - lastScrollYRef.current);
+
+      // Always reveal when near top to avoid "stuck hidden" state
+      if (currentScrollY <= 8) {
+        setScrollDir("up");
+        lastScrollYRef.current = currentScrollY;
+        return;
+      }
+
+      // Ignore tiny scroll jitter to prevent flicker
+      if (delta < 6) {
+        return;
+      }
+
       if (currentScrollY > lastScrollYRef.current && currentScrollY > 50) {
         setScrollDir("down");
       } else {
