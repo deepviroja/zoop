@@ -7,7 +7,7 @@
     "strict": true,
     "noImplicitAny": false,
     "skipLibCheck": true,
-    "outDir": "./dist",
+    "outDir": "./dist/src",
     "rootDir": "./src",
     "baseUrl": ".",
     "types": ["node"]
