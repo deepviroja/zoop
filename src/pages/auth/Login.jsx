@@ -289,7 +289,7 @@ const Login = () => {
         canonicalPath="/login"
       />
       {redirecting && <Loader fullScreen />}
-      <div className="min-h-screen bg-gradient-to-br from-zoop-moss/20 to-white flex items-center justify-center p-3 sm:p-4">
+      <div className="min-h-screen bg-gradient-to-br from-zoop-moss/20 to-white flex items-center justify-center p-3 sm:p-4 rounded-[1.75rem] sm:rounded-3xl">
         <div className="w-full max-w-md">
           <div className="bg-white rounded-[1.75rem] sm:rounded-3xl shadow-2xl p-5 sm:p-8">
             {/* Header */}

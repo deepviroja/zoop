@@ -69,7 +69,7 @@ const SellerLogin = () => {
   return (
     <>
       {redirecting && <Loader fullScreen />}
-    <div className="min-h-screen bg-gradient-to-br from-zoop-obsidian via-gray-900 to-zoop-obsidian flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-zoop-obsidian via-gray-900 to-zoop-obsidian flex items-center justify-center p-4 rounded-[1.75rem] sm:rounded-3xl">
       <div className="w-full max-w-md">
         {/* Logo/Header */}
         <div className="text-center mb-8">

@@ -395,7 +395,7 @@ const Signup = () => {
   useEffect(() => () => resetPhoneRecaptcha(), []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-zoop-moss/20 to-white flex items-center justify-center p-3 sm:p-4">
+    <div className="min-h-screen bg-gradient-to-br from-zoop-moss/20 to-white flex items-center justify-center p-3 sm:p-4 rounded-[1.75rem] sm:rounded-3xl">
       <Seo
         title="Sign Up | Zoop"
         description="Create your Zoop account."

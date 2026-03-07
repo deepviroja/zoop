@@ -324,7 +324,7 @@ const SellerSignup = () => {
   useEffect(() => () => resetPhoneRecaptcha(), []);
 
   return (
-    <div className="min-h-screen bg-[#f6f1e7] md:grid md:grid-cols-[minmax(320px,42vw)_1fr]">
+    <div className="min-h-screen bg-[#f6f1e7] md:grid md:grid-cols-[minmax(320px,42vw)_1fr] rounded-[1.75rem] sm:rounded-3xl">
       <Seo
         title="Seller Signup | Zoop"
         description="Create your Zoop seller account."
