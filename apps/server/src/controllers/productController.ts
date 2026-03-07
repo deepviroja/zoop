@@ -148,6 +148,16 @@ export const getProductById = async (req: Request, res: Response) => {
           email: seller.email || '',
           photoURL: seller.photoURL || '',
           verificationStatus: seller.verificationStatus || '',
+          showPhoneOnProduct:
+            seller?.storeSettings?.showPhoneOnProduct ?? seller?.showPhoneOnProduct ?? false,
+          showEmailOnProduct:
+            seller?.storeSettings?.showEmailOnProduct ?? seller?.showEmailOnProduct ?? false,
+          sameDayCutoffHour:
+            seller?.storeSettings?.sameDayCutoffHour ?? seller?.sameDayCutoffHour ?? 18,
+          sameDayDeliveryWindowHours:
+            seller?.storeSettings?.sameDayDeliveryWindowHours ??
+            seller?.sameDayDeliveryWindowHours ??
+            4,
         };
       }
     }

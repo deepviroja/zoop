@@ -124,7 +124,7 @@ const AdminLayout = () => {
               <img src={siteConfig.brandLogoUrl} alt="brand" className="h-8 w-8 rounded object-cover" />
             ) : null}
             <h2 className="text-zoop-copper font-900 tracking-tighter uppercase italic text-2xl">
-              {siteConfig?.brandName || "Admin_Control"}
+              {siteConfig?.adminPanelTitle || "Admin Control"}
             </h2>
           </div>
           <button

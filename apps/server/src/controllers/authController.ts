@@ -338,11 +338,10 @@ export const syncUser = async (req: Request, res: Response) => {
 
   try {
     const userDoc = await db.collection('users').doc(user.uid).get();
+    const requestedRole = req.body.role === 'seller' ? 'seller' : 'customer';
     
     if (!userDoc.exists) {
       // Create user if not exists (e.g. first time Google login)
-      const requestedRole = req.body.role === 'seller' ? 'seller' : 'customer';
-      
       const userData: User & Record<string, any> = {
         id: user.uid,
         name: user.name || user.email?.split('@')[0] || 'User',
@@ -368,7 +367,22 @@ export const syncUser = async (req: Request, res: Response) => {
       return res.json({ user: userData });
     }
 
-    let userData = userDoc.data() as User;
+    let userData = userDoc.data() as User & Record<string, any>;
+
+    if (
+      requestedRole === 'seller' &&
+      String(userData.role || 'customer') === 'customer'
+    ) {
+      userData = {
+        ...userData,
+        role: 'seller',
+        verificationStatus: userData.verificationStatus || 'none',
+        onboardingCompleted: false,
+        updatedAt: new Date().toISOString(),
+      };
+      await db.collection('users').doc(user.uid).set(userData, { merge: true });
+      await auth.setCustomUserClaims(user.uid, { role: 'seller' });
+    }
 
     // Special Case: Auto-promote admin email to admin role
     if (user.email === 'admin@zoop.com' && userData.role !== 'admin') {
@@ -825,6 +839,10 @@ export const updateMyProfile = async (req: Request, res: Response) => {
       'weeklyReports',
       'payoutPreference',
       'upiId',
+      'showPhoneOnProduct',
+      'showEmailOnProduct',
+      'sameDayCutoffHour',
+      'sameDayDeliveryWindowHours',
     ];
     const allowed = new Set([
       ...allowedCommon,

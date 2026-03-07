@@ -18,6 +18,7 @@ import { ProductDetailSkeleton } from "../../components/shared/Skeletons";
 import { frequentlyBoughtTogether } from "../../utils/recommendations";
 import { optimizeCloudinaryUrl } from "../../utils/cloudinary";
 import Seo from "../../components/shared/Seo";
+import { getDeliveryEstimate } from "../../utils/delivery";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -246,6 +247,10 @@ const ProductDetail = () => {
     (sum, item) => sum + Number(item?.price || 0),
     0,
   );
+  const deliveryEstimate = getDeliveryEstimate(product, location, {
+    sameDayHours: product?.seller?.sameDayDeliveryWindowHours,
+    cutoffHour: product?.seller?.sameDayCutoffHour,
+  });
 
   if (loading) return <ProductDetailSkeleton />;
 
@@ -720,7 +725,7 @@ const ProductDetail = () => {
                         : "Fast Delivery"}
                     </p>
                     <p className="text-xs text-gray-600 mt-1">
-                      {product.deliveryTime || "2-3 days"}
+                      {deliveryEstimate.label}
                     </p>
                   </div>
                 </div>
@@ -843,8 +848,12 @@ const ProductDetail = () => {
                       </p>
                     </div>
                     <div className="text-sm text-gray-600 space-y-1">
-                      {product.seller.phone && <p>Phone: {product.seller.phone}</p>}
-                      {product.seller.email && <p>Email: {product.seller.email}</p>}
+                      {product.seller.showPhoneOnProduct && product.seller.phone && (
+                        <p>Phone: {product.seller.phone}</p>
+                      )}
+                      {product.seller.showEmailOnProduct && product.seller.email && (
+                        <p>Email: {product.seller.email}</p>
+                      )}
                     </div>
                   </div>
                 </div>

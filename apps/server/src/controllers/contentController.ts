@@ -275,6 +275,7 @@ export const getSiteConfig = async (_req: Request, res: Response) => {
     const defaultConfig = {
       sameDayCities: ['Surat', 'Mumbai'],
       maintenanceMode: false,
+      maintenanceMessage: 'Zoop is under scheduled maintenance. Please check back shortly.',
       featuredCategoryId: 'men',
       announcementBanner: 'Same-Day Delivery active in Surat!',
       brandName: 'ZOOP',
@@ -282,6 +283,17 @@ export const getSiteConfig = async (_req: Request, res: Response) => {
       brandFontFamily: 'inherit',
       brandFontWeight: '900',
       brandLogoUrl: '',
+      sellerPanelTitle: 'Seller Panel',
+      adminPanelTitle: 'Admin Control',
+      customerSidebarCategories: defaultSubNavCategories,
+      customerSidebarQuickLinks: [
+        { label: 'Your Orders', path: '/history' },
+        { label: 'Track Order', path: '/track' },
+        { label: 'Wishlist', path: '/wishlist' },
+        { label: 'Contact Support', path: '/contact' },
+      ],
+      homeSameDayCutoffText: 'Order before 6 PM for same-day delivery',
+      homeHeroHeadline: 'Discover Local Gems',
       subNavCategories: defaultSubNavCategories,
       updatedAt: new Date().toISOString(),
     };

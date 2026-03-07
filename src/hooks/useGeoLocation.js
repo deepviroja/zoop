@@ -13,10 +13,11 @@ export const useGeoLocation = () => {
 
     try {
       const response = await fetch(
-        `/mapapi/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=en`,
+        `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}&accept-language=en`,
         {
           headers: {
             "Accept-Language": "en",
+            "Content-Type": "application/json",
           },
         },
       );
@@ -27,6 +28,10 @@ export const useGeoLocation = () => {
         throw new Error(
           "Received HTML instead of JSON. Did you restart the server?",
         );
+      }
+
+      if (!response.ok) {
+        throw new Error(`Reverse geocoding failed with status ${response.status}`);
       }
 
       const data = await response.json();

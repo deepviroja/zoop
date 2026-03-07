@@ -51,6 +51,45 @@ const STATES_BY_COUNTRY = {
   IN: INDIA_STATES,
 };
 
+const INDIA_CITIES_BY_STATE = {
+  AN: ["Port Blair"],
+  AP: ["Visakhapatnam", "Vijayawada", "Guntur", "Tirupati"],
+  AR: ["Itanagar", "Naharlagun", "Pasighat"],
+  AS: ["Guwahati", "Dibrugarh", "Silchar"],
+  BR: ["Patna", "Gaya", "Muzaffarpur"],
+  CG: ["Raipur", "Bilaspur", "Durg"],
+  CH: ["Chandigarh"],
+  DH: ["Daman", "Diu", "Silvassa"],
+  DL: ["New Delhi", "Delhi"],
+  GA: ["Panaji", "Margao", "Vasco da Gama"],
+  GJ: ["Ahmedabad", "Surat", "Vadodara", "Rajkot", "Bhavnagar"],
+  HP: ["Shimla", "Dharamshala", "Solan"],
+  HR: ["Gurugram", "Faridabad", "Panipat", "Karnal"],
+  JH: ["Ranchi", "Jamshedpur", "Dhanbad"],
+  JK: ["Srinagar", "Jammu"],
+  KA: ["Bengaluru", "Mysuru", "Mangalore", "Hubballi"],
+  KL: ["Kochi", "Thiruvananthapuram", "Kozhikode"],
+  LA: ["Leh", "Kargil"],
+  LD: ["Kavaratti"],
+  MH: ["Mumbai", "Pune", "Nagpur", "Nashik", "Thane"],
+  ML: ["Shillong", "Tura"],
+  MN: ["Imphal"],
+  MP: ["Indore", "Bhopal", "Gwalior", "Jabalpur"],
+  MZ: ["Aizawl"],
+  NL: ["Kohima", "Dimapur"],
+  OD: ["Bhubaneswar", "Cuttack", "Rourkela"],
+  PB: ["Ludhiana", "Amritsar", "Jalandhar", "Mohali"],
+  PY: ["Puducherry"],
+  RJ: ["Jaipur", "Jodhpur", "Udaipur", "Kota"],
+  SK: ["Gangtok"],
+  TN: ["Chennai", "Coimbatore", "Madurai", "Salem"],
+  TS: ["Hyderabad", "Warangal", "Nizamabad"],
+  TR: ["Agartala"],
+  UK: ["Dehradun", "Haridwar", "Haldwani"],
+  UP: ["Lucknow", "Noida", "Kanpur", "Varanasi", "Ghaziabad"],
+  WB: ["Kolkata", "Howrah", "Siliguri", "Durgapur"],
+};
+
 export const getAllCountries = () => COUNTRIES;
 
 export const getCountryByCode = (countryCode = "") =>
@@ -63,3 +102,8 @@ export const getStateByCodeAndCountry = (stateCode = "", countryCode = "") =>
   getStatesOfCountry(countryCode).find(
     (item) => item.isoCode === String(stateCode || "").toUpperCase(),
   ) || null;
+
+export const getCitiesOfState = (countryCode = "", stateCode = "") => {
+  if (String(countryCode || "").toUpperCase() !== "IN") return [];
+  return INDIA_CITIES_BY_STATE[String(stateCode || "").toUpperCase()] || [];
+};

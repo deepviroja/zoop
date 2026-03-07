@@ -41,6 +41,7 @@ const Home = () => {
   const [brands, setBrands] = useState([]);
   const [collections, setCollections] = useState([]);
   const [products, setProducts] = useState([]);
+  const [siteConfig, setSiteConfig] = useState(null);
 
   const [contentLoading, setContentLoading] = useState(true);
   const [productsLoading, setProductsLoading] = useState(true);
@@ -49,16 +50,18 @@ const Home = () => {
   // Fetch all dynamic content in parallel
   const fetchContent = useCallback(async () => {
     try {
-      const [slides, cats, brnds, colls] = await Promise.all([
+      const [slides, cats, brnds, colls, config] = await Promise.all([
         contentApi.getHeroSlides().catch(() => []),
         contentApi.getCategories().catch(() => []),
         contentApi.getBrands().catch(() => []),
         contentApi.getCollections().catch(() => []),
+        contentApi.getSiteConfig().catch(() => null),
       ]);
       setHeroSlides(slides || []);
       setCategories(cats || []);
       setBrands(brnds || []);
       setCollections(colls || []);
+      setSiteConfig(config || null);
     } catch (err) {
       console.error("Content load error:", err);
       setError("Failed to load page content. Please refresh.");
@@ -122,10 +125,7 @@ const Home = () => {
         (city) => String(city).toLowerCase() === localCity.toLowerCase(),
       ),
   );
-  const displayLocalProducts =
-    citySpecificProducts.length > 0
-      ? citySpecificProducts.slice(0, 4)
-      : products.slice(0, 4);
+  const displayLocalProducts = citySpecificProducts.slice(0, 4);
   const newArrivalProducts = [...products]
     .sort(
       (a, b) =>
@@ -160,10 +160,9 @@ const Home = () => {
 
   const collectionCategories = React.useMemo(() => {
     if (categories.length > 0) {
-      const filtered = categories.filter((cat) =>
+      return categories.filter((cat) =>
         liveCategoryIds.has(String(cat.id || "").toLowerCase()),
       );
-      if (filtered.length > 0) return filtered;
     }
     const seen = new Set();
     const fromProducts = products
@@ -180,17 +179,47 @@ const Home = () => {
         };
       })
       .filter(Boolean);
-    if (fromProducts.length > 0) return fromProducts;
-    return [
-      { id: "artisans", name: "Artisans", path: "/category/artisans", desc: "Handpicked by local experts", icon: "🧵" },
-      { id: "home", name: "Home", path: "/category/home", desc: "From home-makers to heritage brands", icon: "🏠" },
-      { id: "kids", name: "Kids", path: "/category/kids", desc: "Playful picks for little ones", icon: "🧸" },
-      { id: "men", name: "Men", path: "/category/men", desc: "Everyday to occasion essentials", icon: "👔" },
-      { id: "women", name: "Women", path: "/category/women", desc: "Modern trends with artisan details", icon: "👜" },
-    ];
+    return fromProducts;
   }, [categories, products, liveCategoryIds]);
+  const featuredBrands = React.useMemo(() => {
+    const grouped = new Map();
+    products.forEach((product) => {
+      const brandName = String(product.brand || "").trim();
+      if (!brandName) return;
+      const key = brandName.toLowerCase();
+      const current = grouped.get(key);
+      const score =
+        Number(product.orderedCount || 0) * 5 +
+        Number(product.ratingCount || 0) * 2 +
+        Number(product.rating || 0);
+      if (!current || score > current.score) {
+        grouped.set(key, {
+          id: key,
+          name: brandName,
+          image:
+            product.thumbnailUrl ||
+            product.image ||
+            product.images?.[0] ||
+            product.imageUrls?.[0] ||
+            "",
+          score,
+          tier:
+            product.isWorldClassBrand ||
+            product.brandTier === "world" ||
+            String(product.type || "").toLowerCase() === "national"
+              ? "World class"
+              : "Local favorite",
+        });
+      }
+    });
+    return Array.from(grouped.values())
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 8);
+  }, [products]);
 
   const activeSlide = heroSlides[currentSlide] || {};
+  const sameDayCutoffText =
+    siteConfig?.homeSameDayCutoffText || "Order before 6 PM for same-day delivery";
 
   if (error) {
     return (
@@ -298,12 +327,12 @@ const Home = () => {
                   <div className="space-y-2">
                     <h1 className="text-3xl sm:text-5xl md:text-8xl font-black tracking-tighter leading-[0.95]">
                       <span className="block text-white">ZOOP</span>
-                        <span className="text-zoop-moss italic">
+                      <span className="text-zoop-moss italic">
                         {activeSlide.city || localCity}
                       </span>
                     </h1>
                     <p className="text-sm sm:text-xl md:text-3xl font-bold text-white/90 max-w-xl leading-tight">
-                      {activeSlide.title || "Discover Local Gems"}
+                      {activeSlide.title || siteConfig?.homeHeroHeadline || "Discover Local Gems"}
                     </p>
                   </div>
                 )}
@@ -457,7 +486,7 @@ const Home = () => {
                 Same-Day in {localCity}
               </h3>
               <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">
-                Order by 6 PM, get it by 9 PM
+                {sameDayCutoffText}
               </p>
             </div>
           </div>
@@ -626,58 +655,54 @@ const Home = () => {
       </section>
 
       {/* BRAND SHOWCASE */}
+      {featuredBrands.length > 0 && (
       <section className="bg-zoop-canvas rounded-[3rem] p-8 md:p-20 text-center overflow-hidden relative">
         <div className="absolute -top-20 -left-20 w-64 h-64 bg-zoop-clay blur-3xl rounded-full opacity-50" />
         <h2 className="text-3xl md:text-5xl font-black text-black italic relative z-10">
-          World Class Brands.
-          <span className="text-zoop-moss">Delivered Fast.</span>
+          Brands You Can Shop Now.
+          <span className="text-zoop-moss"> Ready to deliver.</span>
         </h2>
-        {contentLoading ? (
+        <p className="relative z-10 mt-3 text-sm md:text-base text-gray-600">
+          Built from live products so shoppers only see brands that are actually available.
+        </p>
+        {productsLoading ? (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12">
             {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
               <Skeleton key={i} className="h-24" />
             ))}
           </div>
-        ) : brands.length > 0 ? (
+        ) : (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12 relative z-10">
-            {brands.map((brand, idx) => (
+            {featuredBrands.map((brand, idx) => (
               <Link
                 to={`/products?brand=${encodeURIComponent(brand.name)}`}
                 key={brand.id || idx}
-                className="bg-white border border-black/10 rounded-2xl p-8 flex items-center justify-center grayscale hover:grayscale-0 transition-all cursor-pointer group"
+                className="bg-white border border-black/10 rounded-2xl p-5 md:p-6 flex flex-col items-center justify-center text-center hover:-translate-y-1 transition-all cursor-pointer group shadow-sm hover:shadow-lg"
               >
-                <img
-                  src={optimizeCloudinaryUrl(brand.logo, { width: 500 })}
-                  className="h-10 object-contain group-hover:scale-125 transition-transform"
-                  alt={brand.name}
-                />
+                <div className="h-20 w-full rounded-2xl overflow-hidden bg-[#f4efe6] flex items-center justify-center">
+                  {brand.image ? (
+                    <img
+                      src={optimizeCloudinaryUrl(brand.image, { width: 500 })}
+                      className="h-full w-full object-cover group-hover:scale-105 transition-transform"
+                      alt={brand.name}
+                    />
+                  ) : (
+                    <span className="font-black text-lg text-zoop-obsidian">{brand.name}</span>
+                  )}
+                </div>
+                <p className="mt-4 font-black text-zoop-obsidian">{brand.name}</p>
+                <p className="mt-1 text-[11px] font-bold uppercase tracking-[0.18em] text-gray-500">
+                  {brand.tier}
+                </p>
               </Link>
-            ))}
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12 relative z-10">
-            {[
-              "NIKE",
-              "ADIDAS",
-              "APPLE",
-              "SAMSUNG",
-              "ZARA",
-              "H&M",
-              "PUMA",
-              "SONY",
-            ].map((b) => (
-              <div
-                key={b}
-                className="bg-white border border-black/10 rounded-2xl p-8 flex items-center justify-center"
-              >
-                <span className="font-black text-gray-400 text-lg">{b}</span>
-              </div>
             ))}
           </div>
         )}
       </section>
+      )}
 
       {/* CATEGORY GRID */}
+      {collectionCategories.length > 0 && (
       <section className="relative rounded-3xl border border-[#e7dfd4] bg-gradient-to-br from-[#fcfaf7] via-[#fffefc] to-[#f7f4ee] p-6 md:p-10 shadow-[0_16px_40px_rgba(36,32,24,0.08)] overflow-hidden">
         <div
           className="absolute inset-0 opacity-[0.05]"
@@ -797,6 +822,7 @@ const Home = () => {
           </div>
         </div>
       </section>
+      )}
 
       {/* FEATURED COLLECTIONS */}
       {contentLoading ? (

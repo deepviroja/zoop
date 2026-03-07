@@ -11,6 +11,10 @@ const defaultSettings = {
   autoRestock: false,
   payoutPreference: "bank_transfer",
   upiId: "",
+  showPhoneOnProduct: false,
+  showEmailOnProduct: false,
+  sameDayCutoffHour: 18,
+  sameDayDeliveryWindowHours: 4,
 };
 
 const StoreSettings = () => {
@@ -57,6 +61,26 @@ const StoreSettings = () => {
             profile?.payoutPreference ||
             defaultSettings.payoutPreference,
           upiId: storeSettings.upiId || profile?.upiId || "",
+          showPhoneOnProduct:
+            storeSettings.showPhoneOnProduct ??
+            profile?.showPhoneOnProduct ??
+            defaultSettings.showPhoneOnProduct,
+          showEmailOnProduct:
+            storeSettings.showEmailOnProduct ??
+            profile?.showEmailOnProduct ??
+            defaultSettings.showEmailOnProduct,
+          sameDayCutoffHour:
+            Number(
+              storeSettings.sameDayCutoffHour ??
+                profile?.sameDayCutoffHour ??
+                defaultSettings.sameDayCutoffHour,
+            ) || defaultSettings.sameDayCutoffHour,
+          sameDayDeliveryWindowHours:
+            Number(
+              storeSettings.sameDayDeliveryWindowHours ??
+                profile?.sameDayDeliveryWindowHours ??
+                defaultSettings.sameDayDeliveryWindowHours,
+            ) || defaultSettings.sameDayDeliveryWindowHours,
         });
       } catch (e) {
         showToast(e?.message || "Failed to load store settings", "error");
@@ -93,6 +117,10 @@ const StoreSettings = () => {
           autoRestock: form.autoRestock,
           payoutPreference: form.payoutPreference,
           upiId: form.payoutPreference === "upi" ? form.upiId : "",
+          showPhoneOnProduct: form.showPhoneOnProduct,
+          showEmailOnProduct: form.showEmailOnProduct,
+          sameDayCutoffHour: Number(form.sameDayCutoffHour || 18),
+          sameDayDeliveryWindowHours: Number(form.sameDayDeliveryWindowHours || 4),
         },
         orderNotifications: form.orderNotifications,
         lowStockAlerts: form.lowStockAlerts,
@@ -102,6 +130,10 @@ const StoreSettings = () => {
         autoRestock: form.autoRestock,
         payoutPreference: form.payoutPreference,
         upiId: form.payoutPreference === "upi" ? form.upiId : "",
+        showPhoneOnProduct: form.showPhoneOnProduct,
+        showEmailOnProduct: form.showEmailOnProduct,
+        sameDayCutoffHour: Number(form.sameDayCutoffHour || 18),
+        sameDayDeliveryWindowHours: Number(form.sameDayDeliveryWindowHours || 4),
       });
       showToast("Store settings updated", "success");
     } catch (e) {
@@ -239,6 +271,75 @@ const StoreSettings = () => {
               />
             </div>
           )}
+        </div>
+
+        <div className="bg-white rounded-3xl p-6 md:p-8 border border-gray-100 shadow-sm space-y-6">
+          <h2 className="text-xl font-black text-zoop-obsidian">Customer Contact Visibility</h2>
+          {[
+            { key: "showPhoneOnProduct", label: "Show Phone on Product Page", desc: "Buyers can see your phone number in seller information when enabled" },
+            { key: "showEmailOnProduct", label: "Show Email on Product Page", desc: "Buyers can see your support email in seller information when enabled" },
+          ].map((item) => (
+            <div key={item.key} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+              <div>
+                <p className="font-bold text-zoop-obsidian">{item.label}</p>
+                <p className="text-sm text-gray-500">{item.desc}</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={Boolean(form[item.key])}
+                  onChange={() => handleToggle(item.key)}
+                  className="sr-only peer"
+                />
+                <div className="w-14 h-7 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-zoop-moss" />
+              </label>
+            </div>
+          ))}
+        </div>
+
+        <div className="bg-white rounded-3xl p-6 md:p-8 border border-gray-100 shadow-sm space-y-6">
+          <h2 className="text-xl font-black text-zoop-obsidian">Same-Day Delivery Timing</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">
+                Order Cutoff Hour
+              </label>
+              <input
+                type="number"
+                min="0"
+                max="23"
+                value={form.sameDayCutoffHour}
+                onChange={(e) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    sameDayCutoffHour: Number(e.target.value || 18),
+                  }))
+                }
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-zoop-moss"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">
+                Delivery Window Hours
+              </label>
+              <input
+                type="number"
+                min="1"
+                max="12"
+                value={form.sameDayDeliveryWindowHours}
+                onChange={(e) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    sameDayDeliveryWindowHours: Number(e.target.value || 4),
+                  }))
+                }
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-zoop-moss"
+              />
+            </div>
+          </div>
+          <p className="text-sm text-gray-500">
+            Local products in the buyer&apos;s city will show same-day delivery before the cutoff, then next-day after it.
+          </p>
         </div>
 
         <div className="flex justify-end">

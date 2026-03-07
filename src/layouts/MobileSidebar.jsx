@@ -5,21 +5,19 @@ import { X } from "../assets/icons/X";
 import { ChevronRight } from "../assets/icons/ChevronRight";
 import { useUser } from "../context/UserContext";
 
-const MobileSidebar = ({ isOpen, onClose }) => {
+const MobileSidebar = ({ isOpen, onClose, categories = [], quickLinks = [] }) => {
   const { user, logout } = useUser();
-  const categories = [
-    "Men's Fashion",
-    "Artisan Jewelry",
-    "Home Decor",
-    "Organic Wellness",
-    "Local Footwear",
-  ];
-  const helpLinks = [
-    { label: "Your Orders", path: "/history" },
-    { label: "Track Logistics", path: "/track" },
-    { label: "Customer Support", path: "/contact" },
-    { label: "Sell on Zoop", path: "/seller/signup" },
-  ];
+  const displayCategories = categories.length > 0
+    ? categories
+    : ["Fashion", "Electronics", "Home", "Local", "Brands"];
+  const helpLinks = quickLinks.length > 0
+    ? quickLinks
+    : [
+        { label: "Your Orders", path: "/history" },
+        { label: "Track Order", path: "/track" },
+        { label: "Wishlist", path: "/wishlist" },
+        { label: "Customer Support", path: "/contact" },
+      ];
 
   return (
     <>
@@ -44,7 +42,7 @@ const MobileSidebar = ({ isOpen, onClose }) => {
                 Hello,
               </p>
               <h3 className="text-white font-900 text-lg italic tracking-tighter">
-                {user ? user.name : "Sign In_"}
+                {user ? user.displayName || user.name || "Account" : "Sign In"}
               </h3>
             </div>
           </div>
@@ -61,10 +59,10 @@ const MobileSidebar = ({ isOpen, onClose }) => {
           {/* CATEGORIES SECTION */}
           <section className="px-8 mb-10">
             <h4 className="text-[10px] font-black text-zoop-copper uppercase tracking-[0.3em] mb-6">
-              Market Nodes
+              Shop by Category
             </h4>
             <ul className="space-y-4">
-              {categories.map((cat) => (
+              {displayCategories.map((cat) => (
                 <li key={cat}>
                   <Link
                     to={`/category/${cat.toLowerCase().replace(/\s+/g, "-").replace(/'/g, "")}`}
@@ -169,7 +167,7 @@ const MobileSidebar = ({ isOpen, onClose }) => {
           {/* HELP & SETTINGS */}
           <section className="px-8 mb-10">
             <h4 className="text-[10px] font-black text-gray-300 uppercase tracking-[0.3em] mb-6">
-              Support_Logs
+              Quick Links
             </h4>
             <ul className="space-y-4">
               {helpLinks.map((link) => (
@@ -189,10 +187,10 @@ const MobileSidebar = ({ isOpen, onClose }) => {
           {/* APP STATS (Amazon Style Small Banner) */}
           <div className="mx-8 p-6 bg-zoop-canvas rounded-[2rem] border border-gray-100">
             <p className="text-[9px] font-black uppercase tracking-widest text-zoop-copper mb-1">
-              Local Edge
+              Same-Day
             </p>
             <p className="text-xs font-bold text-zoop-obsidian leading-tight">
-              Same-Day Delivery active in Surat Node.
+              Pick your city to see products that can arrive today.
             </p>
           </div>
         </div>

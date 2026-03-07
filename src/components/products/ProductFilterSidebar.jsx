@@ -31,6 +31,9 @@ const ProductFilterSidebar = ({
     } else {
       document.body.style.overflow = "unset";
     }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
   }, [showFilters]);
 
   return (
@@ -46,8 +49,8 @@ const ProductFilterSidebar = ({
     >
       <div
         ref={sidebarRef}
-        className={`ml-auto flex h-full w-full max-w-[24rem] flex-col bg-white px-4 pb-0 pt-4 shadow-xl lg:sticky lg:max-w-none lg:rounded-[1.75rem] lg:border lg:border-[#e7dfd4] lg:bg-white/88 lg:px-5 lg:pb-5 lg:pt-5 lg:shadow-[0_18px_42px_rgba(41,32,18,0.08)] lg:backdrop-blur-xl lg:h-[calc(100vh-8rem)] lg:overflow-y-auto custom-scrollbar transition-[top] duration-300 ${
-          headerVisible ? "lg:top-40" : "lg:top-24"
+        className={`ml-auto flex h-full w-full max-w-[24rem] flex-col bg-white px-4 pb-0 pt-4 shadow-xl lg:sticky lg:max-w-none lg:rounded-[1.75rem] lg:border lg:border-[#e7dfd4] lg:bg-white/95 lg:px-5 lg:pb-5 lg:pt-5 lg:shadow-[0_18px_42px_rgba(41,32,18,0.08)] lg:backdrop-blur-xl lg:max-h-[calc(100vh-7rem)] lg:overflow-hidden custom-scrollbar transition-[top] duration-300 ${
+          headerVisible ? "lg:top-32" : "lg:top-20"
         }`}
       >
         {/* Mobile Header */}
@@ -78,7 +81,7 @@ const ProductFilterSidebar = ({
           )}
         </div>
 
-        <div className="space-y-6 overflow-y-auto pb-6 lg:pb-0">
+        <div className="space-y-6 overflow-y-auto pb-6 pr-1 lg:flex-1 lg:pb-0">
           {/* Category Filter - Collapsible */}
           <div>
             <button

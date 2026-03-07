@@ -5,3 +5,11 @@ services:
     rootDir: apps/server
     buildCommand: npm install && npm run build
     startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: FRONTEND_URL
+        value: https://zoop-88df6.web.app
+      - key: ALLOWED_ORIGINS
+        value: https://zoop-88df6.web.app,https://zoop-t2bs.onrender.com

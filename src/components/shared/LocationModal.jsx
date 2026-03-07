@@ -1,17 +1,56 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useGeoLocation } from "../../hooks/useGeoLocation";
 import { useUser } from "../../context/UserContext";
+import { contentApi } from "../../services/api";
 
 const LocationModal = ({ isOpen, onClose }) => {
   const { detectCity, loading, error } = useGeoLocation();
   const { updateLocation } = useUser();
   const [searchQuery, setSearchQuery] = useState("");
-  
-  const cities = ["Surat", "Ahmedabad", "Mumbai", "Delhi", "Bangalore", "Pune", "Kolkata", "Chennai", "Jaipur", "Hyderabad"];
+  const [cities, setCities] = useState([
+    "Surat",
+    "Ahmedabad",
+    "Mumbai",
+    "Delhi",
+    "Bengaluru",
+    "Pune",
+    "Kolkata",
+    "Chennai",
+    "Jaipur",
+    "Hyderabad",
+  ]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const loadCities = async () => {
+      try {
+        const list = await contentApi.getCities();
+        if (cancelled || !Array.isArray(list) || list.length === 0) return;
+        const names = list
+          .map((item) => String(item?.name || "").trim())
+          .filter(Boolean);
+        if (!cancelled && names.length > 0) {
+          setCities(Array.from(new Set(names)).sort((a, b) => a.localeCompare(b)));
+        }
+      } catch {
+        // Keep fallback list.
+      }
+    };
+    if (isOpen) {
+      void loadCities();
+    }
+    return () => {
+      cancelled = true;
+    };
+  }, [isOpen]);
 
   // Filter cities based on search query
-  const filteredCities = cities.filter(city =>
-    city.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredCities = useMemo(
+    () =>
+      cities.filter((city) =>
+        city.toLowerCase().includes(searchQuery.toLowerCase()),
+      ),
+    [cities, searchQuery],
   );
 
   if (!isOpen) return null;

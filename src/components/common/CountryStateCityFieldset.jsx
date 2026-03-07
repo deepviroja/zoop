@@ -1,5 +1,9 @@
 import React, { useMemo } from "react";
-import { getAllCountries, getStatesOfCountry } from "../../utils/locationData";
+import {
+  getAllCountries,
+  getCitiesOfState,
+  getStatesOfCountry,
+} from "../../utils/locationData";
 
 const CountryStateCityFieldset = ({
   country = "",
@@ -16,6 +20,10 @@ const CountryStateCityFieldset = ({
     if (!country) return [];
     return getStatesOfCountry(country);
   }, [country]);
+  const cities = useMemo(() => {
+    if (!country || !state) return [];
+    return getCitiesOfState(country, state);
+  }, [country, state]);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2 relative z-10">
@@ -89,18 +97,38 @@ const CountryStateCityFieldset = ({
         <label className="block text-sm font-bold text-gray-700 mb-2">
           City {required ? "*" : ""}
         </label>
-        <input
-          type="text"
-          value={city}
-          onChange={(e) => onCityChange?.(e.target.value)}
-          disabled={!country || !state}
-          placeholder="Enter city"
-          className={`w-full px-4 py-3 rounded-xl border-2 outline-none transition-all mt-1 disabled:bg-gray-100 disabled:cursor-not-allowed ${
-            errors.city
-              ? "border-red-500 bg-red-50"
-              : "border-gray-200 focus:border-zoop-moss"
-          }`}
-        />
+        {cities.length > 0 ? (
+          <select
+            value={city}
+            onChange={(e) => onCityChange?.(e.target.value)}
+            disabled={!country || !state}
+            className={`w-full px-4 py-3 rounded-xl border-2 outline-none transition-all mt-1 disabled:bg-gray-100 disabled:cursor-not-allowed ${
+              errors.city
+                ? "border-red-500 bg-red-50"
+                : "border-gray-200 focus:border-zoop-moss"
+            }`}
+          >
+            <option value="">Select City</option>
+            {cities.map((item) => (
+              <option key={item} value={item}>
+                {item}
+              </option>
+            ))}
+          </select>
+        ) : (
+          <input
+            type="text"
+            value={city}
+            onChange={(e) => onCityChange?.(e.target.value)}
+            disabled={!country || !state}
+            placeholder="Enter city"
+            className={`w-full px-4 py-3 rounded-xl border-2 outline-none transition-all mt-1 disabled:bg-gray-100 disabled:cursor-not-allowed ${
+              errors.city
+                ? "border-red-500 bg-red-50"
+                : "border-gray-200 focus:border-zoop-moss"
+            }`}
+          />
+        )}
         {errors.city && (
           <p className="text-red-500 text-xs mt-1 font-bold">{errors.city}</p>
         )}

@@ -137,7 +137,7 @@ const SellerLayout = () => {
               <img src={siteConfig.brandLogoUrl} alt="brand" className="h-8 w-8 rounded object-cover bg-white" />
             ) : null}
             <h2 className="text-zoop-moss font-900 text-2xl tracking-tighter uppercase italic">
-              {siteConfig?.brandName || "Seller_Panel"}
+              {siteConfig?.sellerPanelTitle || "Seller Panel"}
             </h2>
           </div>
           <button

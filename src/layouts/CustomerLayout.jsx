@@ -211,6 +211,38 @@ const CustomerLayout = () => {
           "Local Artisans",
           "Global Brands",
         ];
+  const customerSidebarCategories =
+    Array.isArray(siteConfig?.customerSidebarCategories) &&
+    siteConfig.customerSidebarCategories.length > 0
+      ? siteConfig.customerSidebarCategories
+      : subNavCategories;
+  const customerSidebarQuickLinks =
+    Array.isArray(siteConfig?.customerSidebarQuickLinks) &&
+    siteConfig.customerSidebarQuickLinks.length > 0
+      ? siteConfig.customerSidebarQuickLinks
+      : [
+          { label: "Your Orders", path: "/history" },
+          { label: "Track Order", path: "/track" },
+          { label: "Wishlist", path: "/wishlist" },
+          { label: "Customer Support", path: "/contact" },
+        ];
+
+  if (siteConfig?.maintenanceMode && !["admin", "seller"].includes(String(user?.role || ""))) {
+    return (
+      <div className="min-h-screen bg-zoop-obsidian text-white flex items-center justify-center p-6">
+        <div className="max-w-xl text-center space-y-4">
+          <p className="text-xs font-black uppercase tracking-[0.28em] text-zoop-moss">
+            Maintenance Mode
+          </p>
+          <h1 className="text-4xl font-black">Zoop is temporarily unavailable</h1>
+          <p className="text-white/70">
+            {siteConfig?.maintenanceMessage ||
+              "We are applying website updates. Please check back shortly."}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-zoop-canvas relative font-sans">
@@ -620,6 +652,8 @@ const CustomerLayout = () => {
               <MobileSidebar
                 isOpen={isSidebarOpen}
                 onClose={() => setSidebarOpen(false)}
+                categories={customerSidebarCategories}
+                quickLinks={customerSidebarQuickLinks}
               />
             </div>
           </div>

@@ -10,6 +10,7 @@ import { Zap } from "../../assets/icons/Zap";
 import { ShoppingCart } from "../../assets/icons/ShoppingCart";
 import StarRating from "./StarRating";
 import { optimizeCloudinaryUrl } from "../../utils/cloudinary";
+import { getDeliveryEstimate } from "../../utils/delivery";
 
 const ProductCard = ({ product, view = "grid" }) => {
   const { addToCart, isInCart } = useCart();
@@ -107,6 +108,7 @@ const ProductCard = ({ product, view = "grid" }) => {
               100,
           )
         : 0;
+  const deliveryEstimate = getDeliveryEstimate(product, user?.city || user?.defaultLocation);
 
   if (view === "list") {
     return (
@@ -196,9 +198,9 @@ const ProductCard = ({ product, view = "grid" }) => {
                       </span>
                     )}
                 </div>
-                {product.deliveryTime && (
+                {(product.deliveryTime || product.type === "Local") && (
                   <p className="text-xs text-green-600 font-medium mt-1">
-                    Delivery: {product.deliveryTime}
+                    {deliveryEstimate.label}
                   </p>
                 )}
               </div>
@@ -211,7 +213,6 @@ const ProductCard = ({ product, view = "grid" }) => {
                     : "bg-gray-200 text-gray-400 cursor-not-allowed"
                 }`}
               >
-                <ShoppingCart width={18} height={18} />
                 {isInCart(product.id) ? (
                   <>
                     <ShoppingCart width={18} height={18} />
@@ -372,15 +373,15 @@ const ProductCard = ({ product, view = "grid" }) => {
           </div>
 
           {/* Delivery Info */}
-          {product.deliveryTime && (
+          {(product.deliveryTime || product.type === "Local") && (
             <p className="text-xs text-green-600 font-medium mt-2 flex items-center gap-1">
-              {product.type === "Local" ? (
+              {deliveryEstimate.isSameDay ? (
                 <>
                   <Zap width={10} height={10} fill="currentColor" />
-                  {product.deliveryTime}
+                  {deliveryEstimate.label}
                 </>
               ) : (
-                `Delivery: ${product.deliveryTime}`
+                deliveryEstimate.label
               )}
             </p>
           )}
