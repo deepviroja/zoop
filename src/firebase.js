@@ -26,7 +26,7 @@ const app = initializeApp(firebaseConfig);
 // In development, set VITE_APPCHECK_DEBUG_TOKEN in .env for local testing.
 if (import.meta.env.DEV && import.meta.env.VITE_APPCHECK_DEBUG_TOKEN) {
   // @ts-ignore — global debug token for local dev
-  self.FIREBASE_APPCHECK_DEBUG_TOKEN = import.meta.env.VITE_APPCHECK_DEBUG_TOKEN;
+  self.FIREBASE_APPCHECK_DEBUG_TOKEN = import.meta.env.VITE_APPCHECK_DEBUG_TOKEN || true;
 }
 
 initializeAppCheck(app, {

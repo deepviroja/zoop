@@ -123,11 +123,18 @@ const CustomerLayout = () => {
   }, [user]);
 
   // Scroll direction logic
+  // On mobile the header is always visible (like BottomNav).
+  // On desktop (md+) it hides on scroll-down and reappears on scroll-up.
   const [scrollDir, setScrollDir] = useState("up");
   const lastScrollYRef = useRef(0);
 
   useEffect(() => {
     const handleScroll = () => {
+      // Only apply auto-hide on desktop (≥768px)
+      if (window.innerWidth < 768) {
+        lastScrollYRef.current = window.scrollY;
+        return;
+      }
       const currentScrollY = window.scrollY;
       if (currentScrollY > lastScrollYRef.current && currentScrollY > 50) {
         setScrollDir("down");
@@ -271,10 +278,11 @@ const CustomerLayout = () => {
       </div>
 
       {/* --- HEADER (Sticky) --- */}
+      {/* Mobile: always visible (translate-y-0). Desktop: smart hide on scroll-down */}
       <header
-        className={`bg-zoop-obsidian text-white sticky top-0 z-50 transition-transform duration-300 ${
-          scrollDir === "down" ? "-translate-y-full" : "translate-y-0"
-        } shadow-xl`}
+        className={`bg-zoop-obsidian text-white sticky top-0 z-50 transition-transform duration-300 shadow-xl ${
+          scrollDir === "down" ? "md:-translate-y-full" : "translate-y-0"
+        }`}
       >
         <div className="max-w-[1400px] mx-auto px-4">
           <div className="h-16 flex items-center justify-between gap-4">

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { Home } from "../../assets/icons/Home";
 import { User } from "../../assets/icons/User";
@@ -15,29 +15,35 @@ const BottomNav = () => {
     { name: "Account", icon: User, path: "/profile" },
   ];
 
-  const [isVisible, setIsVisible] = React.useState(true);
-  const [lastScrollY, setLastScrollY] = React.useState(0);
+  const [isVisible, setIsVisible] = useState(true);
+  const lastScrollYRef = useRef(0);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
 
-      // Show if scrolling up or at top
-      if (currentScrollY < lastScrollY || currentScrollY < 50) {
+      // Always show when near top
+      if (currentScrollY < 50) {
         setIsVisible(true);
       }
-      // Hide if scrolling down and past threshold -- Increased threshold for mobile usability
-      else if (currentScrollY > lastScrollY && currentScrollY > 100) {
-        // Keep visible slightly longer
+      // Show when scrolling UP
+      else if (currentScrollY < lastScrollYRef.current) {
+        setIsVisible(true);
+      }
+      // Hide when scrolling DOWN past threshold
+      else if (
+        currentScrollY > lastScrollYRef.current &&
+        currentScrollY > 100
+      ) {
         setIsVisible(false);
       }
 
-      setLastScrollY(currentScrollY);
+      lastScrollYRef.current = currentScrollY;
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [lastScrollY]);
+  }, []);
 
   return (
     <nav
