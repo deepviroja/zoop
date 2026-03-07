@@ -11,6 +11,7 @@ import AdBanner from "../../components/shared/AdBanner";
 import { contentApi, productsApi } from "../../services/api";
 import { optimizeCloudinaryUrl } from "../../utils/cloudinary";
 import Seo from "../../components/shared/Seo";
+import { normalizeCityName } from "../../utils/cityMapping";
 import men_cat from "../../assets/images/men_cat.png";
 import women_cat from "../../assets/images/women_cat.png";
 import kids_cat from "../../assets/images/kids_cat.png";
@@ -122,7 +123,9 @@ const Home = () => {
       Boolean(p.isSameDayEligible) &&
       Array.isArray(p.cityAvailability) &&
       p.cityAvailability.some(
-        (city) => String(city).toLowerCase() === localCity.toLowerCase(),
+        (city) =>
+          normalizeCityName(city).toLowerCase() ===
+          normalizeCityName(localCity).toLowerCase(),
       ),
   );
   const displayLocalProducts = citySpecificProducts.slice(0, 4);
@@ -146,6 +149,26 @@ const Home = () => {
     });
     return map;
   }, [products]);
+  const getCategoryVisual = useCallback(
+    (categoryId, categoryName, fallbackImage = "") => {
+      const key = String(categoryId || categoryName || "")
+        .toLowerCase()
+        .trim();
+      const product = categoryImageFromProducts[key];
+      return (
+        optimizeCloudinaryUrl(product?.thumbnailUrl, { width: 900 }) ||
+        optimizeCloudinaryUrl(product?.image, { width: 900 }) ||
+        optimizeCloudinaryUrl(product?.images?.[0], { width: 900 }) ||
+        optimizeCloudinaryUrl(product?.imageUrls?.[0], { width: 900 }) ||
+        fallbackImage ||
+        CAT_IMAGES[key] ||
+        `https://placehold.co/800x800/f2ecdf/1a1a1a?text=${encodeURIComponent(
+          categoryName || "Zoop",
+        )}`
+      );
+    },
+    [categoryImageFromProducts],
+  );
 
   const liveCategoryIds = React.useMemo(() => {
     const ids = new Set();
@@ -159,27 +182,37 @@ const Home = () => {
   }, [products]);
 
   const collectionCategories = React.useMemo(() => {
-    if (categories.length > 0) {
-      return categories.filter((cat) =>
-        liveCategoryIds.has(String(cat.id || "").toLowerCase()),
-      );
-    }
-    const seen = new Set();
-    const fromProducts = products
-      .map((p) => {
-        const id = String(p.categoryId || p.category || "").toLowerCase().trim();
-        if (!id || seen.has(id)) return null;
-        seen.add(id);
-        return {
-          id,
-          name: id.charAt(0).toUpperCase() + id.slice(1),
-          path: `/category/${id}`,
-          desc: "Curated for local-first shoppers",
-          icon: "🛍️",
-        };
-      })
-      .filter(Boolean);
-    return fromProducts;
+    const merged = new Map();
+
+    categories.forEach((cat) => {
+      const id = String(cat.id || cat.name || "")
+        .toLowerCase()
+        .trim();
+      if (!id || !liveCategoryIds.has(id)) return;
+      merged.set(id, {
+        ...cat,
+        id,
+        name: cat.name || id.charAt(0).toUpperCase() + id.slice(1),
+        path: cat.path || `/category/${id}`,
+        desc: cat.desc || "Curated for local-first shoppers",
+      });
+    });
+
+    products.forEach((p) => {
+      const id = String(p.categoryId || p.category || "")
+        .toLowerCase()
+        .trim();
+      if (!id || merged.has(id)) return;
+      merged.set(id, {
+        id,
+        name: id.charAt(0).toUpperCase() + id.slice(1),
+        path: `/category/${id}`,
+        desc: "Curated for local-first shoppers",
+        icon: "🛍️",
+      });
+    });
+
+    return Array.from(merged.values());
   }, [categories, products, liveCategoryIds]);
   const featuredBrands = React.useMemo(() => {
     const grouped = new Map();
@@ -663,7 +696,7 @@ const Home = () => {
           <span className="text-zoop-moss"> Ready to deliver.</span>
         </h2>
         <p className="relative z-10 mt-3 text-sm md:text-base text-gray-600">
-          Built from live products so shoppers only see brands that are actually available.
+          Brands that are actually available.
         </p>
         {productsLoading ? (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12">
@@ -672,10 +705,10 @@ const Home = () => {
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12 relative z-10">
-            {featuredBrands.map((brand, idx) => (
-              <Link
-                to={`/products?brand=${encodeURIComponent(brand.name)}`}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12 relative z-10">
+                {featuredBrands.map((brand, idx) => (
+                  <Link
+                to={`/search?q=${encodeURIComponent(brand.name)}`}
                 key={brand.id || idx}
                 className="bg-white border border-black/10 rounded-2xl p-5 md:p-6 flex flex-col items-center justify-center text-center hover:-translate-y-1 transition-all cursor-pointer group shadow-sm hover:shadow-lg"
               >
@@ -747,20 +780,10 @@ const Home = () => {
                   >
                     <div className="relative h-full">
                       <img
-                        src={
-                          optimizeCloudinaryUrl(categoryImageFromProducts[(cat.id || "").toLowerCase()]?.thumbnailUrl, { width: 800 }) ||
-                          CAT_IMAGES[cat.id] ||
-                          cat.image ||
-                          ""
-                        }
+                        src={getCategoryVisual(cat.id, cat.name, cat.image)}
                         alt={cat.name}
                         className="absolute inset-0 w-full h-full object-cover"
                       />
-                      {!CAT_IMAGES[cat.id] && !cat.image && (
-                        <div className="absolute inset-0 flex items-center justify-center text-6xl bg-gradient-to-br from-[#f2ecdf] to-[#efe8dc]">
-                          {cat.icon || "🛍️"}
-                        </div>
-                      )}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-black/10" />
                       <div className="absolute inset-x-0 bottom-0 p-5 text-white">
                         <p className="text-2xl font-black">{cat.name}</p>
@@ -783,20 +806,10 @@ const Home = () => {
                   >
                     <div className="relative h-full">
                       <img
-                        src={
-                          optimizeCloudinaryUrl(categoryImageFromProducts[(cat.id || "").toLowerCase()]?.thumbnailUrl, { width: 800 }) ||
-                          CAT_IMAGES[cat.id] ||
-                          cat.image ||
-                          ""
-                        }
+                        src={getCategoryVisual(cat.id, cat.name, cat.image)}
                         alt={cat.name}
                         className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
-                      {!CAT_IMAGES[cat.id] && !cat.image && (
-                        <div className="absolute inset-0 flex items-center justify-center text-6xl bg-gradient-to-br from-[#f2ecdf] to-[#efe8dc]">
-                          {cat.icon || "🛍️"}
-                        </div>
-                      )}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/10 group-hover:from-black/85" />
                       <div className="absolute inset-x-0 bottom-0 p-5 text-white">
                         <p className="text-2xl font-black">{cat.name}</p>

@@ -25,6 +25,8 @@ const CategoryPage = lazy(() => import("./pages/customer/CategoryPage"));
 const ProductDetail = lazy(() => import("./pages/customer/ProductDetail"));
 const About = lazy(() => import("./pages/static/About"));
 const Contact = lazy(() => import("./pages/static/Contact"));
+const Privacy = lazy(() => import("./pages/static/Privacy"));
+const Cookies = lazy(() => import("./pages/static/Cookies"));
 const Terms = lazy(() => import("./pages/static/Terms"));
 const Help = lazy(() => import("./pages/static/Help"));
 const IconShowcase = lazy(() => import("./pages/IconShowcase"));
@@ -138,6 +140,8 @@ function App() {
             />
             <Route path="about" element={<About />} />
             <Route path="contact" element={<Contact />} />
+            <Route path="privacy" element={<Privacy />} />
+            <Route path="cookies" element={<Cookies />} />
             <Route path="terms" element={<Terms />} />
             <Route path="help" element={<Help />} />
             <Route path="icons" element={<IconShowcase />} />

@@ -13,6 +13,7 @@ import Pagination from "../../components/shared/Pagination";
 import { shuffleProductsForUser } from "../../utils/shuffleProducts";
 import { useUser } from "../../context/UserContext";
 import Seo from "../../components/shared/Seo";
+import { normalizeCityName } from "../../utils/cityMapping";
 
 const Products = () => {
   const { location } = useUser();
@@ -54,7 +55,9 @@ const Products = () => {
               Boolean(product.isSameDayEligible) &&
               Array.isArray(product.cityAvailability) &&
               product.cityAvailability.some(
-                (city) => String(city).toLowerCase() === String(location || "").toLowerCase(),
+                (city) =>
+                  normalizeCityName(city).toLowerCase() ===
+                  normalizeCityName(location || "").toLowerCase(),
               ),
           );
         }
@@ -112,6 +115,11 @@ const Products = () => {
       <div className="max-w-[1600px] mx-auto px-4 py-6 z-999">
         <ProductListHeader
           productCount={filteredProducts.length}
+          heading={
+            categoryParam || typeParam
+              ? ""
+              : "Discover latest and trendy products"
+          }
           sortBy={sortBy}
           setSortBy={setSortBy}
           view={view}

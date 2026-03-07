@@ -176,7 +176,7 @@ const AdminStats = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Sales Chart */}
-          <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm">
+          <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm overflow-hidden">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-black text-zoop-obsidian">
                 Sales Overview
@@ -185,38 +185,35 @@ const AdminStats = () => {
                 This {timeRange}
               </span>
             </div>
-            <div className="flex items-end justify-between gap-3 h-64">
-              {(salesData.length > 0 ? salesData : [{ label: "-", value: 0 }]).map((data, i) => (
-                <div
-                  key={i}
-                  className="flex-1 flex flex-col items-center gap-2"
-                >
+            <div className="overflow-x-auto pb-2">
+              <div className="flex min-w-[640px] items-end justify-between gap-3 h-72">
+                {(salesData.length > 0
+                  ? salesData
+                  : [{ label: "-", value: 0 }]).map((data, i) => (
                   <div
-                    className="w-full relative flex items-end justify-center"
-                    style={{ height: "200px" }}
+                    key={i}
+                    className="flex min-w-[56px] flex-1 flex-col items-center gap-3"
                   >
+                    <p className="text-[11px] font-black text-zoop-obsidian whitespace-nowrap">
+                      ₹{Math.round(data.value).toLocaleString("en-IN")}
+                    </p>
                     <div
-                      className="w-full bg-gradient-to-t from-zoop-moss to-green-400 rounded-t-lg group cursor-pointer hover:opacity-80 transition-all"
-                      style={{ height: `${Math.max(8, (data.value / maxSales) * 100)}%` }}
+                      className="w-full relative flex items-end justify-center"
+                      style={{ height: "208px" }}
                     >
-                      <span className="block text-center text-xs font-black opacity-0 group-hover:opacity-100 -mt-6 transition-opacity">
-                        ₹{Math.round(data.value).toLocaleString("en-IN")}
-                      </span>
+                      <div
+                        className="w-full min-h-[12px] bg-gradient-to-t from-zoop-moss to-green-400 rounded-t-lg group cursor-pointer hover:opacity-80 transition-all"
+                        style={{
+                          height: `${Math.max(8, (data.value / maxSales) * 100)}%`,
+                        }}
+                      />
                     </div>
+                    <span className="text-[11px] font-bold text-gray-500 text-center leading-tight whitespace-nowrap">
+                      {data.label}
+                    </span>
                   </div>
-                  <span className="text-xs font-bold text-gray-500">
-                    {timeRange === "month"
-                      ? i % 5 === 0
-                        ? data.label
-                        : ""
-                      : timeRange === "year"
-                        ? data.label
-                        : i % 2 === 0
-                          ? data.label
-                          : ""}
-                  </span>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
 

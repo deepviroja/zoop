@@ -2,6 +2,16 @@ import React from "react";
 import PhoneInput from "react-country-phone-input";
 import "react-country-phone-input/lib/style.css";
 
+const normalizePhoneValue = (rawValue = "", countryData = {}) => {
+  const digits = String(rawValue || "").replace(/\D/g, "");
+  const dialCode = String(countryData?.dialCode || "").replace(/\D/g, "");
+  if (!digits) return "";
+  const localDigits = dialCode && digits.startsWith(dialCode)
+    ? digits.slice(dialCode.length)
+    : digits;
+  return dialCode ? `+${dialCode}${localDigits}` : `+${digits}`;
+};
+
 const CountryPhoneField = ({
   label = "Phone Number",
   value = "",
@@ -29,7 +39,10 @@ const CountryPhoneField = ({
         placeholder={placeholder}
         onChange={(nextValue, countryData) => {
           onMetaChange?.(countryData || {});
-          onChange?.(nextValue || "", countryData || {});
+          onChange?.(
+            normalizePhoneValue(nextValue || "", countryData || {}),
+            countryData || {},
+          );
         }}
         inputProps={{
           name: inputName,

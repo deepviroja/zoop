@@ -5,6 +5,7 @@ import { Filter } from "../../assets/icons/Filter";
 
 const ProductListHeader = ({
   productCount,
+  heading = "",
   sortBy,
   setSortBy,
   view,
@@ -23,7 +24,7 @@ const ProductListHeader = ({
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div className="hidden md:block">
           <h1 className="text-2xl font-black text-zoop-obsidian">
-            {productCount} Products
+            {heading || `${productCount} Products`}
           </h1>
         </div>
 

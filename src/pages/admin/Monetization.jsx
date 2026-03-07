@@ -1,13 +1,27 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { adminApi } from "../../services/api";
 
+const isNotFoundError = (e) => {
+  const msg = String(e?.message || "").toLowerCase();
+  return (
+    e?.status === 404 ||
+    msg.includes("not found") ||
+    msg.includes("404") ||
+    msg.includes("route")
+  );
+};
+
 const fmtInr = (value) =>
   Number(value || 0).toLocaleString("en-IN", { maximumFractionDigits: 2 });
 
 const Monetization = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [overview, setOverview] = useState({ totals: {}, commissionStructure: [], payouts: [] });
+  const [overview, setOverview] = useState({
+    totals: {},
+    commissionStructure: [],
+    payouts: [],
+  });
   const [commission, setCommission] = useState([]);
   const [offers, setOffers] = useState([]);
   const [offerDraft, setOfferDraft] = useState({
@@ -24,17 +38,40 @@ const Monetization = () => {
   });
   const [error, setError] = useState("");
 
+  const [apiUnavailable, setApiUnavailable] = useState(false);
+
   const load = async () => {
     setLoading(true);
+    setApiUnavailable(false);
     try {
-      const data = await adminApi.getMonetizationOverview();
-      const offerItems = await adminApi.getOffers();
-      setOverview(data || { totals: {}, commissionStructure: [], payouts: [] });
-      setCommission(Array.isArray(data?.commissionStructure) ? data.commissionStructure : []);
-      setOffers(Array.isArray(offerItems) ? offerItems : []);
+      const [data, offerItems] = await Promise.allSettled([
+        adminApi.getMonetizationOverview(),
+        adminApi.getOffers(),
+      ]);
+      if (data.status === "fulfilled" && data.value) {
+        setOverview(
+          data.value || { totals: {}, commissionStructure: [], payouts: [] },
+        );
+        setCommission(
+          Array.isArray(data.value?.commissionStructure)
+            ? data.value.commissionStructure
+            : [],
+        );
+      } else if (data.status === "rejected" && isNotFoundError(data.reason)) {
+        setApiUnavailable(true);
+      } else if (data.status === "rejected") {
+        setError(data.reason?.message || "Failed to load monetization data");
+      }
+      if (offerItems.status === "fulfilled") {
+        setOffers(Array.isArray(offerItems.value) ? offerItems.value : []);
+      }
       setError("");
     } catch (e) {
-      setError(e?.message || "Failed to load monetization data");
+      if (isNotFoundError(e)) {
+        setApiUnavailable(true);
+      } else {
+        setError(e?.message || "Failed to load monetization data");
+      }
     } finally {
       setLoading(false);
     }
@@ -45,7 +82,10 @@ const Monetization = () => {
   }, []);
 
   const pendingPayouts = useMemo(
-    () => (Array.isArray(overview?.payouts) ? overview.payouts.filter((p) => p.status === "PENDING_TRANSFER") : []),
+    () =>
+      Array.isArray(overview?.payouts)
+        ? overview.payouts.filter((p) => p.status === "PENDING_TRANSFER")
+        : [],
     [overview],
   );
 
@@ -76,33 +116,74 @@ const Monetization = () => {
         <h1 className="text-4xl font-900 tracking-tighter italic text-zoop-obsidian uppercase">
           Monetization Hub
         </h1>
-        <p className="text-gray-500 mt-1">Commission, revenue, and payout transfer control.</p>
+        <p className="text-gray-500 mt-1">
+          Commission, revenue, and payout transfer control.
+        </p>
       </div>
 
-      {error && <div className="p-4 rounded-xl bg-red-50 border border-red-100 text-red-700 font-bold">{error}</div>}
+      {apiUnavailable && (
+        <div className="p-5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800">
+          <p className="font-black text-base mb-1">
+            Monetization API not yet available
+          </p>
+          <p className="text-sm font-medium">
+            The backend monetization endpoint is not set up yet. Offers &amp;
+            coupon management is still available below.
+          </p>
+        </div>
+      )}
+      {error && (
+        <div className="p-4 rounded-xl bg-red-50 border border-red-100 text-red-700 font-bold flex items-center justify-between gap-3">
+          <span>{error}</span>
+          <button
+            onClick={() => setError("")}
+            className="text-red-400 hover:text-red-700 font-black text-lg leading-none"
+          >
+            ×
+          </button>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-white rounded-2xl p-5 border border-gray-100">
-          <p className="text-xs font-black uppercase tracking-widest text-gray-400">Total Revenue</p>
-          <p className="text-3xl font-black text-zoop-obsidian mt-2">₹{fmtInr(overview?.totals?.totalRevenue)}</p>
+          <p className="text-xs font-black uppercase tracking-widest text-gray-400">
+            Total Revenue
+          </p>
+          <p className="text-3xl font-black text-zoop-obsidian mt-2">
+            ₹{fmtInr(overview?.totals?.totalRevenue)}
+          </p>
         </div>
         <div className="bg-white rounded-2xl p-5 border border-gray-100">
-          <p className="text-xs font-black uppercase tracking-widest text-gray-400">Total Commission</p>
-          <p className="text-3xl font-black text-zoop-moss mt-2">₹{fmtInr(overview?.totals?.totalCommission)}</p>
+          <p className="text-xs font-black uppercase tracking-widest text-gray-400">
+            Total Commission
+          </p>
+          <p className="text-3xl font-black text-zoop-moss mt-2">
+            ₹{fmtInr(overview?.totals?.totalCommission)}
+          </p>
         </div>
         <div className="bg-white rounded-2xl p-5 border border-gray-100">
-          <p className="text-xs font-black uppercase tracking-widest text-gray-400">Pending Transfer</p>
-          <p className="text-3xl font-black text-amber-600 mt-2">₹{fmtInr(overview?.totals?.pendingTransfer)}</p>
+          <p className="text-xs font-black uppercase tracking-widest text-gray-400">
+            Pending Transfer
+          </p>
+          <p className="text-3xl font-black text-amber-600 mt-2">
+            ₹{fmtInr(overview?.totals?.pendingTransfer)}
+          </p>
         </div>
         <div className="bg-white rounded-2xl p-5 border border-gray-100">
-          <p className="text-xs font-black uppercase tracking-widest text-gray-400">Transferred</p>
-          <p className="text-3xl font-black text-green-600 mt-2">₹{fmtInr(overview?.totals?.transferred)}</p>
+          <p className="text-xs font-black uppercase tracking-widest text-gray-400">
+            Transferred
+          </p>
+          <p className="text-3xl font-black text-green-600 mt-2">
+            ₹{fmtInr(overview?.totals?.transferred)}
+          </p>
         </div>
       </div>
 
       <div className="bg-white rounded-3xl border border-gray-100 p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-black text-zoop-obsidian">Commission Structure</h2>
+          <h2 className="text-2xl font-black text-zoop-obsidian">
+            Commission Structure
+          </h2>
           <button
             onClick={() =>
               setCommission((prev) => [
@@ -117,12 +198,17 @@ const Monetization = () => {
         </div>
         <div className="space-y-3">
           {commission.map((row, idx) => (
-            <div key={`${row.categoryId}-${idx}`} className="grid grid-cols-1 md:grid-cols-4 gap-3">
+            <div
+              key={`${row.categoryId}-${idx}`}
+              className="grid grid-cols-1 md:grid-cols-4 gap-3"
+            >
               <input
                 value={row.categoryId || ""}
                 onChange={(e) =>
                   setCommission((prev) =>
-                    prev.map((p, i) => (i === idx ? { ...p, categoryId: e.target.value } : p)),
+                    prev.map((p, i) =>
+                      i === idx ? { ...p, categoryId: e.target.value } : p,
+                    ),
                   )
                 }
                 className="px-3 py-2 border border-gray-200 rounded-xl"
@@ -132,7 +218,9 @@ const Monetization = () => {
                 value={row.categoryName || ""}
                 onChange={(e) =>
                   setCommission((prev) =>
-                    prev.map((p, i) => (i === idx ? { ...p, categoryName: e.target.value } : p)),
+                    prev.map((p, i) =>
+                      i === idx ? { ...p, categoryName: e.target.value } : p,
+                    ),
                   )
                 }
                 className="px-3 py-2 border border-gray-200 rounded-xl"
@@ -144,7 +232,12 @@ const Monetization = () => {
                 onChange={(e) =>
                   setCommission((prev) =>
                     prev.map((p, i) =>
-                      i === idx ? { ...p, commissionPercent: Number(e.target.value || 0) } : p,
+                      i === idx
+                        ? {
+                            ...p,
+                            commissionPercent: Number(e.target.value || 0),
+                          }
+                        : p,
                     ),
                   )
                 }
@@ -152,7 +245,9 @@ const Monetization = () => {
                 placeholder="commission %"
               />
               <button
-                onClick={() => setCommission((prev) => prev.filter((_, i) => i !== idx))}
+                onClick={() =>
+                  setCommission((prev) => prev.filter((_, i) => i !== idx))
+                }
                 className="px-3 py-2 bg-red-50 text-red-600 rounded-xl font-bold"
               >
                 Remove
@@ -172,26 +267,105 @@ const Monetization = () => {
       <div className="bg-white rounded-3xl border border-gray-100 p-6">
         <div className="flex items-center justify-between gap-3 mb-4">
           <div>
-            <h2 className="text-2xl font-black text-zoop-obsidian">Offers & Coupons</h2>
-            <p className="text-sm text-gray-500">Manage checkout discounts shown to customers.</p>
+            <h2 className="text-2xl font-black text-zoop-obsidian">
+              Offers & Coupons
+            </h2>
+            <p className="text-sm text-gray-500">
+              Manage checkout discounts shown to customers.
+            </p>
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <input value={offerDraft.title} onChange={(e) => setOfferDraft((p) => ({ ...p, title: e.target.value }))} className="px-3 py-2 border border-gray-200 rounded-xl" placeholder="Offer title" />
-          <input value={offerDraft.code} onChange={(e) => setOfferDraft((p) => ({ ...p, code: e.target.value.toUpperCase() }))} className="px-3 py-2 border border-gray-200 rounded-xl" placeholder="Coupon code" />
-          <input value={offerDraft.description} onChange={(e) => setOfferDraft((p) => ({ ...p, description: e.target.value }))} className="px-3 py-2 border border-gray-200 rounded-xl md:col-span-2" placeholder="Short description" />
-          <select value={offerDraft.type} onChange={(e) => setOfferDraft((p) => ({ ...p, type: e.target.value }))} className="px-3 py-2 border border-gray-200 rounded-xl">
+          <input
+            value={offerDraft.title}
+            onChange={(e) =>
+              setOfferDraft((p) => ({ ...p, title: e.target.value }))
+            }
+            className="px-3 py-2 border border-gray-200 rounded-xl"
+            placeholder="Offer title"
+          />
+          <input
+            value={offerDraft.code}
+            onChange={(e) =>
+              setOfferDraft((p) => ({
+                ...p,
+                code: e.target.value.toUpperCase(),
+              }))
+            }
+            className="px-3 py-2 border border-gray-200 rounded-xl"
+            placeholder="Coupon code"
+          />
+          <input
+            value={offerDraft.description}
+            onChange={(e) =>
+              setOfferDraft((p) => ({ ...p, description: e.target.value }))
+            }
+            className="px-3 py-2 border border-gray-200 rounded-xl md:col-span-2"
+            placeholder="Short description"
+          />
+          <select
+            value={offerDraft.type}
+            onChange={(e) =>
+              setOfferDraft((p) => ({ ...p, type: e.target.value }))
+            }
+            className="px-3 py-2 border border-gray-200 rounded-xl"
+          >
             <option value="coupon">Coupon</option>
             <option value="offer">Offer</option>
           </select>
-          <select value={offerDraft.discountType} onChange={(e) => setOfferDraft((p) => ({ ...p, discountType: e.target.value }))} className="px-3 py-2 border border-gray-200 rounded-xl">
+          <select
+            value={offerDraft.discountType}
+            onChange={(e) =>
+              setOfferDraft((p) => ({ ...p, discountType: e.target.value }))
+            }
+            className="px-3 py-2 border border-gray-200 rounded-xl"
+          >
             <option value="percent">Percent</option>
             <option value="flat">Flat</option>
           </select>
-          <input type="number" value={offerDraft.discountValue} onChange={(e) => setOfferDraft((p) => ({ ...p, discountValue: Number(e.target.value || 0) }))} className="px-3 py-2 border border-gray-200 rounded-xl" placeholder="Discount value" />
-          <input type="number" value={offerDraft.minOrderAmount} onChange={(e) => setOfferDraft((p) => ({ ...p, minOrderAmount: Number(e.target.value || 0) }))} className="px-3 py-2 border border-gray-200 rounded-xl" placeholder="Minimum order amount" />
-          <input type="number" value={offerDraft.maxDiscountAmount} onChange={(e) => setOfferDraft((p) => ({ ...p, maxDiscountAmount: Number(e.target.value || 0) }))} className="px-3 py-2 border border-gray-200 rounded-xl" placeholder="Max discount amount" />
-          <select value={offerDraft.scope} onChange={(e) => setOfferDraft((p) => ({ ...p, scope: e.target.value }))} className="px-3 py-2 border border-gray-200 rounded-xl">
+          <input
+            type="number"
+            value={offerDraft.discountValue}
+            onChange={(e) =>
+              setOfferDraft((p) => ({
+                ...p,
+                discountValue: Number(e.target.value || 0),
+              }))
+            }
+            className="px-3 py-2 border border-gray-200 rounded-xl"
+            placeholder="Discount value"
+          />
+          <input
+            type="number"
+            value={offerDraft.minOrderAmount}
+            onChange={(e) =>
+              setOfferDraft((p) => ({
+                ...p,
+                minOrderAmount: Number(e.target.value || 0),
+              }))
+            }
+            className="px-3 py-2 border border-gray-200 rounded-xl"
+            placeholder="Minimum order amount"
+          />
+          <input
+            type="number"
+            value={offerDraft.maxDiscountAmount}
+            onChange={(e) =>
+              setOfferDraft((p) => ({
+                ...p,
+                maxDiscountAmount: Number(e.target.value || 0),
+              }))
+            }
+            className="px-3 py-2 border border-gray-200 rounded-xl"
+            placeholder="Max discount amount"
+          />
+          <select
+            value={offerDraft.scope}
+            onChange={(e) =>
+              setOfferDraft((p) => ({ ...p, scope: e.target.value }))
+            }
+            className="px-3 py-2 border border-gray-200 rounded-xl"
+          >
             <option value="order">Order</option>
             <option value="shipping">Shipping</option>
           </select>
@@ -222,29 +396,48 @@ const Monetization = () => {
           Save Offer
         </button>
         <div className="mt-6 space-y-3">
+          {offers.length === 0 && !loading && (
+            <p className="text-sm text-gray-400 italic py-4 text-center">
+              No offers or coupons yet.
+            </p>
+          )}
           {offers.map((offer) => (
-            <div key={offer.id} className="rounded-2xl border border-gray-100 bg-gray-50 p-4">
+            <div
+              key={offer.id}
+              className="rounded-2xl border border-gray-100 bg-gray-50 p-4"
+            >
               <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                 <div>
-                  <p className="font-black text-zoop-obsidian">{offer.title} {offer.code ? `(${offer.code})` : ""}</p>
+                  <p className="font-black text-zoop-obsidian">
+                    {offer.title} {offer.code ? `(${offer.code})` : ""}
+                  </p>
                   <p className="text-sm text-gray-500">{offer.description}</p>
                   <p className="mt-1 text-xs font-bold uppercase tracking-wider text-[#8b5e3c]">
-                    {offer.discountType === "flat" ? `Flat ₹${offer.discountValue}` : `${offer.discountValue}% off`} • {offer.scope || "order"} • Min ₹{offer.minOrderAmount || 0}
+                    {offer.discountType === "flat"
+                      ? `Flat ₹${offer.discountValue}`
+                      : `${offer.discountValue}% off`}{" "}
+                    • {offer.scope || "order"} • Min ₹
+                    {offer.minOrderAmount || 0}
                   </p>
                 </div>
-                <button
-                  onClick={async () => {
-                    try {
-                      await adminApi.updateOffer(offer.id, { ...offer, active: !offer.active });
-                      await load();
-                    } catch (e) {
-                      setError(e?.message || "Could not update offer");
-                    }
-                  }}
-                  className={`px-4 py-2 rounded-xl text-xs font-black uppercase ${offer.active ? "bg-green-50 text-green-700" : "bg-gray-200 text-gray-700"}`}
-                >
-                  {offer.active ? "Active" : "Inactive"}
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={async () => {
+                      try {
+                        await adminApi.updateOffer(offer.id, {
+                          ...offer,
+                          active: !offer.active,
+                        });
+                        await load();
+                      } catch (e) {
+                        setError(e?.message || "Could not update offer");
+                      }
+                    }}
+                    className={`px-4 py-2 rounded-xl text-xs font-black uppercase ${offer.active ? "bg-green-50 text-green-700" : "bg-gray-200 text-gray-700"}`}
+                  >
+                    {offer.active ? "Active" : "Inactive"}
+                  </button>
+                </div>
               </div>
             </div>
           ))}
@@ -253,7 +446,9 @@ const Monetization = () => {
 
       <div className="bg-white rounded-3xl border border-gray-100 overflow-hidden">
         <div className="p-6 border-b border-gray-100">
-          <h2 className="text-2xl font-black text-zoop-obsidian">Pending Payout Transfers</h2>
+          <h2 className="text-2xl font-black text-zoop-obsidian">
+            Pending Payout Transfers
+          </h2>
         </div>
         {loading ? (
           <p className="p-6 text-gray-500 font-bold">Loading...</p>
@@ -264,7 +459,13 @@ const Monetization = () => {
             <table className="w-full">
               <thead className="bg-gray-50">
                 <tr>
-                  {["Payout ID", "Seller", "Order", "Payout Amount", "Action"].map((h) => (
+                  {[
+                    "Payout ID",
+                    "Seller",
+                    "Order",
+                    "Payout Amount",
+                    "Action",
+                  ].map((h) => (
                     <th
                       key={h}
                       className="px-6 py-4 text-left text-[10px] font-black uppercase tracking-widest text-gray-400"
@@ -277,10 +478,18 @@ const Monetization = () => {
               <tbody className="divide-y divide-gray-100">
                 {pendingPayouts.map((p) => (
                   <tr key={p.id}>
-                    <td className="px-6 py-4 font-bold text-zoop-obsidian">{p.id}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{p.sellerId}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{p.orderId}</td>
-                    <td className="px-6 py-4 font-black text-zoop-moss">₹{fmtInr(p.payoutAmount)}</td>
+                    <td className="px-6 py-4 font-bold text-zoop-obsidian">
+                      {p.id}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-600">
+                      {p.sellerId}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-600">
+                      {p.orderId}
+                    </td>
+                    <td className="px-6 py-4 font-black text-zoop-moss">
+                      ₹{fmtInr(p.payoutAmount)}
+                    </td>
                     <td className="px-6 py-4">
                       <button
                         onClick={() => release(p.id)}

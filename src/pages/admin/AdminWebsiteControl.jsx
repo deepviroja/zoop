@@ -3,6 +3,7 @@ import { adminApi, authApi, contentApi } from "../../services/api";
 
 const AdminWebsiteControl = () => {
   const [saving, setSaving] = useState(false);
+  const [contactSaving, setContactSaving] = useState(false);
   const [maintenanceSaving, setMaintenanceSaving] = useState(false);
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [heroSlides, setHeroSlides] = useState([]);
@@ -23,6 +24,15 @@ const AdminWebsiteControl = () => {
     maintenanceMessage: "",
     sellerPanelTitle: "Seller Panel",
     adminPanelTitle: "Admin Control",
+    contactSupportEmail: "support@zoop.com",
+    contactSupportPhone: "+91 1800 123 4567",
+    contactOfficeTitle: "Head Office",
+    contactOfficeAddressLine1: "Ring Road, Surat",
+    contactOfficeAddressLine2: "Gujarat 395001, India",
+    contactBusinessHoursLine1: "Mon - Sat: 9 AM - 9 PM",
+    contactBusinessHoursLine2: "Sunday: 10 AM - 6 PM",
+    contactMapTitle: "Map Location",
+    contactMapAddress: "Ring Road, Surat, Gujarat",
   });
 
   useEffect(() => {
@@ -109,6 +119,28 @@ const AdminWebsiteControl = () => {
       alert(e?.message || "Failed to update maintenance settings.");
     } finally {
       setMaintenanceSaving(false);
+    }
+  };
+
+  const handleContactSave = async () => {
+    setContactSaving(true);
+    try {
+      await adminApi.updateSiteConfig({
+        contactSupportEmail: String(config.contactSupportEmail || "").trim() || "support@zoop.com",
+        contactSupportPhone: String(config.contactSupportPhone || "").trim() || "+91 1800 123 4567",
+        contactOfficeTitle: String(config.contactOfficeTitle || "").trim(),
+        contactOfficeAddressLine1: String(config.contactOfficeAddressLine1 || "").trim(),
+        contactOfficeAddressLine2: String(config.contactOfficeAddressLine2 || "").trim(),
+        contactBusinessHoursLine1: String(config.contactBusinessHoursLine1 || "").trim(),
+        contactBusinessHoursLine2: String(config.contactBusinessHoursLine2 || "").trim(),
+        contactMapTitle: String(config.contactMapTitle || "").trim(),
+        contactMapAddress: String(config.contactMapAddress || "").trim(),
+      });
+      alert("Contact page settings updated.");
+    } catch (e) {
+      alert(e?.message || "Failed to update contact page settings.");
+    } finally {
+      setContactSaving(false);
     }
   };
 
@@ -199,6 +231,28 @@ const AdminWebsiteControl = () => {
                 }
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-zoop-moss outline-none"
                 placeholder="Order before 6 PM for same-day delivery"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-black uppercase tracking-widest text-gray-500 mb-2">
+                Support Email
+              </label>
+              <input
+                value={config.contactSupportEmail}
+                onChange={(e) => setConfig((prev) => ({ ...prev, contactSupportEmail: e.target.value }))}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-zoop-moss outline-none"
+                placeholder="support@zoop.com"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-black uppercase tracking-widest text-gray-500 mb-2">
+                Support Phone
+              </label>
+              <input
+                value={config.contactSupportPhone}
+                onChange={(e) => setConfig((prev) => ({ ...prev, contactSupportPhone: e.target.value }))}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-zoop-moss outline-none"
+                placeholder="+91 1800 123 4567"
               />
             </div>
           </div>
@@ -427,6 +481,69 @@ const AdminWebsiteControl = () => {
           </div>
         </div>
 
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 space-y-5">
+          <h2 className="text-xl font-black text-zoop-obsidian">Contact Page Control</h2>
+          <div className="rounded-2xl border border-dashed border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
+            <p className="font-black text-zoop-obsidian">Customer Support</p>
+            <p>{config.contactSupportEmail || "support@zoop.com"}</p>
+            <p>{config.contactSupportPhone || "+91 1800 123 4567"}</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input
+              value={config.contactOfficeTitle}
+              onChange={(e) => setConfig((prev) => ({ ...prev, contactOfficeTitle: e.target.value }))}
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl"
+              placeholder="Head Office"
+            />
+            <input
+              value={config.contactMapTitle}
+              onChange={(e) => setConfig((prev) => ({ ...prev, contactMapTitle: e.target.value }))}
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl"
+              placeholder="Map title"
+            />
+            <input
+              value={config.contactOfficeAddressLine1}
+              onChange={(e) => setConfig((prev) => ({ ...prev, contactOfficeAddressLine1: e.target.value }))}
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl"
+              placeholder="Office address line 1"
+            />
+            <input
+              value={config.contactOfficeAddressLine2}
+              onChange={(e) => setConfig((prev) => ({ ...prev, contactOfficeAddressLine2: e.target.value }))}
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl"
+              placeholder="Office address line 2"
+            />
+            <input
+              value={config.contactBusinessHoursLine1}
+              onChange={(e) => setConfig((prev) => ({ ...prev, contactBusinessHoursLine1: e.target.value }))}
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl"
+              placeholder="Business hours line 1"
+            />
+            <input
+              value={config.contactBusinessHoursLine2}
+              onChange={(e) => setConfig((prev) => ({ ...prev, contactBusinessHoursLine2: e.target.value }))}
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl"
+              placeholder="Business hours line 2"
+            />
+            <div className="md:col-span-2">
+              <input
+                value={config.contactMapAddress}
+                onChange={(e) => setConfig((prev) => ({ ...prev, contactMapAddress: e.target.value }))}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl"
+                placeholder="Map address text"
+              />
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={handleContactSave}
+            disabled={contactSaving}
+            className="px-6 py-3 bg-zoop-obsidian text-white rounded-xl font-black text-sm hover:bg-zoop-moss hover:text-zoop-obsidian transition-all disabled:opacity-60"
+          >
+            {contactSaving ? "Saving Contact Page..." : "Save Contact Page Control"}
+          </button>
+        </div>
+
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-amber-200 space-y-4">
           <h2 className="text-xl font-black text-zoop-obsidian">Maintenance Mode</h2>
           <label className="flex items-center gap-3 text-sm font-bold text-gray-700">
@@ -437,7 +554,7 @@ const AdminWebsiteControl = () => {
                 setConfig((prev) => ({ ...prev, maintenanceMode: e.target.checked }))
               }
             />
-            Enable website maintenance for customers
+            Enable maintenance for customers and sellers
           </label>
           <textarea
             value={config.maintenanceMessage}

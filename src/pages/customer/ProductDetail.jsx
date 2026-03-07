@@ -23,7 +23,7 @@ import { getDeliveryEstimate } from "../../utils/delivery";
 const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { addToCart, isInCart } = useCart();
+  const { addToCart, cartItems } = useCart();
   const { user, location } = useUser();
   const { showToast } = useToast();
   const { toggleWishlist, isInWishlist } = useWishlist();
@@ -251,6 +251,7 @@ const ProductDetail = () => {
     sameDayHours: product?.seller?.sameDayDeliveryWindowHours,
     cutoffHour: product?.seller?.sameDayCutoffHour,
   });
+  const productAlreadyInCart = cartItems.some((item) => item.id === product?.id);
 
   if (loading) return <ProductDetailSkeleton />;
 
@@ -582,7 +583,7 @@ const ProductDetail = () => {
             <div className="space-y-3">
               <button
                 onClick={() => {
-                  if (isInCart(product.id)) {
+                  if (productAlreadyInCart) {
                     navigate("/cart");
                   } else {
                     handleAddToCart();
@@ -595,7 +596,7 @@ const ProductDetail = () => {
                     : "bg-gray-300 text-gray-500 cursor-not-allowed"
                 }`}
               >
-                {isInCart(product.id)
+                {productAlreadyInCart
                   ? "View in Cart"
                   : product.inStock
                     ? "Add to Cart"

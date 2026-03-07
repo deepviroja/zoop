@@ -110,12 +110,18 @@ export const useProductFiltering = (allProducts, initialCategory = "all", initia
 
     // In stock filter
     if (filters.inStock) {
-      filtered = filtered.filter((p) => p.inStock);
+      filtered = filtered.filter(
+        (p) => Boolean(p.inStock) || Number(p.stock || 0) > 0,
+      );
     }
 
     // Type filter (Local/National)
     if (filters.type !== "all") {
-      filtered = filtered.filter((p) => p.type === filters.type);
+      filtered = filtered.filter((p) =>
+        filters.type === "Local"
+          ? Boolean(p.isSameDayEligible) || p.type === "Local"
+          : p.type === filters.type,
+      );
     }
 
     // Sort
@@ -134,7 +140,13 @@ export const useProductFiltering = (allProducts, initialCategory = "all", initia
         break;
       case "popularity":
       default:
-        filtered.sort((a, b) => b.reviews - a.reviews);
+        filtered.sort(
+          (a, b) =>
+            Number(b.orderedCount || 0) +
+            Number(b.ratingCount || b.reviews || 0) -
+            (Number(a.orderedCount || 0) +
+              Number(a.ratingCount || a.reviews || 0)),
+        );
         break;
     }
 

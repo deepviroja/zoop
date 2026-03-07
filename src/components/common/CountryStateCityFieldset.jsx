@@ -110,8 +110,8 @@ const CountryStateCityFieldset = ({
           >
             <option value="">Select City</option>
             {cities.map((item) => (
-              <option key={item} value={item}>
-                {item}
+              <option key={item.name} value={item.name}>
+                {item.name}
               </option>
             ))}
           </select>

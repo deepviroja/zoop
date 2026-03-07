@@ -5,7 +5,7 @@ const AuthLayout = () => {
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-white">
       {/* --- LEFT SIDE: THE VIBE (Hidden on Mobile) --- */}
-      <div className="hidden md:flex md:w-1/2 bg-zoop-obsidian p-12 flex-col justify-between relative overflow-hidden">
+      <div className="hidden md:flex md:sticky md:top-0 md:h-screen md:w-1/2 bg-zoop-obsidian p-12 flex-col justify-between relative overflow-hidden">
         {/* Logo */}
         <Link
           to="/"
@@ -40,7 +40,7 @@ const AuthLayout = () => {
       </div>
 
       {/* --- RIGHT SIDE: THE FORM --- */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-h-screen overflow-y-auto">
         {/* Mobile Logo Only */}
         <div className="md:hidden p-6 bg-zoop-obsidian">
           <Link

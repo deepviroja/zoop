@@ -189,8 +189,10 @@ export const adminApi = {
     post<any>(`/content/admin/payouts/${id}/release`, { transferRef }),
   getAds: () => get<any>('/content/admin/ads'),
   saveAdSlot: (id: string, data: any) => put<any>(`/content/admin/ad-slots/${id}`, data),
+  deleteAdSlot: (id: string) => del<any>(`/content/admin/ad-slots/${id}`),
   createAd: (data: any) => post<any>('/content/admin/ads', data),
   updateAd: (id: string, data: any) => put<any>(`/content/admin/ads/${id}`, data),
+  deleteAd: (id: string) => del<any>(`/content/admin/ads/${id}`),
   clearAdminActivities: () => post<any>('/content/admin/reset/activities', {}),
   deleteAllProducts: () => post<any>('/content/admin/reset/delete-all-products', {}),
   deleteUsersByRole: (role: "all" | "customer" | "seller" | "admin") =>

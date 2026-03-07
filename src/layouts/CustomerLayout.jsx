@@ -124,22 +124,22 @@ const CustomerLayout = () => {
 
   // Scroll direction logic
   const [scrollDir, setScrollDir] = useState("up");
-  const [lastScrollY, setLastScrollY] = useState(0);
+  const lastScrollYRef = useRef(0);
 
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      if (currentScrollY > lastScrollY && currentScrollY > 50) {
+      if (currentScrollY > lastScrollYRef.current && currentScrollY > 50) {
         setScrollDir("down");
       } else {
         setScrollDir("up");
       }
-      setLastScrollY(currentScrollY);
+      lastScrollYRef.current = currentScrollY;
     };
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [lastScrollY]);
+  }, []);
 
   const desktopLiveResults =
     searchQuery.trim() === ""
@@ -227,14 +227,25 @@ const CustomerLayout = () => {
           { label: "Customer Support", path: "/contact" },
         ];
 
-  if (siteConfig?.maintenanceMode && !["admin", "seller"].includes(String(user?.role || ""))) {
+  const mobileAccountLink =
+    String(user?.role || "") === "admin"
+      ? { label: "Admin Panel", path: "/admin" }
+      : String(user?.role || "") === "seller"
+        ? { label: "Seller Panel", path: "/seller" }
+        : user
+          ? { label: "My Account", path: "/profile" }
+          : { label: "Login", path: "/login" };
+
+  if (siteConfig?.maintenanceMode && String(user?.role || "") !== "admin") {
     return (
       <div className="min-h-screen bg-zoop-obsidian text-white flex items-center justify-center p-6">
         <div className="max-w-xl text-center space-y-4">
           <p className="text-xs font-black uppercase tracking-[0.28em] text-zoop-moss">
             Maintenance Mode
           </p>
-          <h1 className="text-4xl font-black">Zoop is temporarily unavailable</h1>
+          <h1 className="text-4xl font-black">
+            Zoop is temporarily unavailable
+          </h1>
           <p className="text-white/70">
             {siteConfig?.maintenanceMessage ||
               "We are applying website updates. Please check back shortly."}
@@ -657,6 +668,14 @@ const CustomerLayout = () => {
               />
             </div>
           </div>
+          <div className="md:hidden flex items-center gap-2 overflow-x-auto no-scrollbar pb-3">
+            <Link
+              to={mobileAccountLink.path}
+              className="shrink-0 rounded-full bg-zoop-moss px-4 py-2 text-[11px] font-black uppercase tracking-[0.18em] text-zoop-obsidian"
+            >
+              {mobileAccountLink.label}
+            </Link>
+          </div>
         </div>
 
         {/* MOBILE FULL SCREEN SEARCH */}
@@ -941,7 +960,8 @@ const CustomerLayout = () => {
                 The bridge between local craftsmanship and global standards.
               </p>
               <p className="mt-3 text-[11px] leading-relaxed text-white/50">
-                Demo storefront only. Prices, offers, stock, payments, and deliveries shown here are for demonstration and testing.
+                Demo purpose only. Prices, offers, stock, payments, and
+                deliveries shown here are for demonstration and testing.
               </p>
             </div>
 
@@ -1082,7 +1102,7 @@ const CustomerLayout = () => {
 
             <div className="flex items-center gap-4">
               <span className="text-white/20 text-[10px] font-black uppercase tracking-tighter">
-                Powered by Zoop Logistics
+                Zoop is only for Demo Purpose
               </span>
               <div className="flex gap-3">
                 <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-zoop-moss transition-all cursor-pointer group">

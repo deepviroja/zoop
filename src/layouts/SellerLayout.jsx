@@ -68,12 +68,29 @@ const SellerLayout = () => {
     };
   }, [user]);
 
+  if (siteConfig?.maintenanceMode) {
+    return (
+      <div className="min-h-screen bg-zoop-obsidian text-white flex items-center justify-center p-6">
+        <div className="max-w-xl text-center space-y-4">
+          <p className="text-xs font-black uppercase tracking-[0.28em] text-zoop-moss">
+            Maintenance Mode
+          </p>
+          <h1 className="text-4xl font-black">Seller panel is temporarily unavailable</h1>
+          <p className="text-white/70">
+            {siteConfig?.maintenanceMessage ||
+              "We are applying website updates. Please check back shortly."}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   // Redirect if pending verification or not yet onboarded
   if (user && user.role === "seller") {
     if (user.verificationStatus === "pending") {
       return <Navigate to="/seller/waiting" replace />;
     }
-    if (user.verificationStatus === "none" || !user.verificationStatus) {
+    if (!user.verificationStatus) {
       return <Navigate to="/seller/onboarding" replace />;
     }
     if (user.verificationStatus === "rejected") {

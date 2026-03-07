@@ -20,6 +20,14 @@ const Contact = () => {
   });
   const [myTickets, setMyTickets] = useState([]);
   const [errors, setErrors] = useState({});
+  const [siteConfig, setSiteConfig] = useState(null);
+
+  React.useEffect(() => {
+    contentApi
+      .getSiteConfig()
+      .then((config) => setSiteConfig(config || null))
+      .catch(() => setSiteConfig(null));
+  }, []);
 
   React.useEffect(() => {
     if (!user?.uid) return;
@@ -83,19 +91,28 @@ const Contact = () => {
     {
       icon: MessageCircle,
       title: 'Customer Support',
-      details: ['support@zoop.com', '+91 1800 123 4567'],
+      details: [
+        siteConfig?.contactSupportEmail || 'support@zoop.com',
+        siteConfig?.contactSupportPhone || '+91 1800 123 4567',
+      ],
       color: 'from-blue-500 to-indigo-600'
     },
     {
       icon: MapPin,
-      title: 'Head Office',
-      details: ['Ring Road, Surat', 'Gujarat 395001, India'],
+      title: siteConfig?.contactOfficeTitle || 'Head Office',
+      details: [
+        siteConfig?.contactOfficeAddressLine1 || 'Ring Road, Surat',
+        siteConfig?.contactOfficeAddressLine2 || 'Gujarat 395001, India',
+      ],
       color: 'from-green-500 to-emerald-600'
     },
     {
       icon: Clock,
       title: 'Business Hours',
-      details: ['Mon - Sat: 9 AM - 9 PM', 'Sunday: 10 AM - 6 PM'],
+      details: [
+        siteConfig?.contactBusinessHoursLine1 || 'Mon - Sat: 9 AM - 9 PM',
+        siteConfig?.contactBusinessHoursLine2 || 'Sunday: 10 AM - 6 PM',
+      ],
       color: 'from-purple-500 to-pink-600'
     }
   ];
@@ -233,8 +250,8 @@ const Contact = () => {
         <div className="mt-12 bg-gray-200 rounded-2xl h-96 flex items-center justify-center overflow-hidden">
           <div className="text-center">
             <MapPin width={48} height={48} className="mx-auto text-gray-400 mb-4" />
-            <p className="text-gray-600 font-bold">Map Location</p>
-            <p className="text-sm text-gray-500">Ring Road, Surat, Gujarat</p>
+            <p className="text-gray-600 font-bold">{siteConfig?.contactMapTitle || 'Map Location'}</p>
+            <p className="text-sm text-gray-500">{siteConfig?.contactMapAddress || 'Ring Road, Surat, Gujarat'}</p>
           </div>
         </div>
 

@@ -26,9 +26,15 @@ import { Mail } from "../../assets/icons/Mail";
 import { User } from "../../assets/icons/User";
 import { Lock } from "../../assets/icons/Lock";
 import CountryPhoneField from "../../components/common/CountryPhoneField";
-import { hasUppercase, isValidInternationalPhone } from "../../utils/liveValidation";
+import {
+  hasUppercase,
+  isValidInternationalPhone,
+} from "../../utils/liveValidation";
 import Seo from "../../components/shared/Seo";
-import { sendFirebasePhoneOtp, resetPhoneRecaptcha } from "../../utils/firebasePhoneAuth";
+import {
+  sendFirebasePhoneOtp,
+  resetPhoneRecaptcha,
+} from "../../utils/firebasePhoneAuth";
 
 const SellerSignup = () => {
   const navigate = useNavigate();
@@ -44,7 +50,11 @@ const SellerSignup = () => {
     phone: "",
     role: "seller",
   });
-  const [phoneMeta, setPhoneMeta] = useState({ dialCode: "91", countryCode: "in", format: "" });
+  const [phoneMeta, setPhoneMeta] = useState({
+    dialCode: "91",
+    countryCode: "in",
+    format: "",
+  });
   const [errors, setErrors] = useState({});
   const [generalError, setGeneralError] = useState("");
   const [submitStatus, setSubmitStatus] = useState({ type: "", message: "" });
@@ -63,12 +73,18 @@ const SellerSignup = () => {
 
   const otpSecondsLeft = useMemo(() => {
     if (!otpExpiresAt) return 0;
-    return Math.max(0, Math.ceil((new Date(otpExpiresAt).getTime() - nowTs) / 1000));
+    return Math.max(
+      0,
+      Math.ceil((new Date(otpExpiresAt).getTime() - nowTs) / 1000),
+    );
   }, [otpExpiresAt, nowTs]);
 
   const resendSecondsLeft = useMemo(() => {
     if (!resendAvailableAt) return 0;
-    return Math.max(0, Math.ceil((new Date(resendAvailableAt).getTime() - nowTs) / 1000));
+    return Math.max(
+      0,
+      Math.ceil((new Date(resendAvailableAt).getTime() - nowTs) / 1000),
+    );
   }, [resendAvailableAt, nowTs]);
 
   const formatMMSS = (seconds) => {
@@ -103,7 +119,11 @@ const SellerSignup = () => {
   const validateForm = () => {
     const newErrors = {};
     ["displayName", "email", "phone", "password"].forEach((field) => {
-      const message = validateField(field, nextValue(field, formData), formData);
+      const message = validateField(
+        field,
+        nextValue(field, formData),
+        formData,
+      );
       if (message) newErrors[field] = message;
     });
 
@@ -116,7 +136,10 @@ const SellerSignup = () => {
   const updateFormField = (field, value) => {
     const nextData = { ...formData, [field]: value, phoneMeta };
     setFormData(nextData);
-    setErrors((prev) => ({ ...prev, [field]: validateField(field, value, nextData) }));
+    setErrors((prev) => ({
+      ...prev,
+      [field]: validateField(field, value, nextData),
+    }));
   };
 
   const handleGoogleSignup = async () => {
@@ -159,22 +182,37 @@ const SellerSignup = () => {
 
     setLoading(true);
     try {
-      const response = await apiClient.post("/auth/signup", { ...formData, otpChannel });
+      const response = await apiClient.post("/auth/signup", {
+        ...formData,
+        otpChannel,
+      });
       setOtpRecipient(response?.otpRecipient || formData.email);
       if (otpChannel === "phone") {
-        const confirmation = await sendFirebasePhoneOtp(response?.otpRecipient || formData.phone);
+        resetPhoneRecaptcha();
+        const confirmation = await sendFirebasePhoneOtp(
+          response?.otpRecipient || formData.phone,
+        );
         setPhoneConfirmation(confirmation);
         setOtpExpiresAt(new Date(Date.now() + 5 * 60 * 1000).toISOString());
         setResendAvailableAt(new Date(Date.now() + 60 * 1000).toISOString());
       } else {
         const expiresAt =
-          response?.expiresAt || new Date(Date.now() + 5 * 60 * 1000).toISOString();
+          response?.expiresAt ||
+          new Date(Date.now() + 5 * 60 * 1000).toISOString();
         const resendAfterSec = Number(response?.resendAfterSec || 60);
         setOtpExpiresAt(expiresAt);
-        setResendAvailableAt(new Date(Date.now() + resendAfterSec * 1000).toISOString());
+        setResendAvailableAt(
+          new Date(Date.now() + resendAfterSec * 1000).toISOString(),
+        );
       }
-      showToast(`OTP sent to your ${otpChannel === "phone" ? "mobile" : "email"}!`, "success");
-      setSubmitStatus({ type: "success", message: `OTP sent. Verify your ${otpChannel === "phone" ? "mobile number" : "email"} to continue.` });
+      showToast(
+        `OTP sent to your ${otpChannel === "phone" ? "mobile" : "email"}!`,
+        "success",
+      );
+      setSubmitStatus({
+        type: "success",
+        message: `OTP sent. Verify your ${otpChannel === "phone" ? "mobile number" : "email"} to continue.`,
+      });
       setStep(2);
     } catch (error) {
       console.error("Signup error:", error);
@@ -193,7 +231,9 @@ const SellerSignup = () => {
       let response;
       if (otpChannel === "phone") {
         if (!phoneConfirmation) {
-          throw new Error("Mobile OTP session expired. Please request a new OTP.");
+          throw new Error(
+            "Mobile OTP session expired. Please request a new OTP.",
+          );
         }
         const phoneResult = await phoneConfirmation.confirm(otp);
         const idToken = await phoneResult.user.getIdToken();
@@ -210,7 +250,10 @@ const SellerSignup = () => {
         });
       }
 
-      showToast(`${otpChannel === "phone" ? "Mobile" : "Email"} verified! Setting up your seller profile...`, "success");
+      showToast(
+        `${otpChannel === "phone" ? "Mobile" : "Email"} verified! Setting up your seller profile...`,
+        "success",
+      );
 
       confetti({
         particleCount: 150,
@@ -246,18 +289,27 @@ const SellerSignup = () => {
       const response = await authApi.resendOTP(formData.email, otpChannel);
       setOtpRecipient(response?.otpRecipient || formData.email);
       if (otpChannel === "phone") {
-        const confirmation = await sendFirebasePhoneOtp(response?.otpRecipient || formData.phone);
+        resetPhoneRecaptcha();
+        const confirmation = await sendFirebasePhoneOtp(
+          response?.otpRecipient || formData.phone,
+        );
         setPhoneConfirmation(confirmation);
         setOtpExpiresAt(new Date(Date.now() + 5 * 60 * 1000).toISOString());
         setResendAvailableAt(new Date(Date.now() + 60 * 1000).toISOString());
       } else {
         const expiresAt =
-          response?.expiresAt || new Date(Date.now() + 5 * 60 * 1000).toISOString();
+          response?.expiresAt ||
+          new Date(Date.now() + 5 * 60 * 1000).toISOString();
         const resendAfterSec = Number(response?.resendAfterSec || 60);
         setOtpExpiresAt(expiresAt);
-        setResendAvailableAt(new Date(Date.now() + resendAfterSec * 1000).toISOString());
+        setResendAvailableAt(
+          new Date(Date.now() + resendAfterSec * 1000).toISOString(),
+        );
       }
-      showToast(`New OTP sent to your ${otpChannel === "phone" ? "mobile" : "email"}!`, "success");
+      showToast(
+        `New OTP sent to your ${otpChannel === "phone" ? "mobile" : "email"}!`,
+        "success",
+      );
       setSubmitStatus({ type: "success", message: "A new OTP has been sent." });
     } catch (error) {
       console.error("Resend OTP error:", error);
@@ -272,7 +324,7 @@ const SellerSignup = () => {
   useEffect(() => () => resetPhoneRecaptcha(), []);
 
   return (
-    <div className="min-h-screen rounded-3xl bg-gradient-to-br from-zoop-white to-zoop-copper flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[#f6f1e7] md:grid md:grid-cols-[minmax(320px,42vw)_1fr]">
       <Seo
         title="Seller Signup | Zoop"
         description="Create your Zoop seller account."
@@ -283,8 +335,44 @@ const SellerSignup = () => {
         <Toast message={toast.message} type={toast.type} onClose={hideToast} />
       )}
 
-      <div className="w-full max-w-md">
-        <div className="bg-white rounded-3xl shadow-2xl p-8 border-t-8 border-zoop-copper">
+      <aside className="hidden md:flex md:sticky md:top-0 md:h-screen bg-zoop-obsidian p-10 xl:p-14 flex-col justify-between text-white overflow-hidden">
+        <div className="relative z-10">
+          <Link to="/" className="text-3xl font-black tracking-tighter text-zoop-moss">
+            ZOOP
+            <span className="text-white text-xs italic ml-1">.seller</span>
+          </Link>
+        </div>
+        <div className="relative z-10 max-w-lg">
+          <p className="text-xs font-black uppercase tracking-[0.28em] text-zoop-moss mb-4">
+            Seller Network
+          </p>
+          <h1 className="text-5xl xl:text-6xl font-black leading-[0.94] text-balance">
+            Local speed.
+            <br />
+            <span className="text-zoop-moss">National reach.</span>
+          </h1>
+          <div className="mt-8 space-y-4 text-white/70">
+            <p className="text-pretty">Launch your store, get discovered in your city, and grow with fast same-day demand.</p>
+            <p className="text-pretty">Complete your account on the right. This panel stays fixed while the form scrolls.</p>
+          </div>
+        </div>
+        <div className="relative z-10 grid gap-4 text-sm">
+          <div>
+            <p className="font-black text-zoop-moss">01</p>
+            <p className="text-white/70">Set up seller login with OTP or Google.</p>
+          </div>
+          <div>
+            <p className="font-black text-zoop-moss">02</p>
+            <p className="text-white/70">Finish onboarding, documents, payouts, and store profile.</p>
+          </div>
+        </div>
+        <div className="absolute -right-24 top-20 h-72 w-72 rounded-full bg-zoop-moss/20 blur-3xl" />
+        <div className="absolute -left-24 bottom-0 h-72 w-72 rounded-full bg-zoop-copper/20 blur-3xl" />
+      </aside>
+
+      <section className="min-h-screen overflow-y-auto p-4 md:p-8 lg:p-10">
+        <div className="mx-auto w-full max-w-xl">
+        <div className="bg-white rounded-3xl shadow-2xl p-6 md:p-8 border-t-8 border-zoop-copper">
           <div className="text-center mb-8">
             <Link
               to="/"
@@ -324,7 +412,9 @@ const SellerSignup = () => {
                   <input
                     type="text"
                     value={formData.displayName}
-                    onChange={(e) => updateFormField("displayName", e.target.value)}
+                    onChange={(e) =>
+                      updateFormField("displayName", e.target.value)
+                    }
                     disabled={loading}
                     className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 ${errors.displayName ? "border-red-500" : loading ? "border-zoop-copper bg-zoop-copper/5 animate-pulse" : "border-gray-200"} focus:border-zoop-copper outline-none`}
                     placeholder="John Doe"
@@ -384,8 +474,8 @@ const SellerSignup = () => {
                   </button>
                 </div>
                 {otpChannel === "phone" && (
-                  <p className="mt-2 text-xs text-gray-500">
-                    Phone OTP requires Firebase Phone Authentication and an authorized domain in Firebase Console.
+                  <p className="mt-2 text-xs leading-5 text-gray-500">
+                    Enter the mobile number in full international format. Example: +91 9876543210
                   </p>
                 )}
               </div>
@@ -398,7 +488,11 @@ const SellerSignup = () => {
                   const nextPhoneMeta = countryData || phoneMeta;
                   setPhoneMeta(nextPhoneMeta);
                   const nextData = { ...formData, phoneMeta: nextPhoneMeta };
-                  setFormData((prev) => ({ ...prev, phone: value, phoneMeta: nextPhoneMeta }));
+                  setFormData((prev) => ({
+                    ...prev,
+                    phone: value,
+                    phoneMeta: nextPhoneMeta,
+                  }));
                   setErrors((prev) => ({
                     ...prev,
                     phone: validateField("phone", value, nextData),
@@ -423,7 +517,9 @@ const SellerSignup = () => {
                   <input
                     type={showPassword ? "text" : "password"}
                     value={formData.password}
-                    onChange={(e) => updateFormField("password", e.target.value)}
+                    onChange={(e) =>
+                      updateFormField("password", e.target.value)
+                    }
                     disabled={loading}
                     className={`w-full pl-12 pr-12 py-3 rounded-xl border-2 ${errors.password ? "border-red-500" : loading ? "border-zoop-copper bg-zoop-copper/5 animate-pulse" : "border-gray-200"} focus:border-zoop-copper outline-none`}
                     placeholder="••••••••"
@@ -441,7 +537,9 @@ const SellerSignup = () => {
                   </button>
                 </div>
                 {errors.password && (
-                  <p className="text-red-500 text-xs mt-1 font-bold">{errors.password}</p>
+                  <p className="text-red-500 text-xs mt-1 font-bold">
+                    {errors.password}
+                  </p>
                 )}
                 <PasswordStrength password={formData.password} />
               </div>
@@ -540,7 +638,8 @@ const SellerSignup = () => {
             </div>
           )}
         </div>
-      </div>
+        </div>
+      </section>
     </div>
   );
 };

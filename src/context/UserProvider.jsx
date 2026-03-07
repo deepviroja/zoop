@@ -65,14 +65,14 @@ export const UserProvider = ({ children }) => {
 
           // Fallback to Firestore if claim is missing (e.g. manual admin creation)
           // Get extra data from Firestore
-          let verificationStatus = "none";
+          let verificationStatus;
           let dbProfile = {};
           try {
             const userDoc = await getDoc(doc(db, "users", currentUser.uid));
             if (userDoc.exists()) {
               const data = userDoc.data();
               role = role || data.role;
-              verificationStatus = data.verificationStatus || "none";
+              verificationStatus = data.verificationStatus || undefined;
               dbProfile = data;
               const defaultAddress = Array.isArray(data.addresses)
                 ? data.addresses.find((item) => item?.isDefault) || data.addresses[0]

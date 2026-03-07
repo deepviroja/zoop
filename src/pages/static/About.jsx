@@ -1,44 +1,89 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Zap } from '../../assets/icons/Zap';
-import { Heart } from '../../assets/icons/Heart';
-import { Users } from '../../assets/icons/Users';
-import { TrendingUp } from '../../assets/icons/TrendingUp';
+import React, { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import { Zap } from "../../assets/icons/Zap";
+import { Heart } from "../../assets/icons/Heart";
+import { Users } from "../../assets/icons/Users";
+import { TrendingUp } from "../../assets/icons/TrendingUp";
+import { Plus } from '../../assets/icons/Plus';
+
+import { productsApi } from "../../services/api";
 
 const About = () => {
   const values = [
     {
       icon: Zap,
-      title: 'Hyper-Local Speed',
-      description: 'We deliver products from your city within 4-6 hours, connecting you with local sellers.',
-      color: 'from-yellow-400 to-orange-500'
+      title: "Hyper-Local Speed",
+      description:
+        "We deliver products from your city within 4-6 hours, connecting you with local sellers.",
+      color: "from-yellow-400 to-orange-500",
     },
     {
       icon: Heart,
-      title: 'Artisan First',
-      description: 'Supporting local craftspeople and small businesses to preserve traditional skills.',
-      color: 'from-pink-500 to-rose-600'
+      title: "Artisan First",
+      description:
+        "Supporting local craftspeople and small businesses to preserve traditional skills.",
+      color: "from-pink-500 to-rose-600",
     },
     {
       icon: Users,
-      title: 'Community Driven',
-      description: 'Building a marketplace that empowers local communities and creates opportunities.',
-      color: 'from-blue-500 to-indigo-600'
+      title: "Community Driven",
+      description:
+        "Building a marketplace that empowers local communities and creates opportunities.",
+      color: "from-blue-500 to-indigo-600",
     },
     {
       icon: TrendingUp,
-      title: 'Growth Together',
-      description: 'Helping sellers grow their business while providing customers with quality products.',
-      color: 'from-green-500 to-emerald-600'
-    }
+      title: "Growth Together",
+      description:
+        "Helping sellers grow their business while providing customers with quality products.",
+      color: "from-green-500 to-emerald-600",
+    },
   ];
 
-  const stats = [
-    { label: 'Active Sellers', value: '10,000+' },
-    { label: 'Products', value: '100,000+' },
-    { label: 'Cities', value: '50+' },
-    { label: 'Happy Customers', value: '500,000+' }
-  ];
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    productsApi
+      .getAll()
+      .then((items) => setProducts(Array.isArray(items) ? items : []))
+      .catch(() => setProducts([]));
+  }, []);
+
+  const stats = useMemo(() => {
+    const sellerCount = new Set(
+      products.map((item) => item.sellerId || item.seller?.id).filter(Boolean),
+    ).size;
+    const cityCount = new Set(
+      products
+        .flatMap((item) => item.cityAvailability || [])
+        .map((city) =>
+          String(city || "")
+            .trim()
+            .toLowerCase(),
+        )
+        .filter(Boolean),
+    ).size;
+    const orderCount = products.reduce(
+      (sum, item) => sum + Number(item.orderedCount || item.purchaseCount || 0),
+      0,
+    );
+
+    return [
+      {
+        label: "Active Sellers",
+        value: sellerCount.toLocaleString("en-IN") || "0",
+      },
+      {
+        label: "Products",
+        value: products.length.toLocaleString("en-IN") || "0",
+      },
+      { label: "Cities", value: cityCount.toLocaleString("en-IN") || "0" },
+      {
+        label: "Orders Completed",
+        value: orderCount.toLocaleString("en-IN") || "0",
+      },
+    ];
+  }, [products]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -54,8 +99,8 @@ const About = () => {
             About <span className="text-zoop-moss italic">ZOOP</span>
           </h1>
           <p className="text-lg md:text-xl text-white/80 max-w-3xl mx-auto leading-relaxed">
-            India's fastest hyper-local marketplace connecting customers with local sellers
-            and artisans for same-day delivery.
+            India's fastest hyper-local marketplace connecting customers with
+            local sellers and artisans for same-day delivery.
           </p>
         </div>
       </section>
@@ -69,27 +114,34 @@ const About = () => {
             </h2>
             <div className="space-y-4 text-gray-700 leading-relaxed">
               <p>
-                ZOOP was born from a simple observation: while e-commerce platforms offered
-                convenience, they couldn't match the speed and personal touch of local shopping.
+                ZOOP was born from a simple observation: while e-commerce
+                platforms offered convenience, they couldn't match the speed and
+                personal touch of local shopping.
               </p>
               <p>
-                We created ZOOP to bridge this gap by building a platform that combines the best
-                of both worlds—the convenience of online shopping with the speed and community
-                connection of local commerce.
+                We created ZOOP to bridge this gap by building a platform that
+                combines the best of both worlds—the convenience of online
+                shopping with the speed and community connection of local
+                commerce.
               </p>
               <p>
-                Today, ZOOP serves thousands of customers across India, delivering products from
-                local sellers in just 4-6 hours while supporting artisans and small businesses
-                in their growth journey.
+                Today, ZOOP serves thousands of customers across India,
+                delivering products from local sellers in just 4-6 hours while
+                supporting artisans and small businesses in their growth
+                journey.
               </p>
             </div>
           </div>
           <div className="relative">
             <div className="aspect-square bg-gradient-to-br from-zoop-moss/20 to-zoop-copper/20 rounded-3xl p-8 flex items-center justify-center">
               <div className="text-center">
-                <div className="text-8xl font-black text-zoop-moss mb-4">ZOOP</div>
+                <div className="text-8xl font-black text-zoop-moss mb-4">
+                  ZOOP
+                </div>
                 <p className="text-xl font-bold text-zoop-obsidian">
-                  Local Speed.<br />Global Quality.
+                  Local Speed.
+                  <br />
+                  Global Quality.
                 </p>
               </div>
             </div>
@@ -109,9 +161,10 @@ const About = () => {
                 key={idx}
                 className="text-center p-6 bg-gray-50 rounded-2xl border border-gray-100"
               >
-                <p className="text-4xl md:text-5xl font-black text-zoop-moss mb-2">
-                  {stat.value}
-                </p>
+                <div className="mb-2 inline-flex items-start gap-1 text-4xl font-black text-zoop-moss md:text-5xl">
+                  <span>{stat.value}</span>
+                  <Plus width={14} height={14} className="mt-1 shrink-0 md:mt-1.5" />
+                </div>
                 <p className="text-sm md:text-base font-bold text-gray-700">
                   {stat.label}
                 </p>
@@ -140,7 +193,9 @@ const About = () => {
                 key={idx}
                 className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 hover:shadow-lg transition-shadow"
               >
-                <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${value.color} flex items-center justify-center mb-6 shadow-lg`}>
+                <div
+                  className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${value.color} flex items-center justify-center mb-6 shadow-lg`}
+                >
                   <Icon width={32} height={32} className="text-white" />
                 </div>
                 <h3 className="text-2xl font-black text-zoop-obsidian mb-3">
@@ -162,8 +217,8 @@ const About = () => {
             Join the ZOOP Community
           </h2>
           <p className="text-lg text-white/80 mb-8 max-w-2xl mx-auto">
-            Whether you're a customer looking for fast delivery or a seller wanting
-            to grow your business, ZOOP is here for you.
+            Whether you're a customer looking for fast delivery or a seller
+            wanting to grow your business, ZOOP is here for you.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link

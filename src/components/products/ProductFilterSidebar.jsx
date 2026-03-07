@@ -39,7 +39,7 @@ const ProductFilterSidebar = ({
   return (
     <aside
       className={`
-      lg:block lg:w-72 flex-shrink-0
+      lg:block lg:w-[19rem] xl:w-[20.5rem] flex-shrink-0
       ${
         showFilters
           ? "fixed inset-0 z-[100] bg-black/45 backdrop-blur-[2px] lg:relative lg:z-0 lg:bg-transparent lg:backdrop-blur-none"
@@ -49,7 +49,7 @@ const ProductFilterSidebar = ({
     >
       <div
         ref={sidebarRef}
-        className={`ml-auto flex h-full w-full max-w-[24rem] flex-col bg-white px-4 pb-0 pt-4 shadow-xl lg:sticky lg:max-w-none lg:rounded-[1.75rem] lg:border lg:border-[#e7dfd4] lg:bg-white/95 lg:px-5 lg:pb-5 lg:pt-5 lg:shadow-[0_18px_42px_rgba(41,32,18,0.08)] lg:backdrop-blur-xl lg:max-h-[calc(100vh-7rem)] lg:overflow-hidden custom-scrollbar transition-[top] duration-300 ${
+        className={`ml-auto flex h-full w-full max-w-[24rem] flex-col overflow-hidden bg-white px-4 pb-0 pt-4 shadow-xl lg:sticky lg:max-w-none lg:rounded-[1.75rem] lg:border lg:border-[#e7dfd4] lg:bg-white/95 lg:px-5 lg:pb-5 lg:pt-5 lg:shadow-[0_18px_42px_rgba(41,32,18,0.08)] lg:backdrop-blur-xl lg:max-h-[calc(100vh-7rem)] custom-scrollbar transition-[top] duration-300 ${
           headerVisible ? "lg:top-32" : "lg:top-20"
         }`}
       >
@@ -236,7 +236,7 @@ const ProductFilterSidebar = ({
             </button>
 
             {(expandedSections.brand || filters.brands.length > 0) && (
-              <div className="space-y-2 max-h-48 overflow-y-auto custom-scrollbar pr-2">
+              <div className="space-y-2 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
                 {(brands || []).filter(Boolean).map((brand) => (
                   <label
                     key={brand}
@@ -397,10 +397,9 @@ const ProductFilterSidebar = ({
           </button>
         </div>
 
-        {/* Sidebar Ad */}
-        <div className="mt-8 hidden lg:block">
-          <AdBanner type="sidebar" />
-        </div>
+      </div>
+      <div className="mt-5 hidden xl:block">
+        <AdBanner type="sidebar" />
       </div>
     </aside>
   );

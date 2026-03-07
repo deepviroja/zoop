@@ -34,8 +34,14 @@ import {
   getPincodeValidationMessage,
 } from "../../utils/liveValidation";
 import Seo from "../../components/shared/Seo";
-import { sendFirebasePhoneOtp, resetPhoneRecaptcha } from "../../utils/firebasePhoneAuth";
-import { getCountryByCode, getStateByCodeAndCountry } from "../../utils/locationData";
+import {
+  sendFirebasePhoneOtp,
+  resetPhoneRecaptcha,
+} from "../../utils/firebasePhoneAuth";
+import {
+  getCountryByCode,
+  getStateByCodeAndCountry,
+} from "../../utils/locationData";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -60,7 +66,11 @@ const Signup = () => {
     gender: "",
     role: "customer", // always customer on signup; sellers go through /seller/onboarding after
   });
-  const [phoneMeta, setPhoneMeta] = useState({ dialCode: "91", countryCode: "in", format: "" });
+  const [phoneMeta, setPhoneMeta] = useState({
+    dialCode: "91",
+    countryCode: "in",
+    format: "",
+  });
   const [fieldSuccess, setFieldSuccess] = useState({}); // track field-level success
   const [errors, setErrors] = useState({});
   const [generalError, setGeneralError] = useState("");
@@ -80,12 +90,18 @@ const Signup = () => {
 
   const otpSecondsLeft = useMemo(() => {
     if (!otpExpiresAt) return 0;
-    return Math.max(0, Math.ceil((new Date(otpExpiresAt).getTime() - nowTs) / 1000));
+    return Math.max(
+      0,
+      Math.ceil((new Date(otpExpiresAt).getTime() - nowTs) / 1000),
+    );
   }, [otpExpiresAt, nowTs]);
 
   const resendSecondsLeft = useMemo(() => {
     if (!resendAvailableAt) return 0;
-    return Math.max(0, Math.ceil((new Date(resendAvailableAt).getTime() - nowTs) / 1000));
+    return Math.max(
+      0,
+      Math.ceil((new Date(resendAvailableAt).getTime() - nowTs) / 1000),
+    );
   }, [resendAvailableAt, nowTs]);
 
   const formatMMSS = (seconds) => {
@@ -140,9 +156,17 @@ const Signup = () => {
   };
 
   const updateFormField = (field, value, nextDataOverride = {}) => {
-    const nextData = { ...formData, ...nextDataOverride, [field]: value, phoneMeta };
+    const nextData = {
+      ...formData,
+      ...nextDataOverride,
+      [field]: value,
+      phoneMeta,
+    };
     setFormData(nextData);
-    setErrors((prev) => ({ ...prev, [field]: validateField(field, value, nextData) }));
+    setErrors((prev) => ({
+      ...prev,
+      [field]: validateField(field, value, nextData),
+    }));
   };
 
   const validateForm = () => {
@@ -201,22 +225,37 @@ const Signup = () => {
 
     setLoading(true);
     try {
-      const response = await apiClient.post("/auth/signup", { ...formData, otpChannel });
+      const response = await apiClient.post("/auth/signup", {
+        ...formData,
+        otpChannel,
+      });
       setOtpRecipient(response?.otpRecipient || formData.email);
       if (otpChannel === "phone") {
-        const confirmation = await sendFirebasePhoneOtp(response?.otpRecipient || formData.phone);
+        resetPhoneRecaptcha();
+        const confirmation = await sendFirebasePhoneOtp(
+          response?.otpRecipient || formData.phone,
+        );
         setPhoneConfirmation(confirmation);
         setOtpExpiresAt(new Date(Date.now() + 5 * 60 * 1000).toISOString());
         setResendAvailableAt(new Date(Date.now() + 60 * 1000).toISOString());
       } else {
         const expiresAt =
-          response?.expiresAt || new Date(Date.now() + 5 * 60 * 1000).toISOString();
+          response?.expiresAt ||
+          new Date(Date.now() + 5 * 60 * 1000).toISOString();
         const resendAfterSec = Number(response?.resendAfterSec || 60);
         setOtpExpiresAt(expiresAt);
-        setResendAvailableAt(new Date(Date.now() + resendAfterSec * 1000).toISOString());
+        setResendAvailableAt(
+          new Date(Date.now() + resendAfterSec * 1000).toISOString(),
+        );
       }
-      showToast(`OTP sent to your ${otpChannel === "phone" ? "phone" : "email"}!`, "success");
-      setSubmitStatus({ type: "success", message: `OTP sent. Please verify your ${otpChannel}.` });
+      showToast(
+        `OTP sent to your ${otpChannel === "phone" ? "phone" : "email"}!`,
+        "success",
+      );
+      setSubmitStatus({
+        type: "success",
+        message: `OTP sent. Please verify your ${otpChannel}.`,
+      });
       setStep(2);
     } catch (error) {
       console.error("Signup error:", error);
@@ -257,7 +296,9 @@ const Signup = () => {
       let response;
       if (otpChannel === "phone") {
         if (!phoneConfirmation) {
-          throw new Error("Mobile OTP session expired. Please request a new OTP.");
+          throw new Error(
+            "Mobile OTP session expired. Please request a new OTP.",
+          );
         }
         const phoneResult = await phoneConfirmation.confirm(otp);
         const idToken = await phoneResult.user.getIdToken();
@@ -319,18 +360,27 @@ const Signup = () => {
       const response = await authApi.resendOTP(formData.email, otpChannel);
       setOtpRecipient(response?.otpRecipient || formData.email);
       if (otpChannel === "phone") {
-        const confirmation = await sendFirebasePhoneOtp(response?.otpRecipient || formData.phone);
+        resetPhoneRecaptcha();
+        const confirmation = await sendFirebasePhoneOtp(
+          response?.otpRecipient || formData.phone,
+        );
         setPhoneConfirmation(confirmation);
         setOtpExpiresAt(new Date(Date.now() + 5 * 60 * 1000).toISOString());
         setResendAvailableAt(new Date(Date.now() + 60 * 1000).toISOString());
       } else {
         const expiresAt =
-          response?.expiresAt || new Date(Date.now() + 5 * 60 * 1000).toISOString();
+          response?.expiresAt ||
+          new Date(Date.now() + 5 * 60 * 1000).toISOString();
         const resendAfterSec = Number(response?.resendAfterSec || 60);
         setOtpExpiresAt(expiresAt);
-        setResendAvailableAt(new Date(Date.now() + resendAfterSec * 1000).toISOString());
+        setResendAvailableAt(
+          new Date(Date.now() + resendAfterSec * 1000).toISOString(),
+        );
       }
-      showToast(`New OTP sent to your ${otpChannel === "phone" ? "phone" : "email"}!`, "success");
+      showToast(
+        `New OTP sent to your ${otpChannel === "phone" ? "phone" : "email"}!`,
+        "success",
+      );
       setSubmitStatus({ type: "success", message: "A new OTP has been sent." });
     } catch (error) {
       console.error("Resend OTP error:", error);
@@ -425,10 +475,14 @@ const Signup = () => {
                         setFieldSuccess((s) => ({ ...s, displayName: false }));
                       setErrors((prev) => ({
                         ...prev,
-                        displayName: validateField("displayName", e.target.value, {
-                          ...formData,
-                          displayName: e.target.value,
-                        }),
+                        displayName: validateField(
+                          "displayName",
+                          e.target.value,
+                          {
+                            ...formData,
+                            displayName: e.target.value,
+                          },
+                        ),
                       }));
                     }}
                     className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 transition-all outline-none ${
@@ -503,12 +557,28 @@ const Signup = () => {
                   OTP Delivery
                 </label>
                 <div className="grid grid-cols-2 gap-2 rounded-xl bg-gray-100 p-1">
-                  <button type="button" onClick={() => setOtpChannel("email")} className={`rounded-lg py-2 text-xs font-black uppercase ${otpChannel === "email" ? "bg-white text-zoop-obsidian shadow-sm" : "text-gray-500"}`}>Email OTP</button>
-                  <button type="button" onClick={() => setOtpChannel("phone")} className={`rounded-lg py-2 text-xs font-black uppercase ${otpChannel === "phone" ? "bg-white text-zoop-obsidian shadow-sm" : "text-gray-500"}`}>Mobile OTP</button>
+                  <button
+                    type="button"
+                    onClick={() => setOtpChannel("email")}
+                    className={`rounded-lg py-2 text-xs font-black uppercase ${otpChannel === "email" ? "bg-white text-zoop-obsidian shadow-sm" : "text-gray-500"}`}
+                  >
+                    Email OTP
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setOtpChannel("phone")}
+                    className={`rounded-lg py-2 text-xs font-black uppercase ${otpChannel === "phone" ? "bg-white text-zoop-obsidian shadow-sm" : "text-gray-500"}`}
+                  >
+                    Mobile OTP
+                  </button>
                 </div>
                 {otpChannel === "phone" && (
-                  <p className="mt-2 text-xs text-gray-500">
-                    Phone OTP requires Firebase Phone Authentication and an authorized domain in Firebase Console.
+                  <p className="mt-2 text-xs leading-5 text-gray-500">
+                    Enter your mobile number in international format. Example:
+                    {" "}
+                    <span className="font-bold text-zoop-obsidian">
+                      +91 9876543210
+                    </span>
                   </p>
                 )}
               </div>
@@ -552,7 +622,9 @@ const Signup = () => {
                   }`}
                 />
                 {errors.address && (
-                  <p className="text-red-500 text-xs mt-1 font-bold">{errors.address}</p>
+                  <p className="text-red-500 text-xs mt-1 font-bold">
+                    {errors.address}
+                  </p>
                 )}
               </div>
 
@@ -580,7 +652,11 @@ const Signup = () => {
                   setFormData(nextData);
                   setErrors((prev) => ({
                     ...prev,
-                    countryCode: validateField("countryCode", countryCode, nextData),
+                    countryCode: validateField(
+                      "countryCode",
+                      countryCode,
+                      nextData,
+                    ),
                     stateCode: validateField("stateCode", "", nextData),
                     city: validateField("city", "", nextData),
                   }));
@@ -626,7 +702,10 @@ const Signup = () => {
                     setFormData({ ...formData, pincode: value });
                     setErrors((prev) => ({
                       ...prev,
-                      pincode: validateField("pincode", value, { ...formData, pincode: value }),
+                      pincode: validateField("pincode", value, {
+                        ...formData,
+                        pincode: value,
+                      }),
                     }));
                   }}
                   maxLength={10}
@@ -636,7 +715,11 @@ const Signup = () => {
                       : "border-gray-200 focus:border-zoop-moss focus:ring-2 focus:ring-zoop-moss/20"
                   }`}
                 />
-                {errors.pincode && <p className="text-red-500 text-xs mt-1 font-bold">{errors.pincode}</p>}
+                {errors.pincode && (
+                  <p className="text-red-500 text-xs mt-1 font-bold">
+                    {errors.pincode}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -645,7 +728,9 @@ const Signup = () => {
                 </label>
                 <select
                   value={formData.gender}
-                  onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, gender: e.target.value })
+                  }
                   className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-zoop-moss focus:ring-2 focus:ring-zoop-moss/20 outline-none"
                 >
                   <option value="">Select Gender</option>

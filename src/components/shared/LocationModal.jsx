@@ -2,35 +2,45 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useGeoLocation } from "../../hooks/useGeoLocation";
 import { useUser } from "../../context/UserContext";
 import { contentApi } from "../../services/api";
+import { getAllCities, getCitiesOfCountry } from "../../utils/locationData";
 
 const LocationModal = ({ isOpen, onClose }) => {
   const { detectCity, loading, error } = useGeoLocation();
   const { updateLocation } = useUser();
   const [searchQuery, setSearchQuery] = useState("");
-  const [cities, setCities] = useState([
-    "Surat",
-    "Ahmedabad",
-    "Mumbai",
-    "Delhi",
-    "Bengaluru",
-    "Pune",
-    "Kolkata",
-    "Chennai",
-    "Jaipur",
-    "Hyderabad",
-  ]);
+  const [cities, setCities] = useState([]);
+
+  useEffect(() => {
+    const fallbackCities = Array.from(
+      new Set(
+        [
+          ...getCitiesOfCountry("IN").map((item) =>
+            String(item?.name || "").trim(),
+          ),
+          ...getAllCities().map((item) => String(item?.name || "").trim()),
+        ].filter(Boolean),
+      ),
+    ).sort((a, b) => a.localeCompare(b));
+    setCities(fallbackCities);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
     const loadCities = async () => {
       try {
         const list = await contentApi.getCities();
-        if (cancelled || !Array.isArray(list) || list.length === 0) return;
-        const names = list
-          .map((item) => String(item?.name || "").trim())
-          .filter(Boolean);
+        if (cancelled || !Array.isArray(list)) return;
+        const names = [
+          ...getCitiesOfCountry("IN").map((item) =>
+            String(item?.name || "").trim(),
+          ),
+          ...getAllCities().map((item) => String(item?.name || "").trim()),
+          ...list.map((item) => String(item?.name || "").trim()),
+        ].filter(Boolean);
         if (!cancelled && names.length > 0) {
-          setCities(Array.from(new Set(names)).sort((a, b) => a.localeCompare(b)));
+          setCities(
+            Array.from(new Set(names)).sort((a, b) => a.localeCompare(b)),
+          );
         }
       } catch {
         // Keep fallback list.
@@ -150,24 +160,29 @@ const LocationModal = ({ isOpen, onClose }) => {
             </svg>
           </div>
 
-          {/* Cities Grid */}
-          <div className="grid grid-cols-2 gap-3 max-h-[200px] overflow-y-auto no-scrollbar">
+          {/* Cities List */}
+          <div className="max-h-[320px] overflow-y-auto pr-1">
             {filteredCities.length > 0 ? (
-              filteredCities.map((city) => (
+              filteredCities.slice(0, 500).map((city) => (
                 <button
                   key={city}
                   onClick={() => handleCitySelect(city)}
-                  className="px-4 py-3 rounded-lg border border-gray-100 text-sm font-bold text-gray-600 hover:border-zoop-moss hover:bg-zoop-moss/10 hover:text-zoop-obsidian transition-all"
+                  className="mb-2 w-full px-4 py-3 rounded-lg border border-gray-100 text-left text-sm font-bold text-gray-600 hover:border-zoop-moss hover:bg-zoop-moss/10 hover:text-zoop-obsidian transition-all"
                 >
                   {city}
                 </button>
               ))
             ) : (
-              <div className="col-span-2 text-center py-6 text-gray-400 text-sm">
+              <div className="text-center py-6 text-gray-400 text-sm">
                 No cities found. Try a different search.
               </div>
             )}
           </div>
+          {filteredCities.length > 500 && (
+            <p className="text-[11px] text-center text-gray-400">
+              Showing first 500 results. Keep typing to narrow the city search.
+            </p>
+          )}
         </div>
       </div>
     </div>

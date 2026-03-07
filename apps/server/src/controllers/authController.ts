@@ -33,6 +33,13 @@ type SellerRecord = {
   updatedAt: string;
 };
 
+const normalizePhoneNumber = (value: any) => {
+  const raw = String(value || "").trim();
+  if (!raw) return "";
+  const digits = raw.replace(/\D/g, "");
+  return digits ? `+${digits}` : "";
+};
+
 // Add these functions to authController.ts
 
 export const signupWithOTP = async (req: Request, res: Response) => {
@@ -59,7 +66,7 @@ export const signupWithOTP = async (req: Request, res: Response) => {
 
     // Generate and send OTP to a real email channel.
     const channel = String(otpChannel || "email").toLowerCase() === "phone" ? "phone" : "email";
-    const otpRecipient = channel === "phone" ? String(phone || "").trim() : String(email || "").trim().toLowerCase();
+    const otpRecipient = channel === "phone" ? normalizePhoneNumber(phone) : String(email || "").trim().toLowerCase();
     if (!otpRecipient) {
       return res.status(400).json({ error: channel === "phone" ? "Phone is required for phone OTP" : "Email is required for OTP" });
     }
@@ -79,7 +86,7 @@ export const signupWithOTP = async (req: Request, res: Response) => {
         password, // Hash this in production!
         displayName,
         role: role || "customer",
-        phone: phone || "",
+        phone: normalizePhoneNumber(phone),
         address: address || "",
         city: city || "",
         state: state || "",
@@ -145,7 +152,7 @@ export const verifyOTP = async (req: Request, res: Response) => {
       id: userRecord.uid,
       email: userData.email,
       displayName: userData.displayName,
-      phone: userData.phone || "",
+      phone: normalizePhoneNumber(userData.phone),
       address: userData.address || "",
       city: userData.city || "",
       state: userData.state || "",
@@ -193,14 +200,14 @@ export const registerCustomer = async (req: Request, res: Response) => {
       email,
       password,
       displayName: name,
-      phoneNumber: phone ? phone : undefined,
+      phoneNumber: phone ? normalizePhoneNumber(phone) : undefined,
     });
 
     const userData: User & Record<string, any> = {
       id: userRecord.uid,
       displayName: name,
       email,
-      phone,
+      phone: normalizePhoneNumber(phone),
       address: address || '',
       city: city || '',
       state: state || '',
@@ -256,7 +263,7 @@ export const registerSeller = async (req: Request, res: Response) => {
         email,
         password,
         displayName: ownerName,
-        phoneNumber: phone,
+        phoneNumber: normalizePhoneNumber(phone),
       });
     }
 
@@ -274,7 +281,7 @@ export const registerSeller = async (req: Request, res: Response) => {
       panNumber,
       ownerName,
       email,
-      phone,
+      phone: normalizePhoneNumber(phone),
       address,
       banking,
       status: 'pending',
@@ -295,7 +302,7 @@ export const registerSeller = async (req: Request, res: Response) => {
       businessType,
       gstNumber: gstNumber || '',
       panNumber,
-      phone,
+      phone: normalizePhoneNumber(phone),
       addressLine1: address?.addressLine1 || '',
       addressLine2: address?.addressLine2 || '',
       city: address?.city || '',
@@ -346,7 +353,7 @@ export const syncUser = async (req: Request, res: Response) => {
         id: user.uid,
         name: user.name || user.email?.split('@')[0] || 'User',
         email: user.email || '',
-        phone: user.phone_number,
+        phone: normalizePhoneNumber(user.phone_number),
         address: '',
         city: '',
         state: '',
@@ -376,7 +383,12 @@ export const syncUser = async (req: Request, res: Response) => {
       userData = {
         ...userData,
         role: 'seller',
-        verificationStatus: userData.verificationStatus || 'none',
+        verificationStatus:
+          userData.verificationStatus === 'pending' ||
+          userData.verificationStatus === 'approved' ||
+          userData.verificationStatus === 'rejected'
+            ? userData.verificationStatus
+            : undefined,
         onboardingCompleted: false,
         updatedAt: new Date().toISOString(),
       };
@@ -560,7 +572,7 @@ export const requestLoginOTP = async (req: Request, res: Response) => {
 
     const profileDoc = await db.collection("users").doc(userRecord.uid).get();
     const profile = profileDoc.exists ? (profileDoc.data() as any) : {};
-    const otpRecipient = channel === "phone" ? String(profile?.phone || "").trim() : email;
+    const otpRecipient = channel === "phone" ? normalizePhoneNumber(profile?.phone) : email;
     if (!otpRecipient) {
       return res.status(400).json({ error: "Phone number is not available for this account" });
     }
@@ -634,7 +646,7 @@ export const resendOTP = async (req: Request, res: Response) => {
     }
 
     const pending = pendingDoc.data() as any;
-    const recipient = channel === 'phone' ? String(pending?.phone || '').trim() : email;
+    const recipient = channel === 'phone' ? normalizePhoneNumber(pending?.phone) : email;
     if (!recipient) {
       return res.status(400).json({ error: 'Phone number is not available for this signup' });
     }
@@ -672,8 +684,8 @@ export const verifyPhoneSignup = async (req: Request, res: Response) => {
     }
     const userData = pendingUserDoc.data() as any;
     const decoded = await auth.verifyIdToken(idToken);
-    const verifiedPhone = String(decoded.phone_number || '').trim();
-    const expectedPhone = String(userData?.phone || '').trim();
+    const verifiedPhone = normalizePhoneNumber(decoded.phone_number);
+    const expectedPhone = normalizePhoneNumber(userData?.phone);
     if (!verifiedPhone || !expectedPhone || verifiedPhone !== expectedPhone) {
       return res.status(400).json({ error: 'Verified mobile number does not match signup details' });
     }
@@ -756,13 +768,13 @@ export const verifyPhoneLogin = async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Profile not found for this account' });
     }
     const profile = userDoc.data() as any;
-    const expectedPhone = String(profile?.phone || userRecord.phoneNumber || '').trim();
+    const expectedPhone = normalizePhoneNumber(profile?.phone || userRecord.phoneNumber);
     if (!expectedPhone) {
       return res.status(400).json({ error: 'Phone number is not available for this account' });
     }
 
     const decoded = await auth.verifyIdToken(idToken);
-    const verifiedPhone = String(decoded.phone_number || '').trim();
+    const verifiedPhone = normalizePhoneNumber(decoded.phone_number);
     if (!verifiedPhone || verifiedPhone !== expectedPhone) {
       return res.status(400).json({ error: 'Verified mobile number does not match this account' });
     }
