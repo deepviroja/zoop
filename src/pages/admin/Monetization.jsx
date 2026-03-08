@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { adminApi } from "../../services/api";
+import { formatInrWithSymbol } from "../../utils/currency";
 
 const isNotFoundError = (e) => {
   const msg = String(e?.message || "").toLowerCase();
@@ -11,8 +12,9 @@ const isNotFoundError = (e) => {
   );
 };
 
-const fmtInr = (value) =>
-  Number(value || 0).toLocaleString("en-IN", { maximumFractionDigits: 2 });
+const fmtInr = (value, options = {}) => formatInrWithSymbol(value, options);
+const amountCardClass =
+  "mt-2 break-words text-[clamp(1.95rem,2vw,2.55rem)] font-black leading-none tracking-tight tabular-nums";
 
 const Monetization = () => {
   const [loading, setLoading] = useState(true);
@@ -153,48 +155,48 @@ const Monetization = () => {
           <p className="text-xs font-black uppercase tracking-widest text-gray-400">
             Total Revenue
           </p>
-          <p className="text-3xl font-black text-zoop-obsidian mt-2">
-            ₹{fmtInr(overview?.totals?.totalRevenue)}
+          <p className={`${amountCardClass} text-zoop-obsidian`}>
+            {fmtInr(overview?.totals?.totalRevenue, { compact: true })}
           </p>
         </div>
         <div className="bg-white rounded-2xl p-5 border border-gray-100">
           <p className="text-xs font-black uppercase tracking-widest text-gray-400">
             Total Commission
           </p>
-          <p className="text-3xl font-black text-zoop-moss mt-2">
-            ₹{fmtInr(overview?.totals?.totalCommission)}
+          <p className={`${amountCardClass} text-zoop-moss`}>
+            {fmtInr(overview?.totals?.totalCommission, { compact: true })}
           </p>
         </div>
         <div className="bg-white rounded-2xl p-5 border border-gray-100">
           <p className="text-xs font-black uppercase tracking-widest text-gray-400">
             Pending Transfer
           </p>
-          <p className="text-3xl font-black text-amber-600 mt-2">
-            ₹{fmtInr(overview?.totals?.pendingTransfer)}
+          <p className={`${amountCardClass} text-amber-600`}>
+            {fmtInr(overview?.totals?.pendingTransfer, { compact: true })}
           </p>
         </div>
         <div className="bg-white rounded-2xl p-5 border border-gray-100">
           <p className="text-xs font-black uppercase tracking-widest text-gray-400">
             Awaiting Settlement
           </p>
-          <p className="text-3xl font-black text-sky-600 mt-2">
-            ₹{fmtInr(overview?.totals?.awaitingSettlement)}
+          <p className={`${amountCardClass} text-sky-600`}>
+            {fmtInr(overview?.totals?.awaitingSettlement, { compact: true })}
           </p>
         </div>
         <div className="bg-white rounded-2xl p-5 border border-gray-100">
           <p className="text-xs font-black uppercase tracking-widest text-gray-400">
             On Hold
           </p>
-          <p className="text-3xl font-black text-rose-600 mt-2">
-            ₹{fmtInr(overview?.totals?.onHold)}
+          <p className={`${amountCardClass} text-rose-600`}>
+            {fmtInr(overview?.totals?.onHold, { compact: true })}
           </p>
         </div>
         <div className="bg-white rounded-2xl p-5 border border-gray-100">
           <p className="text-xs font-black uppercase tracking-widest text-gray-400">
             Transferred
           </p>
-          <p className="text-3xl font-black text-green-600 mt-2">
-            ₹{fmtInr(overview?.totals?.transferred)}
+          <p className={`${amountCardClass} text-green-600`}>
+            {fmtInr(overview?.totals?.transferred, { compact: true })}
           </p>
         </div>
       </div>
@@ -510,7 +512,7 @@ const Monetization = () => {
                       {p.orderId}
                     </td>
                     <td className="px-6 py-4 font-black text-zoop-moss">
-                      ₹{fmtInr(p.payoutAmount)}
+                      <span className="tabular-nums">{fmtInr(p.payoutAmount)}</span>
                     </td>
                     <td className="px-6 py-4">
                       <span

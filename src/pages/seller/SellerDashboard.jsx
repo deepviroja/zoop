@@ -2,10 +2,13 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { sellerApi, productsApi } from "../../services/api";
 import { useUser } from "../../context/UserContext";
+import { formatInrWithSymbol } from "../../utils/currency";
 
 const Skeleton = ({ className = "" }) => (
   <div className={`bg-gray-200 animate-pulse rounded-xl ${className}`} />
 );
+const statValueClass =
+  "break-words text-[clamp(1.8rem,2vw,2.35rem)] font-black leading-none tracking-tight tabular-nums";
 
 const statusColor = (s) =>
   s === "delivered"
@@ -248,7 +251,10 @@ const SellerDashboard = () => {
             },
             {
               label: "Revenue",
-              value: `₹${((stats.totalRevenue || 0) / 1000).toFixed(1)}k`,
+              value: formatInrWithSymbol(stats.totalRevenue || 0, {
+                compact: true,
+                maximumFractionDigits: 1,
+              }),
               sub: "↑ All time",
               color: "text-green-500",
             },
@@ -264,7 +270,7 @@ const SellerDashboard = () => {
               className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-all"
             >
               <p className="text-gray-500 text-sm font-medium">{s.label}</p>
-              <h3 className={`text-3xl font-black text-zoop-obsidian mt-1`}>
+              <h3 className={`${statValueClass} text-zoop-obsidian mt-1`}>
                 {s.value}
               </h3>
               <p className={`text-xs font-bold mt-2 ${s.color}`}>{s.sub}</p>
@@ -325,7 +331,9 @@ const SellerDashboard = () => {
                           {p.name || p.title}
                         </p>
                         <p className="text-xs text-gray-500">
-                          ₹{p.price} · {p.category || "Uncategorized"}
+                          {formatInrWithSymbol(p.price || 0, {
+                            maximumFractionDigits: 0,
+                          })} · {p.category || "Uncategorized"}
                         </p>
                       </div>
                       <Link
@@ -377,7 +385,11 @@ const SellerDashboard = () => {
                       </div>
                       <div className="text-right">
                         <p className="font-black text-sm">
-                          ₹{(o.totalAmount || 0).toLocaleString()}
+                          <span className="tabular-nums">
+                            {formatInrWithSymbol(o.totalAmount || 0, {
+                              maximumFractionDigits: 0,
+                            })}
+                          </span>
                         </p>
                         <span
                           className={`text-[10px] font-black px-2 py-0.5 rounded-full ${statusColor(o.status)}`}
@@ -426,7 +438,7 @@ const SellerDashboard = () => {
                       className="flex min-w-[56px] flex-1 flex-col items-center gap-3"
                     >
                       <p className="text-[11px] font-black text-zoop-obsidian whitespace-nowrap">
-                        ₹{Math.round(point.value).toLocaleString("en-IN")}
+                        {formatInrWithSymbol(Math.round(point.value))}
                       </p>
                       <div
                         className="w-full relative flex items-end justify-center"
@@ -494,7 +506,9 @@ const SellerDashboard = () => {
                       </p>
                     </div>
                     <p className="font-black text-lg text-zoop-obsidian whitespace-nowrap">
-                      ₹{p.price}
+                      {formatInrWithSymbol(p.price || 0, {
+                        maximumFractionDigits: 0,
+                      })}
                     </p>
                     <div className="flex gap-2">
                       <Link
@@ -559,7 +573,11 @@ const SellerDashboard = () => {
                     </div>
                     <div className="text-right">
                       <p className="font-black text-zoop-obsidian">
-                        ₹{(o.totalAmount || 0).toLocaleString()}
+                        <span className="tabular-nums">
+                          {formatInrWithSymbol(o.totalAmount || 0, {
+                            maximumFractionDigits: 0,
+                          })}
+                        </span>
                       </p>
                       <span
                         className={`text-[10px] font-black px-2 py-0.5 rounded-full ${statusColor(o.status)}`}

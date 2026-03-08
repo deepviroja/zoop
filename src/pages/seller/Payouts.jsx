@@ -1,8 +1,10 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { sellerApi } from "../../services/api";
+import { formatInrWithSymbol } from "../../utils/currency";
 
-const fmtInr = (value) =>
-  Number(value || 0).toLocaleString("en-IN", { maximumFractionDigits: 2 });
+const fmtInr = (value, options = {}) => formatInrWithSymbol(value, options);
+const amountCardClass =
+  "mt-2 break-words text-[clamp(1.95rem,2.2vw,2.6rem)] font-black leading-none tracking-tight tabular-nums";
 
 const Payouts = () => {
   const [loading, setLoading] = useState(true);
@@ -44,32 +46,34 @@ const Payouts = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4">
         <div className="bg-white rounded-2xl p-5 border border-gray-100">
           <p className="text-xs font-black uppercase tracking-widest text-gray-400">Awaiting Settlement</p>
-          <p className="text-3xl font-black text-sky-600 mt-2">
-            ₹{fmtInr(payload?.totals?.awaitingSettlement)}
+          <p className={`${amountCardClass} text-sky-600`}>
+            {fmtInr(payload?.totals?.awaitingSettlement, { compact: true })}
           </p>
           <p className="mt-2 text-xs text-gray-500">Delivered orders still inside the return window.</p>
         </div>
         <div className="bg-white rounded-2xl p-5 border border-gray-100">
           <p className="text-xs font-black uppercase tracking-widest text-gray-400">On Hold</p>
-          <p className="text-3xl font-black text-rose-600 mt-2">
-            ₹{fmtInr(payload?.totals?.onHold)}
+          <p className={`${amountCardClass} text-rose-600`}>
+            {fmtInr(payload?.totals?.onHold, { compact: true })}
           </p>
           <p className="mt-2 text-xs text-gray-500">Return or dispute review is delaying release.</p>
         </div>
         <div className="bg-white rounded-2xl p-5 border border-gray-100">
           <p className="text-xs font-black uppercase tracking-widest text-gray-400">Pending Transfer</p>
-          <p className="text-3xl font-black text-amber-600 mt-2">
-            ₹{fmtInr(payload?.totals?.pendingTransfer)}
+          <p className={`${amountCardClass} text-amber-600`}>
+            {fmtInr(payload?.totals?.pendingTransfer, { compact: true })}
           </p>
         </div>
         <div className="bg-white rounded-2xl p-5 border border-gray-100">
           <p className="text-xs font-black uppercase tracking-widest text-gray-400">Transferred</p>
-          <p className="text-3xl font-black text-green-600 mt-2">₹{fmtInr(payload?.totals?.transferred)}</p>
+          <p className={`${amountCardClass} text-green-600`}>
+            {fmtInr(payload?.totals?.transferred, { compact: true })}
+          </p>
         </div>
         <div className="bg-white rounded-2xl p-5 border border-gray-100">
           <p className="text-xs font-black uppercase tracking-widest text-gray-400">Approx Balance</p>
-          <p className="text-3xl font-black text-zoop-obsidian mt-2">
-            ₹{fmtInr(payload?.totals?.approximateBalance)}
+          <p className={`${amountCardClass} text-zoop-obsidian`}>
+            {fmtInr(payload?.totals?.approximateBalance, { compact: true })}
           </p>
         </div>
       </div>
@@ -104,11 +108,11 @@ const Payouts = () => {
                   <tr key={row.id}>
                     <td className="px-6 py-4 font-bold text-zoop-obsidian">{row.orderId}</td>
                     <td className="px-6 py-4 text-sm text-gray-600">{row.productId}</td>
-                    <td className="px-6 py-4 font-bold">₹{fmtInr(row.grossAmount)}</td>
+                    <td className="px-6 py-4 font-bold tabular-nums">{fmtInr(row.grossAmount)}</td>
                     <td className="px-6 py-4 text-sm">
-                      ₹{fmtInr(row.commissionAmount)} ({row.commissionPercent}%)
+                      <span className="tabular-nums">{fmtInr(row.commissionAmount)}</span> ({row.commissionPercent}%)
                     </td>
-                    <td className="px-6 py-4 font-black text-zoop-moss">₹{fmtInr(row.payoutAmount)}</td>
+                    <td className="px-6 py-4 font-black text-zoop-moss tabular-nums">{fmtInr(row.payoutAmount)}</td>
                     <td className="px-6 py-4">
                       <span
                         className={`px-3 py-1 rounded-full text-xs font-black ${

@@ -6,6 +6,7 @@ import { Package } from "../../assets/icons/Package";
 import { Activity } from "../../assets/icons/Activity";
 import { ShoppingCart } from "../../assets/icons/ShoppingCart";
 import { adminApi } from "../../services/api";
+import { formatInr, formatInrWithSymbol } from "../../utils/currency";
 
 const statusColor = (s) =>
   s === "delivered" || s === "completed"
@@ -21,6 +22,8 @@ const statusColor = (s) =>
 const Skeleton = ({ className = "" }) => (
   <div className={`bg-gray-200 animate-pulse rounded-xl ${className}`} />
 );
+const statValueClass =
+  "break-words text-[clamp(1.9rem,2vw,2.45rem)] font-black leading-none tracking-tight tabular-nums";
 
 const AdminStats = () => {
   const [analytics, setAnalytics] = useState(null);
@@ -122,7 +125,10 @@ const AdminStats = () => {
               label: "Total Revenue",
               value: loading
                 ? null
-                : `₹${((analytics?.totalRevenue || 0) / 1000).toFixed(1)}k`,
+                : formatInrWithSymbol(analytics?.totalRevenue || 0, {
+                    compact: true,
+                    maximumFractionDigits: 1,
+                  }),
               bg: "from-blue-500 to-blue-600",
               icon: <Activity width={24} height={24} />,
             },
@@ -168,7 +174,7 @@ const AdminStats = () => {
               {loading ? (
                 <Skeleton className="h-10 w-32 bg-white/20" />
               ) : (
-                <h3 className="text-3xl font-black">{card.value}</h3>
+                <h3 className={statValueClass}>{card.value}</h3>
               )}
             </div>
           ))}
@@ -195,7 +201,7 @@ const AdminStats = () => {
                     className="flex min-w-[56px] flex-1 flex-col items-center gap-3"
                   >
                     <p className="text-[11px] font-black text-zoop-obsidian whitespace-nowrap">
-                      ₹{Math.round(data.value).toLocaleString("en-IN")}
+                      {formatInrWithSymbol(Math.round(data.value))}
                     </p>
                     <div
                       className="w-full relative flex items-end justify-center"
@@ -302,7 +308,11 @@ const AdminStats = () => {
                     </div>
                     <div className="text-right">
                       <p className="font-black text-zoop-obsidian">
-                        ₹{(order.totalAmount || 0).toLocaleString()}
+                        <span className="tabular-nums">
+                          {formatInrWithSymbol(order.totalAmount || 0, {
+                            maximumFractionDigits: 0,
+                          })}
+                        </span>
                       </p>
                       <span
                         className={`inline-block px-2 py-1 rounded-full text-[10px] font-black uppercase mt-1 ${statusColor(order.status)}`}
