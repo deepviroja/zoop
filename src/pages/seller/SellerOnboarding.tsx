@@ -127,6 +127,7 @@ const SellerOnboarding = () => {
   const validateStep = (currentStep: number) => {
     const newErrors: Partial<OnboardingFormData> = {};
     let isValid = true;
+    const hasAuthenticatedSeller = Boolean(user?.uid && user?.email);
 
     if (currentStep === 1) {
       if (!formData.businessName.trim())
@@ -159,12 +160,14 @@ const SellerOnboarding = () => {
       else if (!isValidInternationalPhone(formData.phone, phoneMeta))
         newErrors.phone = "Please enter a valid phone number for selected country";
 
-      if (!formData.password) newErrors.password = "Password is required";
-      else if (formData.password.length < 8)
-        newErrors.password = "Password must be at least 8 characters";
+      if (!hasAuthenticatedSeller) {
+        if (!formData.password) newErrors.password = "Password is required";
+        else if (formData.password.length < 8)
+          newErrors.password = "Password must be at least 8 characters";
 
-      if (formData.password !== formData.confirmPassword) {
-        newErrors.confirmPassword = "Passwords do not match";
+        if (formData.password !== formData.confirmPassword) {
+          newErrors.confirmPassword = "Passwords do not match";
+        }
       }
     }
 
@@ -237,7 +240,7 @@ const SellerOnboarding = () => {
             ownerName: formData.ownerName,
             email: formData.email,
             phone: formData.phone,
-            password: formData.password,
+            password: formData.password || "OnboardingOnly#123",
             address: {
                 addressLine1: formData.addressLine1,
                 addressLine2: formData.addressLine2,
@@ -555,52 +558,58 @@ const SellerOnboarding = () => {
                   onMetaChange={(meta) => setPhoneMeta(meta || phoneMeta)}
                 />
                </div>
-               <div className="grid md:grid-cols-2 gap-6 pt-4 border-t border-gray-100">
-                <div>
-                   <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">
-                    Password *
-                  </label>
-                   <input
-                    type="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    className={`w-full px-4 py-3 bg-gray-50 border-2 rounded-xl focus:outline-none transition-colors font-bold ${
-                      errors.password
-                        ? "border-red-500 focus:border-red-500"
-                        : "border-gray-100 focus:border-zoop-moss"
-                    }`}
-                    placeholder="Min 8 chars"
-                  />
-                   {errors.password && (
-                     <p className="text-red-500 text-xs font-bold mt-1">
-                       {errors.password}
-                     </p>
-                   )}
-                </div>
-                 <div>
-                    <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">
-                    Confirm Password *
-                  </label>
-                   <input
-                    type="password"
-                    name="confirmPassword"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    className={`w-full px-4 py-3 bg-gray-50 border-2 rounded-xl focus:outline-none transition-colors font-bold ${
-                      errors.confirmPassword
-                        ? "border-red-500 focus:border-red-500"
-                        : "border-gray-100 focus:border-zoop-moss"
-                    }`}
-                    placeholder="Re-enter password"
-                  />
-                   {errors.confirmPassword && (
-                     <p className="text-red-500 text-xs font-bold mt-1">
-                       {errors.confirmPassword}
-                     </p>
-                   )}
-                </div>
-               </div>
+               {!(user?.uid && user?.email) ? (
+                 <div className="grid md:grid-cols-2 gap-6 pt-4 border-t border-gray-100">
+                  <div>
+                     <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">
+                      Password *
+                    </label>
+                     <input
+                      type="password"
+                      name="password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      className={`w-full px-4 py-3 bg-gray-50 border-2 rounded-xl focus:outline-none transition-colors font-bold ${
+                        errors.password
+                          ? "border-red-500 focus:border-red-500"
+                          : "border-gray-100 focus:border-zoop-moss"
+                      }`}
+                      placeholder="Min 8 chars"
+                    />
+                     {errors.password && (
+                       <p className="text-red-500 text-xs font-bold mt-1">
+                         {errors.password}
+                       </p>
+                     )}
+                  </div>
+                   <div>
+                      <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">
+                      Confirm Password *
+                    </label>
+                     <input
+                      type="password"
+                      name="confirmPassword"
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                      className={`w-full px-4 py-3 bg-gray-50 border-2 rounded-xl focus:outline-none transition-colors font-bold ${
+                        errors.confirmPassword
+                          ? "border-red-500 focus:border-red-500"
+                          : "border-gray-100 focus:border-zoop-moss"
+                      }`}
+                      placeholder="Re-enter password"
+                    />
+                     {errors.confirmPassword && (
+                       <p className="text-red-500 text-xs font-bold mt-1">
+                         {errors.confirmPassword}
+                       </p>
+                     )}
+                  </div>
+                 </div>
+               ) : (
+                 <div className="rounded-2xl border border-zoop-moss/20 bg-zoop-moss/5 px-4 py-4 text-sm font-bold text-zoop-obsidian">
+                   Your seller account is already created. Finish business details below to submit for review.
+                 </div>
+               )}
             </div>
           )}
 

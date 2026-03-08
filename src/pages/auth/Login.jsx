@@ -220,6 +220,7 @@ const Login = () => {
   };
 
   const handleVerifyOTP = async (otp) => {
+    if (loading) return;
     setGeneralError("");
     setLoading(true);
     try {
@@ -245,7 +246,6 @@ const Login = () => {
         });
       }
       if (response?.token) {
-        localStorage.setItem("authToken", response.token);
         await signOut(auth).catch(() => {});
         await signInWithCustomToken(auth, response.token);
       }

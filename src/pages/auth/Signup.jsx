@@ -289,6 +289,7 @@ const Signup = () => {
   };
 
   const handleOTPComplete = async (otp) => {
+    if (loading || otpProcessing) return;
     setLoading(true);
     setOtpProcessing(true);
     setGeneralError("");
@@ -327,7 +328,6 @@ const Signup = () => {
 
       // Store token
       if (response.token) {
-        localStorage.setItem("authToken", response.token);
         // Authenticate with Firebase Client SDK using the custom token
         await signOut(auth).catch(() => {});
         await signInWithCustomToken(auth, response.token);
