@@ -313,9 +313,24 @@ const Checkout = () => {
         }
 
         const keyId =
-          import.meta.env.VITE_RAZORPAY_KEY_ID || paymentOrderResponse?.keyId;
+          paymentOrderResponse?.keyId || import.meta.env.VITE_RAZORPAY_KEY_ID;
         if (!keyId) {
           throw new Error("Razorpay key is not configured in frontend env.");
+        }
+        const backendMode = String(paymentOrderResponse?.keyId || "").startsWith("rzp_live_")
+          ? "live"
+          : String(paymentOrderResponse?.keyId || "").startsWith("rzp_test_")
+            ? "test"
+            : "";
+        const frontendMode = String(import.meta.env.VITE_RAZORPAY_KEY_ID || "").startsWith("rzp_live_")
+          ? "live"
+          : String(import.meta.env.VITE_RAZORPAY_KEY_ID || "").startsWith("rzp_test_")
+            ? "test"
+            : "";
+        if (backendMode && frontendMode && backendMode !== frontendMode) {
+          throw new Error(
+            `Razorpay mode mismatch detected. Backend is using ${backendMode} keys while frontend is using ${frontendMode} keys.`,
+          );
         }
 
         const paymentResult = await new Promise((resolve, reject) => {
