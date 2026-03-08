@@ -31,9 +31,14 @@ const ProductListHeader = ({
         <div className="flex items-center gap-3 w-full md:w-auto">
           {/* Sort Dropdown */}
           <div className="relative flex-1 md:flex-none">
+            <label htmlFor="product-sort" className="sr-only">
+              Sort products
+            </label>
             <select
+              id="product-sort"
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
+              aria-label="Sort products"
               className="w-full md:w-48 appearance-none px-4 py-2 pr-8 border border-gray-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-zoop-moss bg-white cursor-pointer hover:border-zoop-moss transition-colors"
             >
               <option value="popularity">Most Popular</option>
@@ -65,6 +70,7 @@ const ProductListHeader = ({
           <div className="flex gap-1 bg-gray-100 p-1 rounded-lg">
             <button
               onClick={() => setView("grid")}
+              aria-label="Show products in grid view"
               className={`p-2 rounded-md transition-all ${
                 view === "grid" ? "bg-white shadow-sm" : "hover:bg-gray-200"
               }`}
@@ -80,6 +86,7 @@ const ProductListHeader = ({
             </button>
             <button
               onClick={() => setView("list")}
+              aria-label="Show products in list view"
               className={`hidden md:block p-2 rounded-md transition-all ${
                 view === "list" ? "bg-white shadow-sm" : "hover:bg-gray-200"
               }`}
@@ -98,6 +105,7 @@ const ProductListHeader = ({
           {/* Mobile Filter Toggle */}
           <button
             onClick={() => setShowFilters(!showFilters)}
+            aria-label={showFilters ? "Hide filters" : "Show filters"}
             className="lg:hidden flex items-center gap-2 px-4 py-2 bg-zoop-obsidian text-white rounded-lg font-bold text-sm hover:bg-zoop-moss hover:text-zoop-obsidian transition-colors"
           >
             <Filter width={16} height={16} />

@@ -11,6 +11,23 @@ import { X } from "../../assets/icons/X";
 const fmtInr = (value) =>
   Number(value || 0).toLocaleString("en-IN", { maximumFractionDigits: 0 });
 const fmtDateTime = (value) => (value ? new Date(value).toLocaleString() : "-");
+const getAccountState = (user) => {
+  if (
+    user?.isDeleted ||
+    user?.status === "deleted" ||
+    user?.accountState === "deleted"
+  ) {
+    return "deleted";
+  }
+  if (
+    user?.disabled ||
+    user?.status === "banned" ||
+    user?.accountState === "banned"
+  ) {
+    return "banned";
+  }
+  return "active";
+};
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -44,31 +61,52 @@ const UserManagement = () => {
         String(user.email || "").toLowerCase().includes(q);
       const matchesStatus =
         filterStatus === "all" ||
-        (filterStatus === "active" && user.accountState === "active") ||
-        (filterStatus === "suspended" && user.accountState === "banned") ||
-        (filterStatus === "deleted" && user.accountState === "deleted");
+        (filterStatus === "active" && getAccountState(user) === "active") ||
+        (filterStatus === "suspended" && getAccountState(user) === "banned") ||
+        (filterStatus === "deleted" && getAccountState(user) === "deleted");
       return matchesSearch && matchesStatus;
     });
   }, [users, searchQuery, filterStatus]);
 
   const stats = {
     totalUsers: users.length,
-    activeUsers: users.filter((u) => !u.disabled).length,
-    suspended: users.filter((u) => !!u.disabled).length,
+    activeUsers: users.filter((u) => getAccountState(u) === "active").length,
+    suspended: users.filter((u) => getAccountState(u) === "banned").length,
+    deleted: users.filter((u) => getAccountState(u) === "deleted").length,
   };
 
   const handleToggleBan = async (user) => {
-    const action = user.disabled ? "unban" : "ban";
+    const accountState = getAccountState(user);
+    if (accountState === "deleted") {
+      alert("Deleted accounts cannot be unbanned.");
+      return;
+    }
+    const action = accountState === "banned" ? "unban" : "ban";
     if (!window.confirm(`Are you sure you want to ${action} ${user.displayName || user.email}?`)) {
       return;
     }
     try {
-      await adminApi.banUser(user.id, !user.disabled);
+      const shouldDisable = accountState !== "banned";
+      await adminApi.banUser(user.id, shouldDisable);
       setUsers((prev) =>
-        prev.map((u) => (u.id === user.id ? { ...u, disabled: !user.disabled } : u)),
+        prev.map((u) =>
+          u.id === user.id
+            ? {
+                ...u,
+                disabled: shouldDisable,
+                status: shouldDisable ? "banned" : "active",
+                accountState: shouldDisable ? "banned" : "active",
+              }
+            : u,
+        ),
       );
       if (selectedUser?.id === user.id) {
-        setSelectedUser((prev) => ({ ...prev, disabled: !user.disabled }));
+        setSelectedUser((prev) => ({
+          ...prev,
+          disabled: shouldDisable,
+          status: shouldDisable ? "banned" : "active",
+          accountState: shouldDisable ? "banned" : "active",
+        }));
       }
     } catch (err) {
       alert(`Failed to ${action} user`);
@@ -104,6 +142,12 @@ const UserManagement = () => {
             <div className="text-3xl font-black text-orange-700">{stats.suspended}</div>
             <div className="text-[10px] font-black uppercase tracking-widest text-orange-600 mt-1">
               Suspended
+            </div>
+          </div>
+          <div className="bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl p-5 border border-gray-300">
+            <div className="text-3xl font-black text-gray-700">{stats.deleted}</div>
+            <div className="text-[10px] font-black uppercase tracking-widest text-gray-600 mt-1">
+              Deleted
             </div>
           </div>
         </div>
@@ -214,14 +258,14 @@ const UserManagement = () => {
                         )}
                         <span
                           className={`inline-flex mt-1 ml-2 px-2 py-0.5 rounded-full text-[10px] font-black ${
-                            user.accountState === "deleted"
+                            getAccountState(user) === "deleted"
                               ? "bg-gray-200 text-gray-700"
-                              : user.accountState === "banned"
+                              : getAccountState(user) === "banned"
                                 ? "bg-red-100 text-red-700"
                                 : "bg-green-100 text-green-700"
                           }`}
                         >
-                          {user.accountState || "active"}
+                          {getAccountState(user)}
                         </span>
                       </td>
                       <td className="px-6 py-4">
@@ -233,17 +277,23 @@ const UserManagement = () => {
                           >
                             <Eye width={18} height={18} />
                           </button>
-                          <button
-                            onClick={() => handleToggleBan(user)}
-                            className={`p-2 rounded-lg transition-all ${
-                              !user.disabled
-                                ? "bg-red-50 text-red-600 hover:bg-red-100"
-                                : "bg-green-50 text-green-600 hover:bg-green-100"
-                            }`}
-                            title={!user.disabled ? "Suspend User" : "Activate User"}
-                          >
-                            {!user.disabled ? <X width={18} height={18} /> : <Check width={18} height={18} />}
-                          </button>
+                          {getAccountState(user) !== "deleted" && (
+                            <button
+                              onClick={() => handleToggleBan(user)}
+                              className={`p-2 rounded-lg transition-all ${
+                                getAccountState(user) === "banned"
+                                  ? "bg-green-50 text-green-600 hover:bg-green-100"
+                                  : "bg-red-50 text-red-600 hover:bg-red-100"
+                              }`}
+                              title={getAccountState(user) === "banned" ? "Activate User" : "Suspend User"}
+                            >
+                              {getAccountState(user) === "banned" ? (
+                                <Check width={18} height={18} />
+                              ) : (
+                                <X width={18} height={18} />
+                              )}
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>

@@ -177,6 +177,133 @@ async function processDueCommissionPayouts() {
   }
 }
 
+type CommissionRow = {
+  id: string;
+  orderId: string;
+  sellerId: string;
+  productId: string;
+  grossAmount: number;
+  commissionPercent: number;
+  commissionAmount: number;
+  payoutAmount: number;
+  status: string;
+  transferRef?: string;
+  releasedBy?: string;
+  releasedAt?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+  availableAt?: string | null;
+  holdReason?: string;
+  source?: "recorded" | "computed";
+};
+
+const buildPayoutCandidate = async (
+  orderId: string,
+  order: any,
+  item: any,
+  commissionStructure: Array<{ categoryId?: string; commissionPercent?: number }>,
+): Promise<CommissionRow | null> => {
+  if (!item?.productId || !item?.sellerId) return null;
+  const payoutKey = `${orderId}_${item.productId}_${item.sellerId}`;
+  const existingPayout = await db.collection("payouts").doc(payoutKey).get();
+  if (existingPayout.exists) {
+    return {
+      id: payoutKey,
+      source: "recorded",
+      ...(existingPayout.data() as any),
+    } as CommissionRow;
+  }
+
+  const productDoc = await db.collection("products").doc(String(item.productId)).get();
+  if (!productDoc.exists) return null;
+  const product = productDoc.data() as any;
+  const commissionPercent = getCommissionPercentForProduct(product, commissionStructure);
+  const grossAmount = Number(item.price || 0) * Number(item.quantity || 0);
+  const commissionAmount = Number(((grossAmount * commissionPercent) / 100).toFixed(2));
+  const payoutAmount = Number((grossAmount - commissionAmount).toFixed(2));
+  if (payoutAmount <= 0) return null;
+
+  const returnUntilTs = item?.returnEligibleUntil
+    ? new Date(item.returnEligibleUntil).getTime()
+    : 0;
+  const now = Date.now();
+  const returnStatus = String(item?.returnRequest?.status || "").toLowerCase();
+
+  let status = "PENDING_TRANSFER";
+  let holdReason = "";
+  let availableAt: string | null = null;
+
+  if (returnStatus === "requested" || returnStatus === "approved") {
+    status = "ON_HOLD";
+    holdReason = "Return request is under review.";
+  } else if (returnUntilTs && returnUntilTs > now) {
+    status = "AWAITING_SETTLEMENT";
+    availableAt = item.returnEligibleUntil;
+    holdReason = "Waiting for the return window to end.";
+  }
+
+  return {
+    id: payoutKey,
+    orderId,
+    sellerId: String(item.sellerId),
+    productId: String(item.productId),
+    grossAmount,
+    commissionPercent,
+    commissionAmount,
+    payoutAmount,
+    status,
+    transferRef: "",
+    releasedBy: "",
+    releasedAt: null,
+    createdAt: order?.deliveredAt || order?.updatedAt || order?.createdAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    availableAt,
+    holdReason,
+    source: "computed",
+  };
+};
+
+async function getAllPayoutRows() {
+  const commissionStructure = await getCommissionStructure();
+  const ordersSnap = await db.collection("orders").where("status", "==", "delivered").get();
+  const rows = await Promise.all(
+    ordersSnap.docs.flatMap((orderDoc) => {
+      const order = orderDoc.data() as any;
+      const items = Array.isArray(order.items) ? order.items : [];
+      return items.map((item) =>
+        buildPayoutCandidate(orderDoc.id, order, item, commissionStructure),
+      );
+    }),
+  );
+  return rows
+    .filter(Boolean)
+    .map((row) => row as CommissionRow)
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime(),
+    );
+}
+
+const summarizePayoutRows = (rows: CommissionRow[]) => ({
+  totalGross: rows.reduce((sum, row) => sum + Number(row.grossAmount || 0), 0),
+  totalCommission: rows.reduce(
+    (sum, row) => sum + Number(row.commissionAmount || 0),
+    0,
+  ),
+  awaitingSettlement: rows
+    .filter((row) => row.status === "AWAITING_SETTLEMENT")
+    .reduce((sum, row) => sum + Number(row.payoutAmount || 0), 0),
+  onHold: rows
+    .filter((row) => row.status === "ON_HOLD")
+    .reduce((sum, row) => sum + Number(row.payoutAmount || 0), 0),
+  pendingTransfer: rows
+    .filter((row) => row.status === "PENDING_TRANSFER")
+    .reduce((sum, row) => sum + Number(row.payoutAmount || 0), 0),
+  transferred: rows
+    .filter((row) => row.status === "TRANSFERRED")
+    .reduce((sum, row) => sum + Number(row.payoutAmount || 0), 0),
+});
+
 // ─── PUBLIC GET ENDPOINTS ────────────────────────────────────────────────────
 
 export const getCities = async (_req: Request, res: Response) => {
@@ -747,10 +874,14 @@ export const banUser = async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'User not found' });
     }
     const userData = userDoc.data() as any;
+    if (!disabled && (userData?.isDeleted || userData?.status === 'deleted')) {
+      return res.status(400).json({ error: 'Deleted accounts cannot be restored from ban controls' });
+    }
     await auth.updateUser(uid, { disabled: !!disabled });
     await db.collection('users').doc(uid).update({
       disabled: !!disabled,
       status: disabled ? 'banned' : userData?.isDeleted ? 'deleted' : 'active',
+      accountState: disabled ? 'banned' : userData?.isDeleted ? 'deleted' : 'active',
       updatedAt: new Date().toISOString(),
     });
 
@@ -1336,34 +1467,21 @@ export const updateCommissionStructureConfig = async (req: Request, res: Respons
 export const getMonetizationOverview = async (_req: Request, res: Response) => {
   try {
     await processDueCommissionPayouts();
-    const [payoutsSnap, ordersSnap, commissionSnap] = await Promise.all([
-      db.collection('payouts').get(),
+    const [payouts, ordersSnap, commissionSnap] = await Promise.all([
+      getAllPayoutRows(),
       db.collection('orders').get(),
       db.collection('config').doc('commissionStructure').get(),
     ]);
-    const payouts = payoutsSnap.docs.map((d) => d.data() as any);
     const orders = ordersSnap.docs.map((d) => d.data() as any);
-    const totalGross = payouts.reduce((sum, p) => sum + Number(p.grossAmount || 0), 0);
-    const totalCommission = payouts.reduce((sum, p) => sum + Number(p.commissionAmount || 0), 0);
-    const pendingTransfer = payouts
-      .filter((p) => p.status === 'PENDING_TRANSFER')
-      .reduce((sum, p) => sum + Number(p.payoutAmount || 0), 0);
-    const transferred = payouts
-      .filter((p) => p.status === 'TRANSFERRED')
-      .reduce((sum, p) => sum + Number(p.payoutAmount || 0), 0);
+    const payoutTotals = summarizePayoutRows(payouts);
     const totalRevenue = orders.reduce((sum, o) => sum + Number(o.totalAmount || 0), 0);
     res.json({
       totals: {
         totalRevenue,
-        totalGross,
-        totalCommission,
-        pendingTransfer,
-        transferred,
+        ...payoutTotals,
       },
       commissionStructure: commissionSnap.data()?.items || DEFAULT_COMMISSION_STRUCTURE,
-      payouts: payouts.sort(
-        (a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime(),
-      ),
+      payouts,
     });
   } catch (e: any) {
     res.status(500).json({ error: e.message });
@@ -1374,19 +1492,24 @@ export const getSellerPayouts = async (req: Request, res: Response) => {
   try {
     await processDueCommissionPayouts();
     const user = (req as any).user;
-    const payoutsSnap = await db.collection('payouts').where('sellerId', '==', user.uid).get();
-    const payouts = payoutsSnap.docs
-      .map((d) => ({ id: d.id, ...(d.data() as any) }))
-      .sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+    const payouts = (await getAllPayoutRows()).filter(
+      (row) => row.sellerId === user.uid,
+    );
+    const payoutTotals = summarizePayoutRows(payouts);
     const totals = {
-      pendingTransfer: payouts
-        .filter((p) => p.status === 'PENDING_TRANSFER')
-        .reduce((sum, p) => sum + Number(p.payoutAmount || 0), 0),
-      transferred: payouts
-        .filter((p) => p.status === 'TRANSFERRED')
-        .reduce((sum, p) => sum + Number(p.payoutAmount || 0), 0),
+      awaitingSettlement: payoutTotals.awaitingSettlement,
+      onHold: payoutTotals.onHold,
+      pendingTransfer: payoutTotals.pendingTransfer,
+      transferred: payoutTotals.transferred,
       approximateBalance: payouts
-        .filter((p) => ['PENDING_TRANSFER', 'TRANSFERRED'].includes(p.status))
+        .filter((p) =>
+          [
+            'AWAITING_SETTLEMENT',
+            'ON_HOLD',
+            'PENDING_TRANSFER',
+            'TRANSFERRED',
+          ].includes(p.status),
+        )
         .reduce((sum, p) => sum + Number(p.payoutAmount || 0), 0),
     };
     res.json({ payouts, totals });

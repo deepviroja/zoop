@@ -115,6 +115,7 @@ const AdminAdsManagement = () => {
             onChange={(e) =>
               setSlotForm((p) => ({ ...p, placement: e.target.value }))
             }
+            aria-label="Select ad slot placement"
             className="w-full px-3 py-2 border border-gray-200 rounded-xl"
           >
             {placementOptions.map((placement) => (
@@ -223,6 +224,7 @@ const AdminAdsManagement = () => {
             onChange={(e) =>
               setAdForm((p) => ({ ...p, slotId: e.target.value }))
             }
+            aria-label="Select ad slot"
             className="w-full px-3 py-2 border border-gray-200 rounded-xl"
           >
             {(
@@ -238,6 +240,7 @@ const AdminAdsManagement = () => {
             onChange={(e) =>
               setAdForm((p) => ({ ...p, status: e.target.value }))
             }
+            aria-label="Select ad status"
             className="w-full px-3 py-2 border border-gray-200 rounded-xl"
           >
             <option value="PUBLISHED">PUBLISHED</option>
@@ -267,6 +270,7 @@ const AdminAdsManagement = () => {
           <select
             value={activeSlotFilter}
             onChange={(e) => setActiveSlotFilter(e.target.value)}
+            aria-label="Filter ads by slot"
             className="px-3 py-2 border border-gray-200 rounded-xl"
           >
             <option value="all">All Slots</option>
@@ -315,6 +319,7 @@ const AdminAdsManagement = () => {
                           setError(err?.message || "Failed to update ad");
                         }
                       }}
+                      aria-label={`Move ${ad.title} to another slot`}
                       className="px-2 py-1.5 border border-gray-200 rounded-lg text-xs"
                     >
                       {(data.slots || []).map((slot) => (

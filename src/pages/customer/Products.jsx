@@ -167,6 +167,7 @@ const Products = () => {
                         onClick={() =>
                           handleFilterChange({ ...filters, category: "all" })
                         }
+                        aria-label={`Remove ${filters.category} category filter`}
                       >
                         <X width={12} height={12} />
                       </button>
@@ -178,7 +179,10 @@ const Products = () => {
                       className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold flex items-center gap-1"
                     >
                       {brand}
-                      <button onClick={() => handleBrandToggle(brand)}>
+                      <button
+                        onClick={() => handleBrandToggle(brand)}
+                        aria-label={`Remove ${brand} brand filter`}
+                      >
                         <X width={12} height={12} />
                       </button>
                     </span>
@@ -190,6 +194,7 @@ const Products = () => {
                         onClick={() =>
                           handleFilterChange({ ...filters, type: "all" })
                         }
+                        aria-label={`Remove ${filters.type} delivery type filter`}
                       >
                         <X width={12} height={12} />
                       </button>
@@ -202,6 +207,7 @@ const Products = () => {
                         onClick={() =>
                           handleFilterChange({ ...filters, rating: 0 })
                         }
+                        aria-label={`Remove ${filters.rating} star rating filter`}
                       >
                         <X width={12} height={12} />
                       </button>
@@ -214,6 +220,7 @@ const Products = () => {
                         onClick={() =>
                           handleFilterChange({ ...filters, inStock: false })
                         }
+                        aria-label="Remove in-stock filter"
                       >
                         <X width={12} height={12} />
                       </button>
@@ -221,6 +228,7 @@ const Products = () => {
                   )}
                   <button
                     onClick={clearAllFilters}
+                    aria-label="Clear all active filters"
                     className="ml-auto text-xs text-red-500 hover:text-red-700 font-bold uppercase"
                   >
                     Clear All

@@ -61,7 +61,11 @@ const ProductFilterSidebar = ({
               Refine products without leaving the page
             </p>
           </div>
-          <button onClick={() => setShowFilters(false)} className="rounded-full border border-gray-200 p-2">
+          <button
+            onClick={() => setShowFilters(false)}
+            aria-label="Close filters"
+            className="rounded-full border border-gray-200 p-2"
+          >
             <X width={24} height={24} />
           </button>
         </div>
@@ -74,6 +78,7 @@ const ProductFilterSidebar = ({
           {activeFiltersCount > 0 && (
             <button
               onClick={clearAllFilters}
+              aria-label="Clear all filters"
               className="text-xs text-red-500 hover:text-red-700 font-bold uppercase"
             >
               Clear All
@@ -86,6 +91,7 @@ const ProductFilterSidebar = ({
           <div>
             <button
               onClick={() => toggleSection("category")}
+              aria-label={`${expandedSections.category ? "Collapse" : "Expand"} category filters`}
               className="w-full flex justify-between items-center text-sm font-bold text-gray-700 uppercase tracking-wider mb-3 hover:text-zoop-obsidian transition-colors"
             >
               <span>Category</span>
@@ -152,6 +158,7 @@ const ProductFilterSidebar = ({
           <div className="border-t border-gray-200 pt-6">
             <button
               onClick={() => toggleSection("price")}
+              aria-label={`${expandedSections.price ? "Collapse" : "Expand"} price filters`}
               className="w-full flex justify-between items-center text-sm font-bold text-gray-700 uppercase tracking-wider mb-3 hover:text-zoop-obsidian transition-colors"
             >
               <span>Price Range</span>
@@ -225,6 +232,7 @@ const ProductFilterSidebar = ({
           <div className="border-t border-gray-200 pt-6">
             <button
               onClick={() => toggleSection("brand")}
+              aria-label={`${expandedSections.brand ? "Collapse" : "Expand"} brand filters`}
               className="w-full flex justify-between items-center text-sm font-bold text-gray-700 uppercase tracking-wider mb-3 hover:text-zoop-obsidian transition-colors"
             >
               <span>Brand</span>
@@ -261,6 +269,7 @@ const ProductFilterSidebar = ({
           <div className="border-t border-gray-200 pt-6">
             <button
               onClick={() => toggleSection("type")}
+              aria-label={`${expandedSections.type ? "Collapse" : "Expand"} delivery type filters`}
               className="w-full flex justify-between items-center text-sm font-bold text-gray-700 uppercase tracking-wider mb-3 hover:text-zoop-obsidian transition-colors"
             >
               <span>Delivery Type</span>
@@ -323,6 +332,7 @@ const ProductFilterSidebar = ({
           <div className="border-t border-gray-200 pt-6">
             <button
               onClick={() => toggleSection("rating")}
+              aria-label={`${expandedSections.rating ? "Collapse" : "Expand"} rating filters`}
               className="w-full flex justify-between items-center text-sm font-bold text-gray-700 uppercase tracking-wider mb-3 hover:text-zoop-obsidian transition-colors"
             >
               <span>Customer Rating</span>
@@ -384,13 +394,18 @@ const ProductFilterSidebar = ({
           <div className="mb-3 flex items-center justify-between text-xs font-bold uppercase tracking-[0.18em] text-gray-500">
             <span>{activeFiltersCount} active filters</span>
             {activeFiltersCount > 0 && (
-              <button onClick={clearAllFilters} className="text-red-500">
+              <button
+                onClick={clearAllFilters}
+                aria-label="Clear all filters"
+                className="text-red-500"
+              >
                 Clear all
               </button>
             )}
           </div>
           <button
             onClick={() => setShowFilters(false)}
+            aria-label="Show filtered results"
             className="w-full rounded-xl bg-zoop-moss py-3 font-black text-zoop-obsidian"
           >
             Show Results

@@ -30,6 +30,7 @@ const ProductCard = ({ product, view = "grid" }) => {
   const displayImages = product.imageUrls || product.images || [displayImage];
   const optimizedDisplayImage = optimizeCloudinaryUrl(displayImage, { width: 800 });
   const optimizedDisplayImages = (displayImages || []).map((u) => optimizeCloudinaryUrl(u, { width: 800 }));
+  const productTitle = product.title || product.name || "Product image";
 
   const [imageIndex, setImageIndex] = useState(0);
   const [isQuickAddOpen, setQuickAddOpen] = useState(false);
@@ -121,7 +122,7 @@ const ProductCard = ({ product, view = "grid" }) => {
           <div className="w-48 h-48 bg-zoop-canvas rounded-lg overflow-hidden shrink-0 relative">
             <img
               src={optimizedDisplayImage}
-              alt={product.name}
+              alt={productTitle}
               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
               onError={(e) => {
                 e.target.src = "https://via.placeholder.com/300";
@@ -156,6 +157,7 @@ const ProductCard = ({ product, view = "grid" }) => {
                 </div>
                 <button
                   onClick={handleLike}
+                  aria-label={isLiked ? "Remove from wishlist" : "Add to wishlist"}
                   className="p-2 hover:bg-gray-50 rounded-full transition-all"
                 >
                   <Heart
@@ -207,6 +209,13 @@ const ProductCard = ({ product, view = "grid" }) => {
               <button
                 onClick={handleAddToCart}
                 disabled={!isInStock}
+                aria-label={
+                  isInCart(product.id)
+                    ? `View ${productTitle} in cart`
+                    : isInStock
+                      ? `Add ${productTitle} to cart`
+                      : `${productTitle} is out of stock`
+                }
                 className={`px-6 py-3 rounded-lg font-black text-sm uppercase tracking-wider transition-all flex items-center gap-2 ${
                   isInStock
                     ? "bg-zoop-obsidian text-white hover:bg-zoop-moss hover:text-zoop-obsidian hover:scale-105"
@@ -247,7 +256,7 @@ const ProductCard = ({ product, view = "grid" }) => {
         <div className="relative aspect-square bg-zoop-canvas overflow-hidden">
           <img
             src={optimizedDisplayImages[imageIndex] || optimizedDisplayImage}
-            alt={product.name}
+            alt={productTitle}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
             onError={(e) => {
               e.target.src = "https://via.placeholder.com/300";
@@ -299,6 +308,13 @@ const ProductCard = ({ product, view = "grid" }) => {
             <button
               onClick={handleAddToCart}
               disabled={!isInStock}
+              aria-label={
+                isInCart(product.id)
+                  ? `View ${productTitle} in cart`
+                  : isInStock
+                    ? `Quick add ${productTitle} to cart`
+                    : `${productTitle} is out of stock`
+              }
               className={`w-full py-3 rounded-xl font-black text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2 ${
                 isInStock
                   ? "bg-zoop-obsidian/95 backdrop-blur text-white hover:bg-zoop-moss hover:text-zoop-obsidian"
@@ -366,6 +382,11 @@ const ProductCard = ({ product, view = "grid" }) => {
             {/* Mobile Add Button */}
             <button
               onClick={handleMobileAdd}
+              aria-label={
+                hasSizes
+                  ? `Choose size for ${productTitle}`
+                  : `Add ${productTitle} to cart`
+              }
               className="md:hidden bg-zoop-obsidian text-white p-2.5 rounded-xl hover:bg-zoop-moss hover:text-zoop-obsidian transition-colors shadow-lg active:scale-95"
             >
               <ShoppingCart width={18} height={18} />
@@ -408,7 +429,7 @@ const ProductCard = ({ product, view = "grid" }) => {
               <div className="w-20 h-20 bg-gray-100 rounded-xl overflow-hidden">
                 <img
                   src={optimizedDisplayImage}
-                  alt={product.title || product.name}
+                  alt={productTitle}
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -430,6 +451,7 @@ const ProductCard = ({ product, view = "grid" }) => {
                 <button
                   key={size}
                   onClick={() => setSelectedSize(size)}
+                  aria-label={`Select size ${size}`}
                   className={`w-12 h-12 rounded-xl flex items-center justify-center font-black transition-all ${
                     selectedSize === size
                       ? "bg-zoop-obsidian text-white shadow-lg scale-110"
@@ -444,6 +466,7 @@ const ProductCard = ({ product, view = "grid" }) => {
             <button
               onClick={(e) => handleAddToCart(e)}
               disabled={!selectedSize}
+              aria-label={`Add ${productTitle} to cart${selectedSize ? ` in size ${selectedSize}` : ""}`}
               className={`w-full py-4 rounded-xl font-black text-sm uppercase tracking-widest flex items-center justify-center gap-2 ${
                 selectedSize
                   ? "bg-zoop-moss text-zoop-obsidian shadow-lg shadow-zoop-moss/20"

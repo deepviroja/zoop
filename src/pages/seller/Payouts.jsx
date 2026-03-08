@@ -41,7 +41,21 @@ const Payouts = () => {
         <p className="text-gray-500 mt-2">Funds are released only after admin transfer.</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4">
+        <div className="bg-white rounded-2xl p-5 border border-gray-100">
+          <p className="text-xs font-black uppercase tracking-widest text-gray-400">Awaiting Settlement</p>
+          <p className="text-3xl font-black text-sky-600 mt-2">
+            ₹{fmtInr(payload?.totals?.awaitingSettlement)}
+          </p>
+          <p className="mt-2 text-xs text-gray-500">Delivered orders still inside the return window.</p>
+        </div>
+        <div className="bg-white rounded-2xl p-5 border border-gray-100">
+          <p className="text-xs font-black uppercase tracking-widest text-gray-400">On Hold</p>
+          <p className="text-3xl font-black text-rose-600 mt-2">
+            ₹{fmtInr(payload?.totals?.onHold)}
+          </p>
+          <p className="mt-2 text-xs text-gray-500">Return or dispute review is delaying release.</p>
+        </div>
         <div className="bg-white rounded-2xl p-5 border border-gray-100">
           <p className="text-xs font-black uppercase tracking-widest text-gray-400">Pending Transfer</p>
           <p className="text-3xl font-black text-amber-600 mt-2">
@@ -75,7 +89,7 @@ const Payouts = () => {
             <table className="w-full">
               <thead className="bg-gray-50">
                 <tr>
-                  {["Order", "Product", "Gross", "Commission", "Payout", "Status", "Released"].map((h) => (
+                  {["Order", "Product", "Gross", "Commission", "Payout", "Status", "Available", "Released"].map((h) => (
                     <th
                       key={h}
                       className="px-6 py-4 text-left text-[10px] font-black uppercase tracking-widest text-gray-400"
@@ -100,11 +114,21 @@ const Payouts = () => {
                         className={`px-3 py-1 rounded-full text-xs font-black ${
                           row.status === "TRANSFERRED"
                             ? "bg-green-100 text-green-700"
-                            : "bg-amber-100 text-amber-700"
+                            : row.status === "PENDING_TRANSFER"
+                              ? "bg-amber-100 text-amber-700"
+                              : row.status === "AWAITING_SETTLEMENT"
+                                ? "bg-sky-100 text-sky-700"
+                                : "bg-rose-100 text-rose-700"
                         }`}
                       >
-                        {row.status}
+                        {String(row.status || "").replaceAll("_", " ")}
                       </span>
+                      {row.holdReason && (
+                        <p className="mt-1 text-xs text-gray-500">{row.holdReason}</p>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-500">
+                      {row.availableAt ? new Date(row.availableAt).toLocaleString() : "-"}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-500">
                       {row.releasedAt ? new Date(row.releasedAt).toLocaleString() : "-"}
@@ -121,4 +145,3 @@ const Payouts = () => {
 };
 
 export default Payouts;
-

@@ -24,16 +24,21 @@ const CountryStateCityFieldset = ({
     if (!country || !state) return [];
     return getCitiesOfState(country, state);
   }, [country, state]);
+  const countryId = "country-field";
+  const stateId = "state-field";
+  const cityId = "city-field";
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2 relative z-10">
       <div>
-        <label className="block text-sm font-bold text-gray-700 mb-2">
+        <label htmlFor={countryId} className="block text-sm font-bold text-gray-700 mb-2">
           Country {required ? "*" : ""}
         </label>
         <select
+          id={countryId}
           value={country}
           onChange={(e) => onCountryChange?.(e.target.value)}
+          aria-label="Country"
           className={`w-full px-4 py-3 rounded-xl border-2 outline-none transition-all mt-1 ${
             errors.country
               ? "border-red-500 bg-red-50"
@@ -53,14 +58,16 @@ const CountryStateCityFieldset = ({
       </div>
 
       <div>
-        <label className="block text-sm font-bold text-gray-700 mb-2">
+        <label htmlFor={stateId} className="block text-sm font-bold text-gray-700 mb-2">
           State {required ? "*" : ""}
         </label>
         {states.length > 0 ? (
           <select
+            id={stateId}
             value={state}
             onChange={(e) => onStateChange?.(e.target.value)}
             disabled={!country}
+            aria-label="State"
             className={`w-full px-4 py-3 rounded-xl border-2 outline-none transition-all mt-1 disabled:bg-gray-100 disabled:cursor-not-allowed ${
               errors.state
                 ? "border-red-500 bg-red-50"
@@ -76,6 +83,7 @@ const CountryStateCityFieldset = ({
           </select>
         ) : (
           <input
+            id={stateId}
             type="text"
             value={state}
             onChange={(e) => onStateChange?.(e.target.value)}
@@ -94,14 +102,16 @@ const CountryStateCityFieldset = ({
       </div>
 
       <div>
-        <label className="block text-sm font-bold text-gray-700 mb-2">
+        <label htmlFor={cityId} className="block text-sm font-bold text-gray-700 mb-2">
           City {required ? "*" : ""}
         </label>
         {cities.length > 0 ? (
           <select
+            id={cityId}
             value={city}
             onChange={(e) => onCityChange?.(e.target.value)}
             disabled={!country || !state}
+            aria-label="City"
             className={`w-full px-4 py-3 rounded-xl border-2 outline-none transition-all mt-1 disabled:bg-gray-100 disabled:cursor-not-allowed ${
               errors.city
                 ? "border-red-500 bg-red-50"
@@ -117,6 +127,7 @@ const CountryStateCityFieldset = ({
           </select>
         ) : (
           <input
+            id={cityId}
             type="text"
             value={city}
             onChange={(e) => onCityChange?.(e.target.value)}

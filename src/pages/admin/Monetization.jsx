@@ -81,10 +81,14 @@ const Monetization = () => {
     void load();
   }, []);
 
-  const pendingPayouts = useMemo(
+  const payoutQueue = useMemo(
     () =>
       Array.isArray(overview?.payouts)
-        ? overview.payouts.filter((p) => p.status === "PENDING_TRANSFER")
+        ? overview.payouts.filter((p) =>
+            ["PENDING_TRANSFER", "AWAITING_SETTLEMENT", "ON_HOLD"].includes(
+              p.status,
+            ),
+          )
         : [],
     [overview],
   );
@@ -144,7 +148,7 @@ const Monetization = () => {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-6 gap-4">
         <div className="bg-white rounded-2xl p-5 border border-gray-100">
           <p className="text-xs font-black uppercase tracking-widest text-gray-400">
             Total Revenue
@@ -167,6 +171,22 @@ const Monetization = () => {
           </p>
           <p className="text-3xl font-black text-amber-600 mt-2">
             ₹{fmtInr(overview?.totals?.pendingTransfer)}
+          </p>
+        </div>
+        <div className="bg-white rounded-2xl p-5 border border-gray-100">
+          <p className="text-xs font-black uppercase tracking-widest text-gray-400">
+            Awaiting Settlement
+          </p>
+          <p className="text-3xl font-black text-sky-600 mt-2">
+            ₹{fmtInr(overview?.totals?.awaitingSettlement)}
+          </p>
+        </div>
+        <div className="bg-white rounded-2xl p-5 border border-gray-100">
+          <p className="text-xs font-black uppercase tracking-widest text-gray-400">
+            On Hold
+          </p>
+          <p className="text-3xl font-black text-rose-600 mt-2">
+            ₹{fmtInr(overview?.totals?.onHold)}
           </p>
         </div>
         <div className="bg-white rounded-2xl p-5 border border-gray-100">
@@ -447,13 +467,13 @@ const Monetization = () => {
       <div className="bg-white rounded-3xl border border-gray-100 overflow-hidden">
         <div className="p-6 border-b border-gray-100">
           <h2 className="text-2xl font-black text-zoop-obsidian">
-            Pending Payout Transfers
+            Payout Queue
           </h2>
         </div>
         {loading ? (
           <p className="p-6 text-gray-500 font-bold">Loading...</p>
-        ) : pendingPayouts.length === 0 ? (
-          <p className="p-6 text-gray-500 font-bold">No pending payouts.</p>
+        ) : payoutQueue.length === 0 ? (
+          <p className="p-6 text-gray-500 font-bold">No payout records yet.</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -464,6 +484,8 @@ const Monetization = () => {
                     "Seller",
                     "Order",
                     "Payout Amount",
+                    "Status",
+                    "Available",
                     "Action",
                   ].map((h) => (
                     <th
@@ -476,7 +498,7 @@ const Monetization = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {pendingPayouts.map((p) => (
+                {payoutQueue.map((p) => (
                   <tr key={p.id}>
                     <td className="px-6 py-4 font-bold text-zoop-obsidian">
                       {p.id}
@@ -491,12 +513,36 @@ const Monetization = () => {
                       ₹{fmtInr(p.payoutAmount)}
                     </td>
                     <td className="px-6 py-4">
-                      <button
-                        onClick={() => release(p.id)}
-                        className="px-4 py-2 bg-green-600 text-white rounded-lg text-xs font-black uppercase"
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-black ${
+                          p.status === "PENDING_TRANSFER"
+                            ? "bg-amber-100 text-amber-700"
+                            : p.status === "AWAITING_SETTLEMENT"
+                              ? "bg-sky-100 text-sky-700"
+                              : p.status === "ON_HOLD"
+                                ? "bg-rose-100 text-rose-700"
+                                : "bg-green-100 text-green-700"
+                        }`}
                       >
-                        Release
-                      </button>
+                        {String(p.status || "").replaceAll("_", " ")}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-500">
+                      {p.availableAt ? new Date(p.availableAt).toLocaleString() : "-"}
+                    </td>
+                    <td className="px-6 py-4">
+                      {p.status === "PENDING_TRANSFER" ? (
+                        <button
+                          onClick={() => release(p.id)}
+                          className="px-4 py-2 bg-green-600 text-white rounded-lg text-xs font-black uppercase"
+                        >
+                          Release
+                        </button>
+                      ) : (
+                        <span className="text-xs font-bold text-gray-400">
+                          Waiting
+                        </span>
+                      )}
                     </td>
                   </tr>
                 ))}

@@ -181,6 +181,15 @@ const SellerDashboard = () => {
 
   const stats = data?.stats || {};
   const profile = data?.profile || {};
+  const salesData = (salesSeries || []).map((item) => ({
+    label: item.label,
+    value: Number(item.value || 0),
+  }));
+  const maxSales = Math.max(
+    ...(salesData.map((item) => item.value).length
+      ? salesData.map((item) => item.value)
+      : [1]),
+  );
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -383,9 +392,16 @@ const SellerDashboard = () => {
                 <p className="text-gray-400 text-center py-8">No orders yet.</p>
               )}
             </div>
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 md:col-span-2">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-black text-zoop-obsidian">Sales Overview</h3>
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 md:col-span-2 overflow-hidden">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h3 className="text-xl font-black text-zoop-obsidian">
+                    Sales Overview
+                  </h3>
+                  <p className="text-sm text-gray-500 mt-1">
+                    This {timeRange}
+                  </p>
+                </div>
                 <div className="flex gap-2">
                   {["week", "month", "year"].map((range) => (
                     <button
@@ -400,29 +416,35 @@ const SellerDashboard = () => {
                   ))}
                 </div>
               </div>
-              <div className="flex items-end gap-2 h-40">
-                {(salesSeries.length
-                  ? salesSeries
-                  : ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => ({ label: d, value: 0 }))).map((point, idx) => {
-                  const max = Math.max(...(salesSeries.map((s) => s.value)), 1);
-                  const height = Math.max(8, Math.round((point.value / max) * 120));
-                  return (
-                    <div key={point.label} className="flex-1 text-center">
-                      <div className="mx-auto w-full max-w-10 bg-zoop-moss rounded-t-md" style={{ height }} />
-                      <p className="text-[10px] text-gray-500 mt-2 font-bold">
-                        {timeRange === "month"
-                          ? idx % 5 === 0
-                            ? point.label
-                            : ""
-                          : timeRange === "week"
-                            ? idx % 2 === 0
-                              ? point.label
-                              : ""
-                            : point.label}
+              <div className="overflow-x-auto pb-2">
+                <div className="flex min-w-[640px] items-end justify-between gap-3 h-72">
+                  {(salesData.length > 0
+                    ? salesData
+                    : [{ label: "-", value: 0 }]).map((point) => (
+                    <div
+                      key={point.label}
+                      className="flex min-w-[56px] flex-1 flex-col items-center gap-3"
+                    >
+                      <p className="text-[11px] font-black text-zoop-obsidian whitespace-nowrap">
+                        ₹{Math.round(point.value).toLocaleString("en-IN")}
                       </p>
+                      <div
+                        className="w-full relative flex items-end justify-center"
+                        style={{ height: "208px" }}
+                      >
+                        <div
+                          className="w-full min-h-[12px] bg-gradient-to-t from-zoop-moss to-green-400 rounded-t-lg transition-all"
+                          style={{
+                            height: `${Math.max(8, (point.value / maxSales) * 100)}%`,
+                          }}
+                        />
+                      </div>
+                      <span className="text-[11px] font-bold text-gray-500 text-center leading-tight whitespace-nowrap">
+                        {point.label}
+                      </span>
                     </div>
-                  );
-                })}
+                  ))}
+                </div>
               </div>
             </div>
           </div>
