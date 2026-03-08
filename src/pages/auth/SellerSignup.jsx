@@ -149,10 +149,20 @@ const SellerSignup = () => {
       await signInWithPopup(auth, provider);
 
       // Register as seller then go to onboarding
-      await apiClient.post("/auth/sync", { role: "seller" });
+      const syncResponse = await apiClient.post("/auth/sync", { role: "seller" });
+      const syncedUser = syncResponse?.user || {};
+      const sellerPath =
+        syncedUser?.verificationStatus === "approved"
+          ? "/seller/dashboard"
+          : syncedUser?.verificationStatus === "pending" ||
+              syncedUser?.verificationStatus === "rejected"
+            ? "/seller/waiting"
+            : "/seller/onboarding";
 
       showToast(
-        "Seller account created! Let's finish your profile.",
+        sellerPath === "/seller/dashboard"
+          ? "Seller account ready."
+          : "Seller account ready. Continue your setup.",
         "success",
       );
       confetti({
@@ -162,7 +172,7 @@ const SellerSignup = () => {
         colors: ["#a3e635", "#000000"],
       });
 
-      setTimeout(() => navigate("/seller/onboarding"), 1500);
+      setTimeout(() => navigate(sellerPath), 1200);
     } catch (error) {
       console.error("Google Signup error:", error);
       const friendly = getFriendlyError(error);
@@ -184,6 +194,7 @@ const SellerSignup = () => {
     try {
       const response = await apiClient.post("/auth/signup", {
         ...formData,
+        email: formData.email.trim().toLowerCase(),
         otpChannel,
       });
       setOtpRecipient(response?.otpRecipient || formData.email);
@@ -243,7 +254,7 @@ const SellerSignup = () => {
         });
       } else {
         response = await apiClient.post("/auth/verify-otp", {
-          email: formData.email,
+          email: formData.email.trim().toLowerCase(),
           otp,
           otpChannel,
           otpRecipient,
@@ -324,7 +335,7 @@ const SellerSignup = () => {
   useEffect(() => () => resetPhoneRecaptcha(), []);
 
   return (
-    <div className="min-h-screen bg-[#f6f1e7] md:grid md:grid-cols-[minmax(320px,42vw)_1fr] rounded-[1.75rem] sm:rounded-3xl">
+    <div className="min-h-screen bg-[#f6f1e7] rounded-[1.75rem] sm:rounded-3xl md:h-screen md:overflow-hidden md:grid md:grid-cols-[minmax(320px,42vw)_1fr]">
       <Seo
         title="Seller Signup | Zoop"
         description="Create your Zoop seller account."
@@ -353,7 +364,7 @@ const SellerSignup = () => {
           </h1>
           <div className="mt-8 space-y-4 text-white/70">
             <p className="text-pretty">Launch your store, get discovered in your city, and grow with fast same-day demand.</p>
-            <p className="text-pretty">Complete your account on the right. This panel stays fixed while the form scrolls.</p>
+            <p className="text-pretty">Get your business details ready so onboarding stays quick after account creation.</p>
           </div>
         </div>
         <div className="relative z-10 grid gap-4 text-sm">
@@ -370,8 +381,8 @@ const SellerSignup = () => {
         <div className="absolute -left-24 bottom-0 h-72 w-72 rounded-full bg-zoop-copper/20 blur-3xl" />
       </aside>
 
-      <section className="min-h-screen overflow-y-auto p-4 md:p-8 lg:p-10">
-        <div className="mx-auto w-full max-w-xl">
+      <section className="min-h-screen overflow-y-auto p-4 md:h-screen md:min-h-0 md:p-8 lg:p-10">
+        <div className="mx-auto w-full max-w-xl md:py-4">
         <div className="bg-white rounded-3xl shadow-2xl p-6 md:p-8 border-t-8 border-zoop-copper">
           <div className="text-center mb-8">
             <Link
@@ -578,6 +589,7 @@ const SellerSignup = () => {
               <button
                 type="button"
                 onClick={handleGoogleSignup}
+                disabled={loading}
                 className="w-full flex items-center justify-center gap-3 py-4 bg-white border-2 border-gray-100 rounded-xl font-bold text-gray-700 hover:bg-gray-50 hover:border-gray-200 transition-all shadow-sm"
               >
                 <svg
@@ -609,7 +621,7 @@ const SellerSignup = () => {
               <p className="text-center text-gray-600 text-sm">
                 Already a seller?{" "}
                 <Link
-                  to="/login"
+                  to="/login?redirect=/seller/dashboard"
                   className="text-zoop-copper font-bold hover:underline"
                 >
                   Login here

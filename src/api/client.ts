@@ -1,10 +1,21 @@
 import { API_BASE_URL } from "../config/apiBase";
+import { auth } from "../firebase";
 
 const API_URL = API_BASE_URL;
 
 // Helper to get auth token
-const getAuthToken = (): string | null => {
-  return localStorage.getItem('authToken');
+const getAuthToken = async (): Promise<string | null> => {
+  const cachedToken = localStorage.getItem('authToken');
+  if (cachedToken) return cachedToken;
+  const currentUser = auth.currentUser;
+  if (!currentUser) return null;
+  try {
+    const freshToken = await currentUser.getIdToken();
+    if (freshToken) localStorage.setItem("authToken", freshToken);
+    return freshToken;
+  } catch {
+    return null;
+  }
 };
 
 /** Map raw error → user-friendly message (mirrors errorMessages.js for TS side) */
@@ -60,7 +71,7 @@ function networkError(): Error {
 
 export const apiClient = {
   get: async <T>(endpoint: string): Promise<T> => {
-    const token = getAuthToken();
+    const token = await getAuthToken();
     const headers: HeadersInit = { 'Content-Type': 'application/json' };
     if (token) headers['Authorization'] = `Bearer ${token}`;
     try {
@@ -76,7 +87,7 @@ export const apiClient = {
   },
 
   post: async <T>(endpoint: string, body: any): Promise<T> => {
-    const token = getAuthToken();
+    const token = await getAuthToken();
     const headers: HeadersInit = { 'Content-Type': 'application/json' };
     if (token) headers['Authorization'] = `Bearer ${token}`;
     try {
@@ -97,7 +108,7 @@ export const apiClient = {
 
   /** Upload files as multipart/form-data */
   postForm: async <T>(endpoint: string, formData: FormData): Promise<T> => {
-    const token = getAuthToken();
+    const token = await getAuthToken();
     const headers: HeadersInit = {};
     if (token) headers['Authorization'] = `Bearer ${token}`;
     try {
@@ -117,7 +128,7 @@ export const apiClient = {
   },
 
   put: async <T>(endpoint: string, body: any): Promise<T> => {
-    const token = getAuthToken();
+    const token = await getAuthToken();
     const headers: HeadersInit = { 'Content-Type': 'application/json' };
     if (token) headers['Authorization'] = `Bearer ${token}`;
     try {
@@ -137,7 +148,7 @@ export const apiClient = {
   },
 
   delete: async <T>(endpoint: string): Promise<T> => {
-    const token = getAuthToken();
+    const token = await getAuthToken();
     const headers: HeadersInit = { 'Content-Type': 'application/json' };
     if (token) headers['Authorization'] = `Bearer ${token}`;
     try {

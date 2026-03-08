@@ -44,7 +44,8 @@ const normalizePhoneNumber = (value: any) => {
 
 export const signupWithOTP = async (req: Request, res: Response) => {
   try {
-    const { email, password, displayName, role, phone, address, city, state, pincode, gender, otpChannel } = req.body;
+    const { password, displayName, role, phone, address, city, state, pincode, gender, otpChannel } = req.body;
+    const email = String(req.body?.email || "").trim().toLowerCase();
 
     // Validate input
     if (!email || !password || !displayName) {
@@ -113,7 +114,8 @@ export const signupWithOTP = async (req: Request, res: Response) => {
 
 export const verifyOTP = async (req: Request, res: Response) => {
   try {
-    const { email, otp, otpChannel, otpRecipient } = req.body;
+    const email = String(req.body?.email || "").trim().toLowerCase();
+    const { otp, otpChannel, otpRecipient } = req.body;
     const channel = String(otpChannel || "email").toLowerCase() === "phone" ? "phone" : "email";
     if (channel === "phone") {
       return res.status(400).json({ error: "Use Firebase phone verification for mobile OTP" });

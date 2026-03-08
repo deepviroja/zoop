@@ -577,7 +577,7 @@ const Home = () => {
         </section>
       ) : null}
       <section className="space-y-4">
-        <AdBanner type="horizontal" slotId="home_top" />
+        <AdBanner type="horizontal" slotId="home_top" size="hero" />
       </section>
 
       {/* TRENDING FOR YOU */}

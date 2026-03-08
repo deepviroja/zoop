@@ -3,7 +3,8 @@ import { Outlet, Link } from "react-router-dom";
 
 const AuthLayout = () => {
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-white">
+    <div className="min-h-screen bg-white md:h-screen md:overflow-hidden">
+      <div className="flex min-h-screen flex-col md:h-screen md:flex-row">
       {/* --- LEFT SIDE: THE VIBE (Hidden on Mobile) --- */}
       <div className="hidden md:flex md:sticky md:top-0 md:h-screen md:w-1/2 bg-zoop-obsidian p-12 flex-col justify-between relative overflow-hidden">
         {/* Logo */}
@@ -40,7 +41,7 @@ const AuthLayout = () => {
       </div>
 
       {/* --- RIGHT SIDE: THE FORM --- */}
-      <div className="flex-1 flex flex-col min-h-screen overflow-y-auto">
+      <div className="flex min-h-screen flex-1 flex-col md:h-screen md:min-h-0 md:overflow-hidden">
         {/* Mobile Logo Only */}
         <div className="md:hidden p-6 bg-zoop-obsidian">
           <Link
@@ -51,8 +52,9 @@ const AuthLayout = () => {
           </Link>
         </div>
 
-        <div className="flex-1 flex items-center justify-center p-8 md:p-16">
-          <div className="w-full max-w-md space-y-8">
+        <div className="flex-1 overflow-y-auto">
+          <div className="flex min-h-full items-start justify-center p-6 sm:p-8 md:p-12 lg:p-16">
+            <div className="w-full max-w-md space-y-8 py-2 md:py-6">
             <Outlet />
 
             {/* Global Auth Footer */}
@@ -69,8 +71,10 @@ const AuthLayout = () => {
                 .
               </p>
             </div>
+            </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

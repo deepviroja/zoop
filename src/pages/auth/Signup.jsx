@@ -227,6 +227,7 @@ const Signup = () => {
     try {
       const response = await apiClient.post("/auth/signup", {
         ...formData,
+        email: formData.email.trim().toLowerCase(),
         otpChannel,
       });
       setOtpRecipient(response?.otpRecipient || formData.email);
@@ -308,7 +309,7 @@ const Signup = () => {
         });
       } else {
         response = await apiClient.post("/auth/verify-otp", {
-          email: formData.email,
+          email: formData.email.trim().toLowerCase(),
           otp,
           otpChannel,
           otpRecipient,
@@ -395,7 +396,7 @@ const Signup = () => {
   useEffect(() => () => resetPhoneRecaptcha(), []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-zoop-moss/20 to-white flex items-center justify-center p-3 sm:p-4 rounded-[1.75rem] sm:rounded-3xl">
+    <div className="bg-gradient-to-br from-zoop-moss/20 via-white to-zoop-moss/10 p-3 sm:p-4 rounded-[1.75rem] sm:rounded-3xl">
       <Seo
         title="Sign Up | Zoop"
         description="Create your Zoop account."
@@ -866,17 +867,15 @@ const Signup = () => {
                   Login
                 </Link>
               </p>
-              <div className="text-center">
+              <p className="text-center text-sm text-gray-500 font-bold">
+                Want to sell on Zoop?{" "}
                 <Link
                   to="/seller/signup"
-                  className="inline-flex items-center gap-2 text-sm text-gray-500 font-bold transition-colors"
+                  className="text-zoop-obsidian hover:underline"
                 >
-                  Want to sell on Zoop?
-                  <p className="hover:text-zoop-obsidian font-bold hover:underline">
-                    Create a Seller Account →
-                  </p>
+                  Create a seller account
                 </Link>
-              </div>
+              </p>
             </form>
           ) : (
             <div className="space-y-6">

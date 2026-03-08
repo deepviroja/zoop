@@ -22,7 +22,8 @@ export const resetPhoneRecaptcha = () => {
 };
 
 export const sendFirebasePhoneOtp = async (phoneNumber) => {
-  if (!phoneNumber) {
+  const normalizedPhone = String(phoneNumber || "").trim().replace(/\s+/g, "");
+  if (!normalizedPhone) {
     throw new Error("Phone number is required for mobile OTP");
   }
   const container = getContainer();
@@ -36,7 +37,7 @@ export const sendFirebasePhoneOtp = async (phoneNumber) => {
     await recaptchaVerifier.render();
   }
   try {
-    return await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
+    return await signInWithPhoneNumber(auth, normalizedPhone, recaptchaVerifier);
   } catch (error) {
     resetPhoneRecaptcha();
     throw error;

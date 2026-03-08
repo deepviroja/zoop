@@ -46,7 +46,7 @@ const AdminLogin = () => {
       let syncedRole = role;
       try {
         const syncResponse = await apiClient.post("/auth/sync", {});
-        syncedRole = syncResponse?.role || role;
+        syncedRole = syncResponse?.user?.role || role;
       } catch (err) {
         console.warn(
           "Admin sync failed, proceeding with Firebase role...",

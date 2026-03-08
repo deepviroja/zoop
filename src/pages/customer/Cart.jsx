@@ -9,7 +9,6 @@ import { Heart } from "../../assets/icons/Heart";
 import { contentApi, ordersApi } from "../../services/api";
 import { productsApi } from "../../services/api";
 import ProductCard from "../../components/product/ProductCard";
-import { frequentlyBoughtTogether } from "../../utils/recommendations";
 
 const Cart = () => {
   const { cartItems, removeFromCart, updateQuantity, getCartTotal, clearCart } =
@@ -51,14 +50,6 @@ const Cart = () => {
       .filter((p) => cartCategories.has(String(p.categoryId || p.category || "").toLowerCase()))
       .slice(0, 10);
   }, [allProducts, cartItems]);
-
-  const suggestionsByCartItem = useMemo(() => {
-    const map = {};
-    cartItems.forEach((item) => {
-      map[item.id] = frequentlyBoughtTogether(item, allProducts, 4);
-    });
-    return map;
-  }, [cartItems, allProducts]);
 
   const handleApplyCoupon = () => {
     // Simple coupon logic - can be enhanced
@@ -340,21 +331,6 @@ const Cart = () => {
                   </div>
                 </div>
                 </div>
-                {Array.isArray(suggestionsByCartItem[item.id]) &&
-                  suggestionsByCartItem[item.id].length > 0 && (
-                    <div className="md:col-span-2 w-full mt-2 border-t border-gray-100 pt-4">
-                      <p className="text-xs font-black uppercase tracking-widest text-gray-500 mb-3">
-                        Frequently Bought Together
-                      </p>
-                      <div className="flex gap-3 overflow-x-auto pb-2">
-                        {suggestionsByCartItem[item.id].map((suggested) => (
-                          <div key={suggested.id} className="min-w-[220px] max-w-[220px]">
-                            <ProductCard product={suggested} />
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
               </div>
             ))}
           </div>
@@ -558,8 +534,20 @@ const Cart = () => {
       )}
 
       {relatedSuggestions.length > 0 && (
-        <div className="max-w-[1200px] mx-auto mt-10">
-          <h3 className="text-2xl font-900 text-zoop-obsidian mb-4">Related Products You Can Add</h3>
+        <div className="max-w-[1200px] mx-auto mt-10 rounded-[2rem] border border-[#e9dfcf] bg-white p-5 md:p-7 shadow-[0_18px_44px_rgba(42,32,15,0.08)]">
+          <div className="mb-5 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.24em] text-[#8b5e3c]">
+                Frequently Bought Together
+              </p>
+              <h3 className="text-2xl font-900 text-zoop-obsidian">
+                Complete your cart before checkout
+              </h3>
+            </div>
+            <p className="text-sm text-gray-500">
+              Matching picks from the same categories in your cart.
+            </p>
+          </div>
           <div className="flex gap-4 overflow-x-auto pb-3">
             {relatedSuggestions.map((product) => (
               <div key={product.id} className="min-w-[260px] max-w-[260px]">

@@ -29,12 +29,17 @@ if (import.meta.env.DEV && import.meta.env.VITE_APPCHECK_DEBUG_TOKEN) {
   self.FIREBASE_APPCHECK_DEBUG_TOKEN = import.meta.env.VITE_APPCHECK_DEBUG_TOKEN || true;
 }
 
-initializeAppCheck(app, {
-  provider: new ReCaptchaEnterpriseProvider(
-    import.meta.env.VITE_RECAPTCHA_SITE_KEY || "6LfPzYIsAAAAAPFYrWqmr2KikIPUbapbJto27KDX"
-  ),
-  isTokenAutoRefreshEnabled: true,
-});
+const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
+if (recaptchaSiteKey) {
+  try {
+    initializeAppCheck(app, {
+      provider: new ReCaptchaEnterpriseProvider(recaptchaSiteKey),
+      isTokenAutoRefreshEnabled: true,
+    });
+  } catch (error) {
+    console.warn("Firebase App Check initialization skipped", error);
+  }
+}
 
 // ─── Firebase Services ────────────────────────────────────────────────────────
 export const auth = getAuth(app);

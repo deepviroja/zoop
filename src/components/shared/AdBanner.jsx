@@ -10,7 +10,7 @@ const SLOT_BY_TYPE = {
 };
 const DISMISSED_ADS_KEY = "zoop_dismissed_ads_session";
 
-const AdBanner = ({ type = "horizontal", slotId: slotIdProp = "" }) => {
+const AdBanner = ({ type = "horizontal", slotId: slotIdProp = "", size = "default" }) => {
   const [ads, setAds] = useState([]);
   const [dismissedAds, setDismissedAds] = useState(() => {
     try {
@@ -55,7 +55,9 @@ const AdBanner = ({ type = "horizontal", slotId: slotIdProp = "" }) => {
   const wrapperClass =
     type === "sidebar"
       ? "group relative block h-[235px] overflow-hidden rounded-[1.6rem] border border-[#ddd3c2] bg-[#f9f4ea] shadow-[0_18px_40px_rgba(42,32,15,0.12)] xl:h-[255px]"
-      : "group relative block h-[180px] w-full overflow-hidden rounded-[1.4rem] border border-[#ddd3c2] bg-[#f9f4ea] shadow-[0_16px_34px_rgba(42,32,15,0.1)] sm:h-[190px] md:h-[260px] lg:h-[280px] xl:h-[300px] my-4 md:my-5";
+      : size === "hero"
+        ? "group relative block h-[190px] w-full overflow-hidden rounded-[1.4rem] border border-[#ddd3c2] bg-[#f9f4ea] shadow-[0_16px_34px_rgba(42,32,15,0.1)] sm:h-[210px] md:h-[300px] lg:h-[360px] xl:h-[390px] my-4 md:my-5"
+        : "group relative block h-[180px] w-full overflow-hidden rounded-[1.4rem] border border-[#ddd3c2] bg-[#f9f4ea] shadow-[0_16px_34px_rgba(42,32,15,0.1)] sm:h-[190px] md:h-[260px] lg:h-[280px] xl:h-[300px] my-4 md:my-5";
 
   const content = (
     <>
@@ -87,13 +89,23 @@ const AdBanner = ({ type = "horizontal", slotId: slotIdProp = "" }) => {
           className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
         />
       ) : (
-        <img
-          src={optimizeCloudinaryUrl(displayAd.mediaUrl, { width: 1600 })}
-          alt={displayAd.title || "Ad"}
-          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
-          loading="lazy"
-          referrerPolicy="no-referrer"
-        />
+        <>
+          <img
+            src={optimizeCloudinaryUrl(displayAd.mediaUrl, { width: 1600 })}
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover opacity-45 blur-sm scale-110"
+            loading="lazy"
+            referrerPolicy="no-referrer"
+            aria-hidden="true"
+          />
+          <img
+            src={optimizeCloudinaryUrl(displayAd.mediaUrl, { width: 1600 })}
+            alt={displayAd.title || "Ad"}
+            className="absolute inset-0 z-[1] w-full h-full object-contain p-2 sm:p-3 md:p-4 transition-transform duration-700 group-hover:scale-[1.02]"
+            loading="lazy"
+            referrerPolicy="no-referrer"
+          />
+        </>
       )}
       <div className="absolute -right-8 top-4 h-20 w-20 rounded-full border border-white/20 bg-white/10 blur-md md:-right-10 md:top-6 md:h-28 md:w-28" />
       <div className="absolute bottom-[-18%] right-[-8%] h-28 w-28 rounded-full bg-[#b7e84b]/20 blur-2xl md:h-40 md:w-40" />

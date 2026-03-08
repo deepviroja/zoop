@@ -615,14 +615,14 @@ const ProductDetail = () => {
                 Buy Now
               </button>
               {showFbtPanel && fbtProducts.length > 0 && (
-                <div className="rounded-[1.75rem] border border-[#e4dccf] bg-gradient-to-br from-[#fbf7ef] via-white to-[#f3eee4] p-5 shadow-[0_18px_44px_rgba(42,32,15,0.08)]">
+                <div className="rounded-[1.75rem] border border-[#d8ccb7] bg-gradient-to-br from-[#fffaf1] via-[#fffdf9] to-[#f4ece0] p-5 shadow-[0_22px_52px_rgba(42,32,15,0.12)] ring-1 ring-[#efe5d5]">
                   <div className="flex items-start justify-between gap-3 mb-4">
                     <div>
                       <p className="text-xs font-black uppercase tracking-[0.28em] text-[#8b5e3c]">
                         Buy Together
                       </p>
                       <p className="text-lg font-black text-zoop-obsidian">
-                        Similar picks bundled for one checkout
+                        Add the full set in one step
                       </p>
                     </div>
                     <button
@@ -671,7 +671,7 @@ const ProductDetail = () => {
                         });
                         navigate("/cart");
                       }}
-                      className="rounded-full bg-zoop-moss px-5 py-3 text-sm font-black uppercase tracking-[0.22em] text-black"
+                      className="rounded-full bg-zoop-moss px-5 py-3 text-sm font-black uppercase tracking-[0.22em] text-black shadow-[0_12px_24px_rgba(163,230,53,0.35)]"
                     >
                       Buy Together
                     </button>
