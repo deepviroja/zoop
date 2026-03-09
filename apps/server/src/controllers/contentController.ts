@@ -1732,6 +1732,47 @@ export const getPublicAdsBySlot = async (req: Request, res: Response) => {
 const isSuperAdmin = (user: any) =>
   String(user?.email || '').trim().toLowerCase() === 'admin@zoop.com';
 
+const normalizeEmail = (value: any) =>
+  String(value || '').trim().toLowerCase();
+
+const archiveDeletedAccount = async (payload: {
+  uid: string;
+  email: string;
+  role?: string;
+  deletedBy?: string;
+  source: 'admin';
+  reason?: string;
+  profile?: Record<string, any> | null;
+}) => {
+  const email = normalizeEmail(payload.email);
+  if (!email) return;
+  await db.collection('deleted_accounts').doc(email).set(
+    {
+      email,
+      uid: payload.uid,
+      role: payload.role || payload.profile?.role || 'customer',
+      deletedAt: new Date().toISOString(),
+      deletedBy: payload.deletedBy || null,
+      source: payload.source,
+      reason: payload.reason || null,
+      profileSnapshot: payload.profile || null,
+      updatedAt: new Date().toISOString(),
+    },
+    { merge: true },
+  );
+};
+
+const removeFirebaseUserIfPresent = async (uid: string) => {
+  if (!uid) return;
+  try {
+    await auth.deleteUser(uid);
+  } catch (error: any) {
+    if (String(error?.code || '') !== 'auth/user-not-found') {
+      throw error;
+    }
+  }
+};
+
 const deleteCollectionInBatches = async (collectionName: string, batchSize = 100) => {
   while (true) {
     const snap = await db.collection(collectionName).limit(batchSize).get();
@@ -1807,23 +1848,72 @@ export const superAdminDeleteUsersByRole = async (req: Request, res: Response) =
       if (email === 'admin@zoop.com') return false;
       return role === 'all' ? true : userRole === role;
     });
+    const deletedAt = new Date().toISOString();
     for (let i = 0; i < targets.length; i += 100) {
       const chunk = targets.slice(i, i + 100);
       const batch = db.batch();
       chunk.forEach((doc) => {
+        const data = doc.data() as any;
         batch.set(
           doc.ref,
           {
             isDeleted: true,
             status: 'deleted',
             disabled: true,
-            deletedAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
+            deletedAt,
+            updatedAt: deletedAt,
           },
           { merge: true },
         );
+        if (String(data?.role || '').toLowerCase() === 'seller') {
+          batch.set(
+            db.collection('users').doc(doc.id),
+            {
+              verificationStatus: 'deleted',
+            },
+            { merge: true },
+          );
+        }
       });
       await batch.commit();
+      await Promise.all(
+        chunk.map(async (doc) => {
+          const data = doc.data() as any;
+          if (String(data?.role || '').toLowerCase() === 'seller') {
+            const productsSnap = await db.collection('products').where('sellerId', '==', doc.id).get();
+            if (!productsSnap.empty) {
+              const productsBatch = db.batch();
+              productsSnap.docs.forEach((productDoc) => {
+                productsBatch.set(
+                  productDoc.ref,
+                  {
+                    moderationStatus: 'removed',
+                    updatedAt: deletedAt,
+                  },
+                  { merge: true },
+                );
+              });
+              await productsBatch.commit();
+            }
+          }
+          await Promise.all([
+            archiveDeletedAccount({
+              uid: doc.id,
+              email: data?.email || '',
+              role: data?.role || 'customer',
+              deletedBy: requester?.uid,
+              source: 'admin',
+              reason: `Admin deleted account via reset for role=${role}`,
+              profile: data,
+            }),
+            db.collection('pending_users')
+              .doc(normalizeEmail(data?.email))
+              .delete()
+              .catch(() => {}),
+            removeFirebaseUserIfPresent(doc.id),
+          ]);
+        }),
+      );
     }
     res.json({ message: 'User records updated as deleted', affected: targets.length, role });
   } catch (e: any) {

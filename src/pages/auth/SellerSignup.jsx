@@ -149,7 +149,10 @@ const SellerSignup = () => {
       await signInWithPopup(auth, provider);
 
       // Register as seller then go to onboarding
-      const syncResponse = await apiClient.post("/auth/sync", { role: "seller" });
+      const syncResponse = await apiClient.post("/auth/sync", {
+        role: "seller",
+        mode: "signup",
+      });
       const syncedUser = syncResponse?.user || {};
       const sellerPath =
         syncedUser?.verificationStatus === "approved"

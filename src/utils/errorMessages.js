@@ -30,6 +30,7 @@ export function getFriendlyError(error) {
     "auth/weak-password":            "Password must be at least 8 characters long.",
     "auth/too-many-requests":        "Too many failed attempts. Please wait a few minutes and try again.",
     "auth/user-disabled":            "This account has been suspended. Contact support for help.",
+    "auth/user-token-expired":       "Your session expired. Please log in again.",
     "auth/popup-closed-by-user":     "", // Silent — user closed it intentionally
     "auth/popup-blocked":            "Your browser blocked the sign-in popup. Please allow popups and try again.",
     "auth/cancelled-popup-request":  "",
@@ -63,6 +64,10 @@ export function getFriendlyError(error) {
     return "Too many attempts. Please wait a moment and try again.";
   if (msg.includes("api request failed") || msg.includes("api request denied"))
     return "Something went wrong on our end. Please try again shortly.";
+  if (msg.includes("account has been deleted") || msg.includes("account was deleted"))
+    return "This account has been deleted. Sign up again to create a new account or use the recovery email if available.";
+  if (msg.includes("profile not found for this account"))
+    return "This account is no longer available. Sign up again to create a new account.";
   if (msg.includes("domain") && msg.includes("authorized"))
     return "This website domain is not authorized in Firebase Phone Authentication yet.";
   if (msg.includes("forbidden") || msg.includes("403"))

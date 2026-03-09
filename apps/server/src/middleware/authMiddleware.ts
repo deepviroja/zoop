@@ -16,6 +16,9 @@ export const authenticate = async (req: UserRequest, res: Response, next: NextFu
     const decodedToken = await admin.auth().verifyIdToken(token);
     const userDoc = await admin.firestore().collection('users').doc(decodedToken.uid).get();
     const profile = userDoc.exists ? (userDoc.data() as any) : null;
+    if (!userDoc.exists) {
+      return res.status(403).json({ error: 'Account profile not found' });
+    }
     if (profile?.isDeleted) {
       return res.status(403).json({ error: 'Account is deleted' });
     }

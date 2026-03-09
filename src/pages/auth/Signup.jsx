@@ -197,7 +197,7 @@ const Signup = () => {
       const provider = new GoogleAuthProvider();
       setLoading(true);
       await signInWithPopup(auth, provider);
-      await apiClient.post("/auth/sync", { role: "customer" });
+      await apiClient.post("/auth/sync", { role: "customer", mode: "signup" });
       showToast("Account created successfully!", "success");
       confetti({
         particleCount: 150,

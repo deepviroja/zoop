@@ -65,6 +65,13 @@ const Login = () => {
     return () => window.clearInterval(timer);
   }, [loginMode, otpStep]);
 
+  useEffect(() => {
+    const notice = sessionStorage.getItem("zoop_auth_notice");
+    if (!notice) return;
+    setGeneralError(notice);
+    sessionStorage.removeItem("zoop_auth_notice");
+  }, []);
+
   const otpSecondsLeft = useMemo(() => {
     if (!otpExpiresAt) return 0;
     return Math.max(
@@ -118,8 +125,11 @@ const Login = () => {
       await signInWithPopup(auth, provider);
       // Sync user with backend to assign role if new
       try {
-        await apiClient.post("/auth/sync");
-      } catch (_) {}
+        await apiClient.post("/auth/sync", { mode: "login" });
+      } catch (error) {
+        await signOut(auth).catch(() => {});
+        throw error;
+      }
       setRedirecting(true);
       setSuccessMsg("Login successful! Redirecting...");
       // Navigation handled by useEffect watching user

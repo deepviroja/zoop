@@ -33,6 +33,10 @@ function friendlyMessage(status: number, raw: string): string {
     return 'No account found with this email.';
   if (msg.includes('wrong-password') || msg.includes('invalid credential'))
     return 'Incorrect email or password.';
+  if (msg.includes('account has been deleted') || msg.includes('account was deleted'))
+    return 'This account has been deleted. Sign up again to create a new account or use the recovery email if available.';
+  if (msg.includes('profile not found for this account'))
+    return 'This account is no longer available. Sign up again to create a new account.';
   if (msg.includes('too-many-requests') || msg.includes('too many'))
     return 'Too many attempts. Please wait a moment and try again.';
   if (status === 401) return 'Please log in to continue.';

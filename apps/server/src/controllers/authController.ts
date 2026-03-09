@@ -40,17 +40,108 @@ const normalizePhoneNumber = (value: any) => {
   return digits ? `+${digits}` : "";
 };
 
+const normalizeEmail = (value: any) =>
+  String(value || "").trim().toLowerCase();
+
+const isDeletedAccount = (record: any) =>
+  !!record &&
+  (record.isDeleted === true ||
+    String(record.status || "").toLowerCase() === "deleted" ||
+    String(record.accountState || "").toLowerCase() === "deleted");
+
+const getDeletedAccountRef = (email: string) =>
+  db.collection("deleted_accounts").doc(normalizeEmail(email));
+
+const archiveDeletedAccount = async ({
+  uid,
+  email,
+  role,
+  reason,
+  deletedBy,
+  source,
+  profile,
+}: {
+  uid?: string;
+  email: string;
+  role?: string;
+  reason?: string;
+  deletedBy?: string;
+  source: "self-service" | "admin";
+  profile?: Record<string, any> | null;
+}) => {
+  const normalizedEmail = normalizeEmail(email);
+  if (!normalizedEmail) return;
+  await getDeletedAccountRef(normalizedEmail).set(
+    {
+      email: normalizedEmail,
+      uid: uid || null,
+      role: role || profile?.role || "customer",
+      deletedAt: new Date().toISOString(),
+      deletedBy: deletedBy || null,
+      reason: reason || null,
+      source,
+      profileSnapshot: profile || null,
+      updatedAt: new Date().toISOString(),
+    },
+    { merge: true },
+  );
+};
+
+const removeFirebaseUserIfPresent = async (uid: string) => {
+  if (!uid) return;
+  try {
+    await auth.deleteUser(uid);
+  } catch (error: any) {
+    if (String(error?.code || "") !== "auth/user-not-found") {
+      throw error;
+    }
+  }
+};
+
+const releaseDeletedEmailForReuse = async (email: string) => {
+  const normalizedEmail = normalizeEmail(email);
+  if (!normalizedEmail) return;
+
+  let authUser: admin.auth.UserRecord | null = null;
+  try {
+    authUser = await auth.getUserByEmail(normalizedEmail);
+  } catch (error: any) {
+    if (String(error?.code || "") !== "auth/user-not-found") {
+      throw error;
+    }
+  }
+
+  if (!authUser) return;
+
+  const [profileDoc, deletedMarker] = await Promise.all([
+    db.collection("users").doc(authUser.uid).get(),
+    getDeletedAccountRef(normalizedEmail).get(),
+  ]);
+  const profile = profileDoc.exists ? (profileDoc.data() as any) : null;
+  const shouldRelease =
+    !profileDoc.exists || isDeletedAccount(profile) || deletedMarker.exists;
+
+  if (!shouldRelease) return;
+
+  await Promise.all([
+    removeFirebaseUserIfPresent(authUser.uid),
+    db.collection("pending_users").doc(normalizedEmail).delete().catch(() => {}),
+  ]);
+};
+
 // Add these functions to authController.ts
 
 export const signupWithOTP = async (req: Request, res: Response) => {
   try {
     const { password, displayName, role, phone, address, city, state, pincode, gender, otpChannel } = req.body;
-    const email = String(req.body?.email || "").trim().toLowerCase();
+    const email = normalizeEmail(req.body?.email);
 
     // Validate input
     if (!email || !password || !displayName) {
       return res.status(400).json({ error: "Missing required fields" });
     }
+
+    await releaseDeletedEmailForReuse(email);
 
     // Check if user exists in Firebase
     try {
@@ -114,7 +205,7 @@ export const signupWithOTP = async (req: Request, res: Response) => {
 
 export const verifyOTP = async (req: Request, res: Response) => {
   try {
-    const email = String(req.body?.email || "").trim().toLowerCase();
+    const email = normalizeEmail(req.body?.email);
     const { otp, otpChannel, otpRecipient } = req.body;
     const channel = String(otpChannel || "email").toLowerCase() === "phone" ? "phone" : "email";
     if (channel === "phone") {
@@ -169,8 +260,11 @@ export const verifyOTP = async (req: Request, res: Response) => {
       })
     });
 
-    // Delete pending user
-    await db.collection("pending_users").doc(email).delete();
+    // Delete pending user and clear any deletion tombstone for a fresh signup.
+    await Promise.all([
+      db.collection("pending_users").doc(email).delete(),
+      getDeletedAccountRef(email).delete().catch(() => {}),
+    ]);
 
     await Promise.allSettled([
       sendWelcomeEmail(userData.email, userData.displayName),
@@ -195,9 +289,11 @@ export const verifyOTP = async (req: Request, res: Response) => {
   }
 };
 export const registerCustomer = async (req: Request, res: Response) => {
-  const { email, password, name, phone, city, state, pincode, address } = req.body;
+  const { password, name, phone, city, state, pincode, address } = req.body;
+  const email = normalizeEmail(req.body?.email);
 
   try {
+    await releaseDeletedEmailForReuse(email);
     const userRecord = await auth.createUser({
       email,
       password,
@@ -221,6 +317,7 @@ export const registerCustomer = async (req: Request, res: Response) => {
     };
 
     await db.collection('users').doc(userRecord.uid).set(userData);
+    await getDeletedAccountRef(email).delete().catch(() => {});
     
     // Set custom claims for role-based auth
     await auth.setCustomUserClaims(userRecord.uid, { role: 'customer' });
@@ -248,14 +345,16 @@ export const registerSeller = async (req: Request, res: Response) => {
     gstNumber,
     panNumber,
     ownerName,
-    email,
+    email: rawEmail,
     phone,
     password,
     address,
     banking,
   } = req.body;
+  const email = normalizeEmail(rawEmail);
 
   try {
+    await releaseDeletedEmailForReuse(email);
     // 1. Create a user (if not exists)
     let userRecord;
     try {
@@ -319,6 +418,7 @@ export const registerSeller = async (req: Request, res: Response) => {
       updatedAt: new Date().toISOString(),
     };
     await db.collection('users').doc(userRecord.uid).set(userData, { merge: true });
+    await getDeletedAccountRef(email).delete().catch(() => {});
 
     res.status(201).json({ message: 'Seller registration submitted successfully', sellerId });
   } catch (error: any) {
@@ -348,8 +448,21 @@ export const syncUser = async (req: Request, res: Response) => {
   try {
     const userDoc = await db.collection('users').doc(user.uid).get();
     const requestedRole = req.body.role === 'seller' ? 'seller' : 'customer';
+    const mode = String(req.body?.mode || "login").toLowerCase() === "signup"
+      ? "signup"
+      : "login";
+    const normalizedEmail = normalizeEmail(user.email);
+    const deletedMarker = normalizedEmail
+      ? await getDeletedAccountRef(normalizedEmail).get()
+      : null;
     
     if (!userDoc.exists) {
+      if (deletedMarker?.exists && mode !== "signup") {
+        return res.status(403).json({
+          error:
+            "This account was deleted. Sign up again to create a new account or use the account recovery email if available.",
+        });
+      }
       // Create user if not exists (e.g. first time Google login)
       const userData: User & Record<string, any> = {
         id: user.uid,
@@ -371,12 +484,21 @@ export const syncUser = async (req: Request, res: Response) => {
         })
       };
       await db.collection('users').doc(user.uid).set(userData);
+      if (deletedMarker?.exists) {
+        await getDeletedAccountRef(normalizedEmail).delete().catch(() => {});
+      }
       // Set custom claims
       await auth.setCustomUserClaims(user.uid, { role: requestedRole });
       return res.json({ user: userData });
     }
 
     let userData = userDoc.data() as User & Record<string, any>;
+    if (isDeletedAccount(userData)) {
+      return res.status(403).json({
+        error:
+          "This account was deleted. Sign up again to create a new account or use the account recovery email if available.",
+      });
+    }
 
     if (
       requestedRole === 'seller' &&
@@ -417,7 +539,8 @@ export const syncUser = async (req: Request, res: Response) => {
   }
 };
 export const adminCreateUser = async (req: Request, res: Response) => {
-  const { email, password, displayName, role } = req.body;
+  const { password, displayName, role } = req.body;
+  const email = normalizeEmail(req.body?.email);
 
   try {
     const requester = (req as any).user;
@@ -434,6 +557,8 @@ export const adminCreateUser = async (req: Request, res: Response) => {
         error: "admin@zoop.com is reserved for super admin",
       });
     }
+
+    await releaseDeletedEmailForReuse(email);
 
     const userRecord = await auth.createUser({
       email,
@@ -455,6 +580,7 @@ export const adminCreateUser = async (req: Request, res: Response) => {
     };
 
     await db.collection('users').doc(userRecord.uid).set(userData);
+    await getDeletedAccountRef(email).delete().catch(() => {});
 
     res.status(201).json({ message: 'User created successfully', user: userData });
   } catch (error: any) {
@@ -472,7 +598,7 @@ export const adminCreateUser = async (req: Request, res: Response) => {
 export const requestDeleteAccountOTP = async (req: Request, res: Response) => {
   try {
     const user = (req as any).user;
-    const email = String(user?.email || "").trim().toLowerCase();
+    const email = normalizeEmail(user?.email);
     if (!email) return res.status(400).json({ error: "Email not found for user" });
 
     const profileDoc = await db.collection("users").doc(user.uid).get();
@@ -509,7 +635,7 @@ export const requestDeleteAccountOTP = async (req: Request, res: Response) => {
 export const confirmDeleteAccount = async (req: Request, res: Response) => {
   try {
     const user = (req as any).user;
-    const email = String(user?.email || "").trim().toLowerCase();
+    const email = normalizeEmail(user?.email);
     const otp = String(req.body?.otp || "").trim();
     const reason = String(req.body?.reason || "").trim();
     if (!email || !otp) {
@@ -523,7 +649,8 @@ export const confirmDeleteAccount = async (req: Request, res: Response) => {
 
     const userRef = db.collection("users").doc(user.uid);
     const userDoc = await userRef.get();
-    const role = (userDoc.data() as any)?.role || user.role || "customer";
+    const userProfile = (userDoc.data() as any) || {};
+    const role = userProfile?.role || user.role || "customer";
     await userRef.set(
       {
         isDeleted: true,
@@ -537,8 +664,21 @@ export const confirmDeleteAccount = async (req: Request, res: Response) => {
       { merge: true },
     );
 
-    // Disable auth account to prevent further login while preserving audit trail.
-    await auth.updateUser(user.uid, { disabled: true });
+    await Promise.all([
+      archiveDeletedAccount({
+        uid: user.uid,
+        email,
+        role,
+        reason: reason || "Self-requested account deletion",
+        deletedBy: user.uid,
+        source: "self-service",
+        profile: userProfile,
+      }),
+      db.collection("pending_users").doc(email).delete().catch(() => {}),
+    ]);
+
+    // Remove the Firebase auth user so the same email can be used for a fresh signup.
+    await removeFirebaseUserIfPresent(user.uid);
     if (String(role) === "seller") {
       const products = await db.collection("products").where("sellerId", "==", user.uid).get();
       const batch = db.batch();
@@ -563,17 +703,32 @@ export const confirmDeleteAccount = async (req: Request, res: Response) => {
 
 export const requestLoginOTP = async (req: Request, res: Response) => {
   try {
-    const email = String(req.body?.email || "").trim().toLowerCase();
+    const email = normalizeEmail(req.body?.email);
     const channel = String(req.body?.otpChannel || "email").toLowerCase() === "phone" ? "phone" : "email";
     if (!email) return res.status(400).json({ error: "Email is required" });
 
-    const userRecord = await auth.getUserByEmail(email);
+    let userRecord;
+    try {
+      userRecord = await auth.getUserByEmail(email);
+    } catch (error: any) {
+      if (String(error?.code || "") === "auth/user-not-found") {
+        return res.status(404).json({ error: "No account found for this email" });
+      }
+      throw error;
+    }
     if (!userRecord?.uid) {
       return res.status(404).json({ error: "No account found for this email" });
     }
 
     const profileDoc = await db.collection("users").doc(userRecord.uid).get();
     const profile = profileDoc.exists ? (profileDoc.data() as any) : {};
+    if (!profileDoc.exists || isDeletedAccount(profile)) {
+      await releaseDeletedEmailForReuse(email);
+      return res.status(403).json({
+        error:
+          "This account has been deleted. Sign up again to create a new account or use the recovery email if available.",
+      });
+    }
     const otpRecipient = channel === "phone" ? normalizePhoneNumber(profile?.phone) : email;
     if (!otpRecipient) {
       return res.status(400).json({ error: "Phone number is not available for this account" });
@@ -602,7 +757,7 @@ export const requestLoginOTP = async (req: Request, res: Response) => {
 
 export const verifyLoginOTP = async (req: Request, res: Response) => {
   try {
-    const email = String(req.body?.email || "").trim().toLowerCase();
+    const email = normalizeEmail(req.body?.email);
     const channel = String(req.body?.otpChannel || "email").toLowerCase() === "phone" ? "phone" : "email";
     if (channel === "phone") {
       return res.status(400).json({ error: "Use Firebase phone verification for mobile OTP" });
@@ -617,10 +772,25 @@ export const verifyLoginOTP = async (req: Request, res: Response) => {
       return res.status(400).json({ error: "Invalid or expired OTP" });
     }
 
-    const userRecord = await auth.getUserByEmail(email);
-    const customToken = await auth.createCustomToken(userRecord.uid);
+    let userRecord;
+    try {
+      userRecord = await auth.getUserByEmail(email);
+    } catch (error: any) {
+      if (String(error?.code || "") === "auth/user-not-found") {
+        return res.status(404).json({ error: "No account found for this email" });
+      }
+      throw error;
+    }
     const userDoc = await db.collection("users").doc(userRecord.uid).get();
     const userData = userDoc.exists ? (userDoc.data() as any) : {};
+    if (!userDoc.exists || isDeletedAccount(userData)) {
+      await releaseDeletedEmailForReuse(email);
+      return res.status(403).json({
+        error:
+          "This account has been deleted. Sign up again to create a new account or use the recovery email if available.",
+      });
+    }
+    const customToken = await auth.createCustomToken(userRecord.uid);
 
     res.json({
       message: "Login successful",
@@ -638,7 +808,7 @@ export const verifyLoginOTP = async (req: Request, res: Response) => {
 };
 export const resendOTP = async (req: Request, res: Response) => {
   try {
-    const email = String(req.body?.email || '').trim().toLowerCase();
+    const email = normalizeEmail(req.body?.email);
     const channel = String(req.body?.otpChannel || 'email').toLowerCase() === 'phone' ? 'phone' : 'email';
     if (!email) return res.status(400).json({ error: 'Email is required' });
 
@@ -674,7 +844,7 @@ export const resendOTP = async (req: Request, res: Response) => {
 
 export const verifyPhoneSignup = async (req: Request, res: Response) => {
   try {
-    const email = String(req.body?.email || '').trim().toLowerCase();
+    const email = normalizeEmail(req.body?.email);
     const idToken = String(req.body?.idToken || '').trim();
     if (!email || !idToken) {
       return res.status(400).json({ error: 'Email and Firebase phone token are required' });
@@ -734,7 +904,10 @@ export const verifyPhoneSignup = async (req: Request, res: Response) => {
       }),
     }, { merge: true });
 
-    await db.collection('pending_users').doc(email).delete();
+    await Promise.all([
+      db.collection('pending_users').doc(email).delete(),
+      getDeletedAccountRef(email).delete().catch(() => {}),
+    ]);
     await Promise.allSettled([
       sendWelcomeEmail(userData.email, userData.displayName),
       verifiedPhone ? sendWelcomePhoneMessage(verifiedPhone, userData.displayName) : Promise.resolve(),
@@ -758,18 +931,34 @@ export const verifyPhoneSignup = async (req: Request, res: Response) => {
 
 export const verifyPhoneLogin = async (req: Request, res: Response) => {
   try {
-    const email = String(req.body?.email || '').trim().toLowerCase();
+    const email = normalizeEmail(req.body?.email);
     const idToken = String(req.body?.idToken || '').trim();
     if (!email || !idToken) {
       return res.status(400).json({ error: 'Email and Firebase phone token are required' });
     }
 
-    const userRecord = await auth.getUserByEmail(email);
+    let userRecord;
+    try {
+      userRecord = await auth.getUserByEmail(email);
+    } catch (error: any) {
+      if (String(error?.code || "") === "auth/user-not-found") {
+        return res.status(404).json({ error: "No account found for this email" });
+      }
+      throw error;
+    }
     const userDoc = await db.collection('users').doc(userRecord.uid).get();
     if (!userDoc.exists) {
+      await releaseDeletedEmailForReuse(email);
       return res.status(404).json({ error: 'Profile not found for this account' });
     }
     const profile = userDoc.data() as any;
+    if (isDeletedAccount(profile)) {
+      await releaseDeletedEmailForReuse(email);
+      return res.status(403).json({
+        error:
+          'This account has been deleted. Sign up again to create a new account or use the recovery email if available.',
+      });
+    }
     const expectedPhone = normalizePhoneNumber(profile?.phone || userRecord.phoneNumber);
     if (!expectedPhone) {
       return res.status(400).json({ error: 'Phone number is not available for this account' });

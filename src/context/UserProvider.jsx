@@ -12,6 +12,9 @@ import {
 } from "firebase/auth";
 import { showToast } from "../services/toastService";
 
+const DELETED_ACCOUNT_NOTICE =
+  "This account has been deleted. Sign up again to create a new account or use the recovery email if available.";
+
 const getMissingCustomerFields = (profile = {}) => {
   const missing = [];
   if (!(profile.displayName || profile.name)) missing.push("name");
@@ -67,10 +70,24 @@ export const UserProvider = ({ children }) => {
           // Get extra data from Firestore
           let verificationStatus;
           let dbProfile = {};
+          let missingProfile = false;
           try {
             const userDoc = await getDoc(doc(db, "users", currentUser.uid));
             if (userDoc.exists()) {
               const data = userDoc.data();
+              if (
+                data?.isDeleted ||
+                String(data?.status || "").toLowerCase() === "deleted" ||
+                String(data?.accountState || "").toLowerCase() === "deleted"
+              ) {
+                sessionStorage.setItem("zoop_auth_notice", DELETED_ACCOUNT_NOTICE);
+                await signOut(auth);
+                setUser(null);
+                localStorage.removeItem("authToken");
+                localStorage.removeItem("zoop_user");
+                setIsLoading(false);
+                return;
+              }
               role = role || data.role;
               verificationStatus = data.verificationStatus || undefined;
               dbProfile = data;
@@ -86,9 +103,21 @@ export const UserProvider = ({ children }) => {
                 setLocation(preferredCity);
                 localStorage.setItem("zoop_city", preferredCity);
               }
+            } else {
+              missingProfile = true;
             }
           } catch (e) {
             console.warn("Failed to fetch user data from Firestore", e);
+          }
+
+          if (missingProfile) {
+            sessionStorage.setItem("zoop_auth_notice", DELETED_ACCOUNT_NOTICE);
+            await signOut(auth);
+            setUser(null);
+            localStorage.removeItem("authToken");
+            localStorage.removeItem("zoop_user");
+            setIsLoading(false);
+            return;
           }
 
           role = role || "customer";
@@ -123,15 +152,10 @@ export const UserProvider = ({ children }) => {
           }
         } catch (err) {
           console.error("Error getting user data:", err);
-          // Fallback
-          setUser({
-            uid: currentUser.uid,
-            email: currentUser.email,
-            displayName:
-              currentUser.displayName || currentUser.email?.split("@")[0],
-            role: "customer",
-            profileMissingFields: getMissingCustomerFields(),
-          });
+          await signOut(auth).catch(() => {});
+          setUser(null);
+          localStorage.removeItem("authToken");
+          localStorage.removeItem("zoop_user");
         }
       } else {
         setUser(null);
