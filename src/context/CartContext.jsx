@@ -16,6 +16,30 @@ const loadCart = (uid) => {
   }
 };
 
+const mergeCartItemWithProduct = (item, product) => {
+  const stock = Number(product?.stock ?? item.stock ?? 0);
+  const safeQuantity = Math.max(
+    1,
+    Math.min(Number(item.quantity) || 1, stock > 0 ? stock : Number(item.quantity) || 1),
+  );
+
+  return {
+    ...item,
+    ...product,
+    name: product?.name || product?.title || item.name || item.title || "Product",
+    title: product?.title || product?.name || item.title || item.name || "Product",
+    image: product?.image || product?.thumbnailUrl || item.image || item.thumbnailUrl || "",
+    thumbnailUrl:
+      product?.thumbnailUrl || product?.image || item.thumbnailUrl || item.image || "",
+    price: Number(product?.price ?? item.price ?? 0),
+    stock,
+    quantity: safeQuantity,
+    selectedSize: item.selectedSize ?? null,
+    selectedColor: item.selectedColor ?? null,
+    addedAt: item.addedAt ?? Date.now(),
+  };
+};
+
 export const CartProvider = ({ children }) => {
   const { user } = useContext(UserContext) || {};
   const uid = user?.uid || null;
@@ -49,19 +73,60 @@ export const CartProvider = ({ children }) => {
       const validityPairs = await Promise.all(
         uniqueIds.map(async (id) => {
           try {
-            await apiClient.get(`/products/${id}`);
-            return [id, true];
+            const product = await apiClient.get(`/products/${id}`);
+            return [id, product];
           } catch {
-            return [id, false];
+            return [id, null];
           }
         }),
       );
       if (cancelled) return;
-      const validMap = new Map(validityPairs);
-      const cleaned = cartItems.filter((item) => validMap.get(item.id));
-      if (cleaned.length !== cartItems.length) {
-        setCartItems(cleaned);
+      const productMap = new Map(validityPairs);
+      const removedItems = [];
+      let quantityAdjusted = false;
+      let pricingChanged = false;
+      const refreshed = cartItems
+        .filter((item) => {
+          const exists = Boolean(productMap.get(item.id));
+          if (!exists) removedItems.push(item.id);
+          return exists;
+        })
+        .map((item) => {
+          const nextItem = mergeCartItemWithProduct(item, productMap.get(item.id));
+          if (nextItem.quantity !== item.quantity) quantityAdjusted = true;
+          if (Number(nextItem.price) !== Number(item.price)) pricingChanged = true;
+          return nextItem;
+        });
+
+      const hasChanged =
+        removedItems.length > 0 ||
+        refreshed.length !== cartItems.length ||
+        refreshed.some((item, index) => {
+          const prev = cartItems[index];
+          return (
+            item.id !== prev?.id ||
+            item.price !== prev?.price ||
+            item.stock !== prev?.stock ||
+            item.quantity !== prev?.quantity ||
+            item.title !== prev?.title ||
+            item.name !== prev?.name ||
+            item.image !== prev?.image ||
+            item.thumbnailUrl !== prev?.thumbnailUrl ||
+            item.type !== prev?.type
+          );
+        });
+
+      if (hasChanged) {
+        setCartItems(refreshed);
+      }
+      if (removedItems.length > 0) {
         showToast.info("Unavailable products were removed from your cart.");
+      }
+      if (quantityAdjusted) {
+        showToast.info("Cart quantities were adjusted to match current stock.");
+      }
+      if (pricingChanged) {
+        showToast.info("Cart prices were refreshed with the latest product pricing.");
       }
       setCartValidated(true);
     };
@@ -93,6 +158,7 @@ export const CartProvider = ({ children }) => {
       return;
     }
 
+    setCartValidated(false);
     setCartItems((prevItems) => {
       if (existingItem) {
         return prevItems.map((item) =>
@@ -129,6 +195,7 @@ export const CartProvider = ({ children }) => {
     selectedSize = null,
     selectedColor = null,
   ) => {
+    setCartValidated(false);
     setCartItems((prevItems) =>
       prevItems.filter(
         (item) =>
@@ -151,6 +218,7 @@ export const CartProvider = ({ children }) => {
       removeFromCart(productId, selectedSize, selectedColor);
       return;
     }
+    setCartValidated(false);
     setCartItems((prevItems) =>
       prevItems.map((item) =>
         item.id === productId &&
@@ -162,7 +230,10 @@ export const CartProvider = ({ children }) => {
     );
   };
 
-  const clearCart = () => setCartItems([]);
+  const clearCart = () => {
+    setCartValidated(false);
+    setCartItems([]);
+  };
 
   const getCartTotal = () =>
     cartItems.reduce((total, item) => total + item.price * item.quantity, 0);

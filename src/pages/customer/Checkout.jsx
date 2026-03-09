@@ -306,6 +306,15 @@ const Checkout = () => {
             customer_uid: user?.uid || "guest",
             customer_email: formData.email || "",
           },
+          appliedOffer: selectedOffer
+            ? {
+                id: selectedOffer.id,
+                code: selectedOffer.code || "",
+                title: selectedOffer.title,
+                discountAmount: selectedOfferDiscount,
+                scope: selectedOffer.scope || "order",
+              }
+            : undefined,
         });
         const razorpayOrder = paymentOrderResponse?.order;
         if (!razorpayOrder?.id) {

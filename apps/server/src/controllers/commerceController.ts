@@ -66,6 +66,15 @@ const createRazorpayOrderSchema = z.object({
   ),
   receipt: z.string().max(64).optional(),
   notes: z.record(z.string()).optional(),
+  appliedOffer: z
+    .object({
+      id: z.string().min(1).optional(),
+      code: z.string().optional(),
+      title: z.string().optional(),
+      discountAmount: z.number().min(0).optional(),
+      scope: z.enum(['order', 'shipping']).optional(),
+    })
+    .optional(),
 });
 
 const verifyRazorpayPaymentSchema = z.object({
@@ -173,24 +182,119 @@ const ensureRazorpayEnv = () => {
   return { keyId, keySecret };
 };
 
-const calculateOrderAmount = async (items: Array<{ productId: string; quantity: number }>) => {
+const calculateOfferDiscount = (
+  offer: any,
+  itemSubtotal: number,
+  shippingAmount: number,
+) => {
+  if (!offer || offer.active === false || itemSubtotal < Number(offer.minOrderAmount || 0)) {
+    return {
+      offerDiscountAmount: 0,
+      appliedOffer: null,
+    };
+  }
+
+  const scope = String(offer.scope || 'order') === 'shipping' ? 'shipping' : 'order';
+  const baseAmount = scope === 'shipping' ? shippingAmount : itemSubtotal;
+  const rawDiscount =
+    String(offer.discountType || 'percent') === 'flat'
+      ? Number(offer.discountValue || 0)
+      : Math.round((baseAmount * Number(offer.discountValue || 0)) / 100);
+  const cappedDiscount = offer.maxDiscountAmount
+    ? Math.min(rawDiscount, Number(offer.maxDiscountAmount || 0))
+    : rawDiscount;
+  const offerDiscountAmount = Math.max(0, Math.min(baseAmount, cappedDiscount));
+
+  return {
+    offerDiscountAmount,
+    appliedOffer: {
+      id: offer.id || '',
+      code: offer.code || '',
+      title: offer.title || '',
+      scope,
+      discountAmount: offerDiscountAmount,
+    },
+  };
+};
+
+const calculateOrderAmount = async (
+  items: Array<{ productId: string; quantity: number }>,
+  appliedOffer?: { id?: string },
+) => {
   let subtotal = 0;
   let hasNationalShipping = false;
+  const itemsSnapshot: Array<Record<string, any>> = [];
   for (const item of items) {
     const productDoc = await db.collection('products').doc(item.productId).get();
     if (!productDoc.exists) {
       throw new Error(`PRODUCT_NOT_FOUND::${item.productId}`);
     }
     const product = productDoc.data() as any;
-    subtotal += Number(product?.price || 0) * item.quantity;
-    if (String(product?.type || '').toLowerCase() === 'national') {
+    const unitPrice = Number(product?.price || 0);
+    const lineSubtotal = unitPrice * item.quantity;
+    subtotal += lineSubtotal;
+    const shippingType = String(product?.type || '').toLowerCase();
+    if (shippingType === 'national') {
       hasNationalShipping = true;
     }
+    itemsSnapshot.push({
+      productId: item.productId,
+      quantity: item.quantity,
+      unitPrice,
+      subtotal: lineSubtotal,
+      title: product?.title || 'Product',
+      thumbnailUrl: product?.thumbnailUrl || '',
+      shippingType,
+    });
   }
   const shipping = hasNationalShipping ? 150 : 0;
   const tax = Math.round(subtotal * 0.05);
-  const total = subtotal + shipping + tax;
-  return { subtotal, shipping, tax, total };
+  let offerDiscountAmount = 0;
+  let resolvedAppliedOffer: any = null;
+  if (appliedOffer?.id) {
+    const offerDoc = await db.collection('offers').doc(appliedOffer.id).get();
+    if (offerDoc.exists) {
+      const computed = calculateOfferDiscount(
+        { id: offerDoc.id, ...(offerDoc.data() as any) },
+        subtotal,
+        shipping,
+      );
+      offerDiscountAmount = computed.offerDiscountAmount;
+      resolvedAppliedOffer = computed.appliedOffer;
+    }
+  }
+  const total = Math.max(0, subtotal + shipping + tax - offerDiscountAmount);
+  return {
+    subtotal,
+    shipping,
+    tax,
+    offerDiscountAmount,
+    appliedOffer: resolvedAppliedOffer,
+    total,
+    itemsSnapshot,
+  };
+};
+
+const buildItemQuantityMap = (items: Array<{ productId: string; quantity: number }>) => {
+  const map = new Map<string, number>();
+  items.forEach((item) => {
+    map.set(item.productId, (map.get(item.productId) || 0) + Number(item.quantity || 0));
+  });
+  return map;
+};
+
+const doItemsMatchPaymentAttempt = (
+  requestedItems: Array<{ productId: string; quantity: number }>,
+  paymentItems: Array<{ productId: string; quantity: number }> | undefined,
+) => {
+  if (!Array.isArray(paymentItems) || paymentItems.length === 0) return false;
+  const requestedMap = buildItemQuantityMap(requestedItems);
+  const paymentMap = buildItemQuantityMap(paymentItems);
+  if (requestedMap.size !== paymentMap.size) return false;
+  for (const [productId, quantity] of requestedMap.entries()) {
+    if ((paymentMap.get(productId) || 0) !== quantity) return false;
+  }
+  return true;
 };
 
 const computeRazorpaySignature = (orderId: string, paymentId: string) => {
@@ -213,7 +317,7 @@ export const createRazorpayOrder = async (req: Request, res: Response) => {
     const user = (req as any).user;
     const { keyId, keySecret } = ensureRazorpayEnv();
     const parsed = createRazorpayOrderSchema.parse(req.body);
-    const pricing = await calculateOrderAmount(parsed.items);
+    const pricing = await calculateOrderAmount(parsed.items, parsed.appliedOffer);
     if (pricing.total <= 0) {
       return res.status(400).json({ error: 'Order amount must be greater than 0' });
     }
@@ -251,6 +355,8 @@ export const createRazorpayOrder = async (req: Request, res: Response) => {
       amount: Number(razorpayOrder.amount || amount),
       currency: razorpayOrder.currency || 'INR',
       pricing,
+      appliedOffer: pricing.appliedOffer,
+      items: pricing.itemsSnapshot,
       receipt: razorpayOrder.receipt || receipt,
       status: 'created',
       createdAt: nowISO(),
@@ -463,6 +569,15 @@ export const createOrder = async (req: Request, res: Response) => {
       if (paymentAttempt.userId !== user.uid) {
         return res.status(403).json({ error: 'Forbidden' });
       }
+      if (paymentAttempt.status === 'consumed' && paymentAttempt.orderId) {
+        const existingOrderDoc = await db.collection('orders').doc(paymentAttempt.orderId).get();
+        if (existingOrderDoc.exists) {
+          return res.status(200).json({
+            message: 'Order already created successfully',
+            order: { id: existingOrderDoc.id, ...(existingOrderDoc.data() as any) },
+          });
+        }
+      }
       if ((paymentAttempt.expiresAt || '') < nowISO()) {
         return res.status(400).json({ error: 'Payment attempt expired' });
       }
@@ -475,6 +590,11 @@ export const createOrder = async (req: Request, res: Response) => {
       ) {
         return res.status(400).json({ error: 'Payment reference mismatch' });
       }
+      if (!doItemsMatchPaymentAttempt(orderData.items, paymentAttempt.items)) {
+        return res.status(400).json({
+          error: 'Payment items do not match the current order. Please retry checkout.',
+        });
+      }
     }
 
     const orderRef = db.collection('orders').doc();
@@ -483,6 +603,11 @@ export const createOrder = async (req: Request, res: Response) => {
       let itemSubtotal = 0;
       let hasNationalShipping = false;
       const enrichedItems: any[] = [];
+      const paymentItemMap = new Map<string, any>(
+        Array.isArray(paymentAttempt?.items)
+          ? paymentAttempt.items.map((item: any) => [item.productId, item])
+          : [],
+      );
 
       for (const item of orderData.items) {
         const productRef = db.collection('products').doc(item.productId);
@@ -512,11 +637,17 @@ export const createOrder = async (req: Request, res: Response) => {
           updatedAt: nowISO(),
         });
 
-        const unitPrice = Number(product.price || 0);
+        const paymentItemSnapshot = paymentItemMap.get(item.productId);
+        const unitPrice = Number(
+          paymentItemSnapshot?.unitPrice ?? product.price ?? 0,
+        );
         const subtotal = unitPrice * item.quantity;
         itemSubtotal += subtotal;
         if (product.sellerId) sellerIds.add(product.sellerId);
-        if (String(product?.type || '').toLowerCase() === 'national') {
+        if (
+          String(paymentItemSnapshot?.shippingType || product?.type || '').toLowerCase() ===
+          'national'
+        ) {
           hasNationalShipping = true;
         }
 
@@ -527,8 +658,8 @@ export const createOrder = async (req: Request, res: Response) => {
           quantity: item.quantity,
           price: unitPrice,
           subtotal,
-          title: product.title || 'Product',
-          thumbnailUrl: product.thumbnailUrl || '',
+          title: paymentItemSnapshot?.title || product.title || 'Product',
+          thumbnailUrl: paymentItemSnapshot?.thumbnailUrl || product.thumbnailUrl || '',
           status: 'PENDING',
           returnWindowDays,
           returnEligibleUntil: null,
@@ -536,36 +667,35 @@ export const createOrder = async (req: Request, res: Response) => {
         });
       }
 
-      const shippingAmount = hasNationalShipping ? 150 : 0;
-      const taxAmount = Math.round(itemSubtotal * 0.05);
       let offerDiscountAmount = 0;
       let appliedOffer: any = null;
-      if (orderData.appliedOffer?.id) {
+      let shippingAmount = hasNationalShipping ? 150 : 0;
+      let taxAmount = Math.round(itemSubtotal * 0.05);
+      if (onlinePaymentMethods.has(paymentMethod) && paymentAttempt?.pricing) {
+        shippingAmount = Number(paymentAttempt.pricing.shipping ?? shippingAmount);
+        taxAmount = Number(paymentAttempt.pricing.tax ?? taxAmount);
+        offerDiscountAmount = Math.max(0, Number(paymentAttempt.pricing.offerDiscountAmount || 0));
+        appliedOffer = paymentAttempt.appliedOffer || paymentAttempt.pricing.appliedOffer || null;
+      } else if (orderData.appliedOffer?.id) {
         const offerDoc = await tx.get(db.collection('offers').doc(orderData.appliedOffer.id));
         if (offerDoc.exists) {
-          const offer = offerDoc.data() as any;
-          if (offer?.active !== false && itemSubtotal >= Number(offer?.minOrderAmount || 0)) {
-            const baseAmount =
-              String(offer?.scope || 'order') === 'shipping' ? shippingAmount : itemSubtotal;
-            const rawDiscount =
-              String(offer?.discountType || 'percent') === 'flat'
-                ? Number(offer?.discountValue || 0)
-                : Math.round((baseAmount * Number(offer?.discountValue || 0)) / 100);
-            const cappedDiscount = offer?.maxDiscountAmount
-              ? Math.min(rawDiscount, Number(offer.maxDiscountAmount || 0))
-              : rawDiscount;
-            offerDiscountAmount = Math.max(0, Math.min(baseAmount, cappedDiscount));
-            appliedOffer = {
-              id: offerDoc.id,
-              code: offer.code || '',
-              title: offer.title || '',
-              scope: offer.scope || 'order',
-              discountAmount: offerDiscountAmount,
-            };
-          }
+          const computed = calculateOfferDiscount(
+            { id: offerDoc.id, ...(offerDoc.data() as any) },
+            itemSubtotal,
+            shippingAmount,
+          );
+          offerDiscountAmount = computed.offerDiscountAmount;
+          appliedOffer = computed.appliedOffer;
         }
       }
-      const totalAmount = Math.max(0, itemSubtotal + shippingAmount + taxAmount - offerDiscountAmount);
+      const totalAmount = Math.max(
+        0,
+        Number(
+          onlinePaymentMethods.has(paymentMethod) && paymentAttempt?.pricing?.total != null
+            ? paymentAttempt.pricing.total
+            : itemSubtotal + shippingAmount + taxAmount - offerDiscountAmount,
+        ),
+      );
 
       if (onlinePaymentMethods.has(paymentMethod)) {
         const expectedAmount = Math.round(totalAmount * 100);

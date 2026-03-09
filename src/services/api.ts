@@ -102,6 +102,13 @@ export const ordersApi = {
     items: Array<{ productId: string; quantity: number }>;
     receipt?: string;
     notes?: Record<string, string>;
+    appliedOffer?: {
+      id?: string;
+      code?: string;
+      title?: string;
+      discountAmount?: number;
+      scope?: "order" | "shipping";
+    };
   }) => post<any>('/commerce/payments/razorpay/order', data),
   verifyRazorpayPayment: (data: {
     razorpayOrderId: string;
