@@ -196,6 +196,18 @@ const CustomerLayout = () => {
   }, [locationPath.pathname, qParam]);
 
   useEffect(() => {
+    if (
+      user &&
+      user.role === "customer" &&
+      Array.isArray(user.profileMissingFields) &&
+      user.profileMissingFields.length > 0 &&
+      locationPath.pathname !== "/profile"
+    ) {
+      navigate("/profile?edit=1&welcome=1", { replace: true });
+    }
+  }, [user, locationPath.pathname, navigate]);
+
+  useEffect(() => {
     const onDocClick = (e) => {
       if (!desktopSearchRef.current) return;
       if (!desktopSearchRef.current.contains(e.target)) {

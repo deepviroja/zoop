@@ -93,7 +93,7 @@ const AdminLayout = () => {
   ];
 
   return (
-    <div className="flex min-h-screen bg-zoop-clay/10 relative">
+    <div className="flex h-screen max-h-screen overflow-hidden bg-zoop-clay/10 relative">
       {/* --- MOBILE HEADER TOGGLE --- */}
       <div className="md:hidden fixed top-0 left-0 right-0 p-4 z-50 pointer-events-none">
         <button
@@ -190,7 +190,7 @@ const AdminLayout = () => {
       </aside>
 
       {/* --- MAIN CONTENT --- */}
-      <main className="flex-1 w-full p-4 md:p-8 pt-20 md:pt-8 overflow-y-auto">
+      <main className="flex-1 w-full overflow-y-auto overscroll-contain p-4 pt-20 md:p-8 md:pt-8">
         <div className="mb-4 flex items-center justify-between bg-white border border-gray-100 rounded-xl px-4 py-3 shadow-sm">
           <p className="text-xs font-black uppercase tracking-widest text-gray-500">
             Admin Console

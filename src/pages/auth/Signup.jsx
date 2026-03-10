@@ -197,7 +197,7 @@ const Signup = () => {
       const provider = new GoogleAuthProvider();
       setLoading(true);
       await signInWithPopup(auth, provider);
-      await apiClient.post("/auth/sync", { role: "customer", mode: "signup" });
+      await authApi.syncUser({ role: "customer", mode: "signup" });
       showToast("Account created successfully!", "success");
       confetti({
         particleCount: 150,
@@ -205,7 +205,7 @@ const Signup = () => {
         origin: { y: 0.6 },
         colors: ["#a3e635", "#000000"],
       });
-      setTimeout(() => navigate("/"), 1500);
+      setTimeout(() => navigate("/profile?edit=1&welcome=1"), 1500);
     } catch (error) {
       console.error("Google Signup error:", error);
       const friendly = getFriendlyError(error);
@@ -235,6 +235,7 @@ const Signup = () => {
         resetPhoneRecaptcha();
         const confirmation = await sendFirebasePhoneOtp(
           response?.otpRecipient || formData.phone,
+          { containerId: "signup-phone-recaptcha", size: "normal" },
         );
         setPhoneConfirmation(confirmation);
         setOtpExpiresAt(new Date(Date.now() + 5 * 60 * 1000).toISOString());
@@ -338,7 +339,7 @@ const Signup = () => {
         if (formData.role === "seller") {
           navigate("/seller/onboarding");
         } else {
-          navigate("/");
+          navigate("/profile?edit=1&welcome=1");
         }
       }, 1500);
     } catch (error) {
@@ -364,6 +365,7 @@ const Signup = () => {
         resetPhoneRecaptcha();
         const confirmation = await sendFirebasePhoneOtp(
           response?.otpRecipient || formData.phone,
+          { containerId: "signup-phone-recaptcha", size: "normal" },
         );
         setPhoneConfirmation(confirmation);
         setOtpExpiresAt(new Date(Date.now() + 5 * 60 * 1000).toISOString());
@@ -583,6 +585,13 @@ const Signup = () => {
                   </p>
                 )}
               </div>
+
+              {otpChannel === "phone" && (
+                <div
+                  id="signup-phone-recaptcha"
+                  className="overflow-hidden rounded-2xl"
+                />
+              )}
 
               <CountryPhoneField
                 label="Phone Number"

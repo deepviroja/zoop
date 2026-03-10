@@ -8,6 +8,7 @@ import { Edit } from "../../assets/icons/Edit";
 import { Package } from "../../assets/icons/Package";
 import { Heart } from "../../assets/icons/Heart";
 import { MapPin } from "../../assets/icons/MapPin";
+import { Star } from "../../assets/icons/Star";
 import CountryPhoneField from "../../components/common/CountryPhoneField";
 import CountryStateCityFieldset from "../../components/common/CountryStateCityFieldset";
 import {
@@ -305,7 +306,7 @@ const Profile = () => {
     {
       label: "Reviews",
       value: String(stats.reviews),
-      icon: "⭐",
+      icon: Star,
       color: "from-yellow-400 to-orange-500",
     },
   ];

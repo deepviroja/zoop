@@ -292,11 +292,16 @@ const AdminStats = () => {
                   >
                     <div className="flex-1">
                       <p className="font-bold text-zoop-obsidian text-sm truncate">
-                        {order.id}
+                        {order.displayOrderId || order.id}
                       </p>
                       <p className="text-xs text-gray-500">
-                        {order.items} item(s)
+                        {(order.customer?.name || order.customer?.email || "Customer")} • {order.items} item(s)
                       </p>
+                      {order.primaryProduct?.title && (
+                        <p className="text-xs text-gray-500 truncate">
+                          {order.primaryProduct.title}
+                        </p>
+                      )}
                       <p className="text-xs text-gray-400 mt-1">
                         {new Date(order.createdAt).toLocaleDateString("en-IN", {
                           day: "numeric",

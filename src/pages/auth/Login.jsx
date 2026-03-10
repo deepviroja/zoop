@@ -9,7 +9,6 @@ import {
   sendPasswordResetEmail,
   signOut,
 } from "firebase/auth";
-import { apiClient } from "../../api/client";
 import { authApi } from "../../services/api";
 import { validateEmail } from "../../utils/validation";
 import { getFriendlyError } from "../../utils/errorMessages";
@@ -94,13 +93,23 @@ const Login = () => {
     return `${mins}:${String(secs).padStart(2, "0")}`;
   };
 
+  const getPostLoginPath = (nextUser) => {
+    if (!nextUser) return from;
+    if (nextUser.role === "seller") return "/seller/dashboard";
+    if (nextUser.role === "admin") return "/admin";
+    if (
+      Array.isArray(nextUser.profileMissingFields) &&
+      nextUser.profileMissingFields.length > 0
+    ) {
+      return "/profile?edit=1&welcome=1";
+    }
+    return from;
+  };
+
   // ✅ React to user state changes — navigate AFTER UserProvider sets user
   useEffect(() => {
     if (!isLoading && user) {
-      if (user.role === "seller")
-        navigate("/seller/dashboard", { replace: true });
-      else if (user.role === "admin") navigate("/admin", { replace: true });
-      else navigate(from, { replace: true });
+      navigate(getPostLoginPath(user), { replace: true });
     }
   }, [user, isLoading, navigate, from]);
 
@@ -125,7 +134,7 @@ const Login = () => {
       await signInWithPopup(auth, provider);
       // Sync user with backend to assign role if new
       try {
-        await apiClient.post("/auth/sync", { mode: "login" });
+        await authApi.syncUser({ mode: "login" });
       } catch (error) {
         await signOut(auth).catch(() => {});
         throw error;
@@ -204,6 +213,7 @@ const Login = () => {
         resetPhoneRecaptcha();
         const confirmation = await sendFirebasePhoneOtp(
           response?.otpRecipient || phoneValue,
+          { containerId: "login-phone-recaptcha", size: "normal" },
         );
         setPhoneConfirmation(confirmation);
         setOtpExpiresAt(new Date(Date.now() + 5 * 60 * 1000).toISOString());
@@ -536,6 +546,10 @@ const Login = () => {
                         error={errors.phone}
                         defaultCountry="in"
                       />
+                      <div
+                        id="login-phone-recaptcha"
+                        className="mt-3 overflow-hidden rounded-2xl"
+                      />
                     </div>
                   )}
                   {otpStep ? (
@@ -565,6 +579,7 @@ const Login = () => {
                     </>
                   ) : (
                     <div className="space-y-2">
+                      <p></p>
                       <p className="text-sm text-gray-600">
                         Choose where the OTP should be delivered, then send it.
                       </p>

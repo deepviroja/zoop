@@ -304,6 +304,105 @@ const summarizePayoutRows = (rows: CommissionRow[]) => ({
     .reduce((sum, row) => sum + Number(row.payoutAmount || 0), 0),
 });
 
+const buildDirectory = (items: Array<Record<string, any>>) =>
+  items.reduce<Record<string, any>>((acc, item) => {
+    acc[String(item.id || "")] = item;
+    return acc;
+  }, {});
+
+const buildDisplayOrderId = (id: string) =>
+  `#${String(id || "").slice(-8).toUpperCase()}`;
+
+const enrichOrderRecord = (
+  order: Record<string, any>,
+  usersById: Record<string, any>,
+  productsById: Record<string, any>,
+) => {
+  const customerProfile = usersById[String(order.userId || "")] || {};
+  const items = Array.isArray(order.items)
+    ? order.items.map((item: any) => {
+        const product = productsById[String(item.productId || "")] || {};
+        const seller = usersById[String(item.sellerId || "")] || {};
+        return {
+          ...item,
+          title: item.title || product.title || product.name || "Product",
+          product,
+          seller: {
+            id: item.sellerId || seller.id || "",
+            displayName: seller.displayName || seller.name || "",
+            businessName: seller.businessName || "",
+            email: seller.email || "",
+          },
+        };
+      })
+    : [];
+
+  return {
+    ...order,
+    displayOrderId: buildDisplayOrderId(String(order.id || "")),
+    customer: {
+      id: order.userId || "",
+      name:
+        order.customer?.name ||
+        customerProfile.displayName ||
+        customerProfile.name ||
+        "",
+      email: order.customer?.email || customerProfile.email || "",
+      phone: order.customer?.phone || customerProfile.phone || "",
+    },
+    itemCount: items.length,
+    primaryProduct: items[0]
+      ? {
+          id: items[0].productId || "",
+          title: items[0].title || "",
+        }
+      : null,
+    sellerSummaries: Array.from(
+      new Map(
+        items
+          .filter((item: any) => item.seller?.id || item.sellerId)
+          .map((item: any) => [
+            item.seller?.id || item.sellerId,
+            {
+              id: item.seller?.id || item.sellerId || "",
+              displayName: item.seller?.displayName || "",
+              businessName: item.seller?.businessName || "",
+            },
+          ]),
+      ).values(),
+    ),
+    items,
+  };
+};
+
+const enrichPayoutRows = (
+  rows: CommissionRow[],
+  usersById: Record<string, any>,
+  productsById: Record<string, any>,
+  ordersById: Record<string, any>,
+) =>
+  rows.map((row) => {
+    const product = productsById[String(row.productId || "")] || {};
+    const seller = usersById[String(row.sellerId || "")] || {};
+    const order = ordersById[String(row.orderId || "")] || {};
+    const customer = usersById[String(order.userId || "")] || {};
+    return {
+      ...row,
+      displayOrderId: buildDisplayOrderId(String(row.orderId || "")),
+      productTitle: product.title || product.name || "",
+      sellerName: seller.businessName || seller.displayName || seller.name || "",
+      customer: {
+        id: order.userId || "",
+        name:
+          order.customer?.name ||
+          customer.displayName ||
+          customer.name ||
+          "",
+        email: order.customer?.email || customer.email || "",
+      },
+    };
+  });
+
 // ─── PUBLIC GET ENDPOINTS ────────────────────────────────────────────────────
 
 export const getCities = async (_req: Request, res: Response) => {
@@ -538,13 +637,17 @@ export const getAdminAnalytics = async (_req: Request, res: Response) => {
       db.collection('sellers').get(),
     ]);
 
-    const orders = ordersSnap.docs.map(d => d.data() as any);
+    const users = usersSnap.docs.map((d) => ({ id: d.id, ...(d.data() as any) }));
+    const products = productsSnap.docs.map((d) => ({ id: d.id, ...(d.data() as any) }));
+    const usersById = buildDirectory(users);
+    const productsById = buildDirectory(products);
+    const orders = ordersSnap.docs.map(d => ({ id: d.id, ...(d.data() as any) }));
     const totalRevenue = orders.reduce((sum, o) => sum + (o.totalAmount || 0), 0);
 
     // Category breakdown from products
     const productsByCategory: Record<string, number> = {};
-    productsSnap.docs.forEach(d => {
-      const cat = (d.data() as any).category || 'Other';
+    products.forEach((d) => {
+      const cat = d.category || 'Other';
       productsByCategory[cat] = (productsByCategory[cat] || 0) + 1;
     });
     const categoryStats = Object.entries(productsByCategory).map(([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count);
@@ -553,14 +656,21 @@ export const getAdminAnalytics = async (_req: Request, res: Response) => {
     const recentOrders = orders
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       .slice(0, 10)
-      .map(o => ({
-        id: o.id,
-        userId: o.userId,
-        status: o.status,
-        totalAmount: o.totalAmount,
-        createdAt: o.createdAt,
-        items: o.items?.length || 0,
-      }));
+      .map((o) => {
+        const enriched = enrichOrderRecord(o, usersById, productsById);
+        return {
+          id: o.id,
+          displayOrderId: enriched.displayOrderId,
+          userId: o.userId,
+          customer: enriched.customer,
+          status: o.status,
+          totalAmount: o.totalAmount,
+          createdAt: o.createdAt,
+          items: enriched.itemCount,
+          primaryProduct: enriched.primaryProduct,
+          sellerSummaries: enriched.sellerSummaries,
+        };
+      });
 
     // Top sellers by products listed
     const sellerProductCount: Record<string, number> = {};
@@ -961,9 +1071,19 @@ export const rejectSeller = async (req: Request, res: Response) => {
 export const getAllOrders = async (req: Request, res: Response) => {
   try {
     const { status, page = '1', limit = '20' } = req.query;
-    const snap = await db.collection('orders').get();
-    let orders = snap.docs
-      .map(d => ({ id: d.id, ...d.data() as any }))
+    const [ordersSnap, usersSnap, productsSnap] = await Promise.all([
+      db.collection('orders').get(),
+      db.collection('users').get(),
+      db.collection('products').get(),
+    ]);
+    const usersById = buildDirectory(
+      usersSnap.docs.map((d) => ({ id: d.id, ...(d.data() as any) })),
+    );
+    const productsById = buildDirectory(
+      productsSnap.docs.map((d) => ({ id: d.id, ...(d.data() as any) })),
+    );
+    let orders = ordersSnap.docs
+      .map(d => enrichOrderRecord({ id: d.id, ...d.data() as any }, usersById, productsById))
       .sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
     if (status) orders = orders.filter(o => o.status === status);
     const paginated = orders.slice((Number(page) - 1) * Number(limit), Number(page) * Number(limit));
@@ -1124,12 +1244,20 @@ export const getSellerOrders = async (req: Request, res: Response) => {
     const user = (req as any).user;
     const sellerId = user.uid;
 
-    const productsSnap = await db.collection('products').where('sellerId', '==', sellerId).get();
-    const productIds = new Set(productsSnap.docs.map(d => d.id));
+    const [productsSnap, usersSnap] = await Promise.all([
+      db.collection('products').where('sellerId', '==', sellerId).get(),
+      db.collection('users').get(),
+    ]);
+    const products = productsSnap.docs.map((d) => ({ id: d.id, ...(d.data() as any) }));
+    const productIds = new Set(products.map((d) => d.id));
+    const usersById = buildDirectory(
+      usersSnap.docs.map((d) => ({ id: d.id, ...(d.data() as any) })),
+    );
+    const productsById = buildDirectory(products);
 
     const ordersSnap = await db.collection('orders').orderBy('createdAt', 'desc').get();
     const sellerOrders = ordersSnap.docs
-      .map(d => ({ id: d.id, ...d.data() as any }))
+      .map(d => enrichOrderRecord({ id: d.id, ...d.data() as any }, usersById, productsById))
       .filter(o => o.items?.some((item: any) => productIds.has(item.productId)));
 
     res.json(sellerOrders);
@@ -1467,12 +1595,21 @@ export const updateCommissionStructureConfig = async (req: Request, res: Respons
 export const getMonetizationOverview = async (_req: Request, res: Response) => {
   try {
     await processDueCommissionPayouts();
-    const [payouts, ordersSnap, commissionSnap] = await Promise.all([
+    const [payouts, ordersSnap, commissionSnap, usersSnap, productsSnap] = await Promise.all([
       getAllPayoutRows(),
       db.collection('orders').get(),
       db.collection('config').doc('commissionStructure').get(),
+      db.collection('users').get(),
+      db.collection('products').get(),
     ]);
-    const orders = ordersSnap.docs.map((d) => d.data() as any);
+    const orders = ordersSnap.docs.map((d) => ({ id: d.id, ...(d.data() as any) }));
+    const ordersById = buildDirectory(orders);
+    const usersById = buildDirectory(
+      usersSnap.docs.map((d) => ({ id: d.id, ...(d.data() as any) })),
+    );
+    const productsById = buildDirectory(
+      productsSnap.docs.map((d) => ({ id: d.id, ...(d.data() as any) })),
+    );
     const payoutTotals = summarizePayoutRows(payouts);
     const totalRevenue = orders.reduce((sum, o) => sum + Number(o.totalAmount || 0), 0);
     res.json({
@@ -1481,7 +1618,7 @@ export const getMonetizationOverview = async (_req: Request, res: Response) => {
         ...payoutTotals,
       },
       commissionStructure: commissionSnap.data()?.items || DEFAULT_COMMISSION_STRUCTURE,
-      payouts,
+      payouts: enrichPayoutRows(payouts, usersById, productsById, ordersById),
     });
   } catch (e: any) {
     res.status(500).json({ error: e.message });
@@ -1492,8 +1629,23 @@ export const getSellerPayouts = async (req: Request, res: Response) => {
   try {
     await processDueCommissionPayouts();
     const user = (req as any).user;
-    const payouts = (await getAllPayoutRows()).filter(
+    const [allPayoutRows, usersSnap, productsSnap, ordersSnap] = await Promise.all([
+      getAllPayoutRows(),
+      db.collection('users').get(),
+      db.collection('products').get(),
+      db.collection('orders').get(),
+    ]);
+    const payouts = allPayoutRows.filter(
       (row) => row.sellerId === user.uid,
+    );
+    const ordersById = buildDirectory(
+      ordersSnap.docs.map((d) => ({ id: d.id, ...(d.data() as any) })),
+    );
+    const usersById = buildDirectory(
+      usersSnap.docs.map((d) => ({ id: d.id, ...(d.data() as any) })),
+    );
+    const productsById = buildDirectory(
+      productsSnap.docs.map((d) => ({ id: d.id, ...(d.data() as any) })),
     );
     const payoutTotals = summarizePayoutRows(payouts);
     const totals = {
@@ -1512,7 +1664,10 @@ export const getSellerPayouts = async (req: Request, res: Response) => {
         )
         .reduce((sum, p) => sum + Number(p.payoutAmount || 0), 0),
     };
-    res.json({ payouts, totals });
+    res.json({
+      payouts: enrichPayoutRows(payouts, usersById, productsById, ordersById),
+      totals,
+    });
   } catch (e: any) {
     res.status(500).json({ error: e.message });
   }

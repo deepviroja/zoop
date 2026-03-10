@@ -463,10 +463,17 @@ export const syncUser = async (req: Request, res: Response) => {
             "This account was deleted. Sign up again to create a new account or use the account recovery email if available.",
         });
       }
+      if (mode !== "signup") {
+        return res.status(404).json({
+          error:
+            "No Zoop account exists for this Google login yet. Use Sign up with Google first.",
+        });
+      }
       // Create user if not exists (e.g. first time Google login)
       const userData: User & Record<string, any> = {
         id: user.uid,
         name: user.name || user.email?.split('@')[0] || 'User',
+        displayName: user.name || user.email?.split('@')[0] || 'User',
         email: user.email || '',
         phone: normalizePhoneNumber(user.phone_number),
         address: '',

@@ -1,5 +1,8 @@
 import React from 'react';
 import { useUser } from '../../context/UserContext';
+import { Lock } from "../../assets/icons/Lock";
+import { Store } from "../../assets/icons/Store";
+import { AlertCircle } from "../../assets/icons/AlertCircle";
 
 interface Props {
   children: React.ReactNode;
@@ -29,10 +32,10 @@ export const ProtectedRoute: React.FC<Props> = ({ children, allowedRoles, adminO
   if (!user) {
     return (
       <div className="min-h-[70vh] flex items-center justify-center p-6">
-        <div className="bg-white rounded-3xl shadow-2xl p-10 max-w-md w-full text-center border-2 border-zoop-moss/20">
-          <div className="w-20 h-20 bg-zoop-moss/10 rounded-full flex items-center justify-center mx-auto mb-6">
-            <span className="text-4xl">🔒</span>
-          </div>
+          <div className="bg-white rounded-3xl shadow-2xl p-10 max-w-md w-full text-center border-2 border-zoop-moss/20">
+            <div className="w-20 h-20 bg-zoop-moss/10 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Lock width={34} height={34} className="text-zoop-obsidian" />
+            </div>
           <h2 className="text-2xl font-black text-zoop-obsidian mb-4 uppercase italic">Access Required</h2>
           <p className="text-gray-500 mb-8 font-bold">Please log in to your account to access this page.</p>
           <div className="flex flex-col gap-3">
@@ -62,7 +65,7 @@ export const ProtectedRoute: React.FC<Props> = ({ children, allowedRoles, adminO
         <div className="min-h-[70vh] flex items-center justify-center p-6">
           <div className="bg-white rounded-3xl shadow-2xl p-10 max-w-md w-full text-center border-2 border-amber-100">
             <div className="w-20 h-20 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-6">
-              <span className="text-4xl">🏪</span>
+              <Store width={34} height={34} className="text-amber-700" />
             </div>
             <h2 className="text-2xl font-black text-zoop-obsidian mb-4 uppercase italic">Seller Access Only</h2>
             <p className="text-gray-600 mb-3 font-bold">
@@ -97,7 +100,7 @@ export const ProtectedRoute: React.FC<Props> = ({ children, allowedRoles, adminO
         <div className="min-h-[70vh] flex items-center justify-center p-6">
           <div className="bg-white rounded-3xl shadow-2xl p-10 max-w-md w-full text-center border-2 border-red-100">
             <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
-              <span className="text-4xl">🚫</span>
+              <AlertCircle width={34} height={34} className="text-red-600" />
             </div>
             <h2 className="text-2xl font-black text-red-600 mb-4 uppercase italic">Unauthorized</h2>
             <p className="text-gray-600 mb-8 font-bold">Your account does not have permission to view this content.</p>

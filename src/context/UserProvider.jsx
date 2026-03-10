@@ -111,11 +111,43 @@ export const UserProvider = ({ children }) => {
           }
 
           if (missingProfile) {
-            sessionStorage.setItem("zoop_auth_notice", DELETED_ACCOUNT_NOTICE);
-            await signOut(auth);
-            setUser(null);
-            localStorage.removeItem("authToken");
-            localStorage.removeItem("zoop_user");
+            role = role || "customer";
+            const provisionalProfile = {
+              displayName:
+                currentUser.displayName || currentUser.email?.split("@")[0] || "User",
+              name:
+                currentUser.displayName || currentUser.email?.split("@")[0] || "User",
+              email: currentUser.email || "",
+              phone: currentUser.phoneNumber || "",
+              address: "",
+              city: "",
+              state: "",
+              pincode: "",
+              photoURL: currentUser.photoURL || "",
+            };
+            const missingFields =
+              role === "seller"
+                ? getMissingSellerFields(provisionalProfile)
+                : getMissingCustomerFields(provisionalProfile);
+            const provisionalUser = {
+              uid: currentUser.uid,
+              email: currentUser.email,
+              displayName: provisionalProfile.displayName,
+              role,
+              verificationStatus,
+              emailVerified: currentUser.emailVerified,
+              ...provisionalProfile,
+              profileMissingFields: missingFields,
+              profileNeedsSetup: true,
+            };
+            setUser(provisionalUser);
+            localStorage.setItem("zoop_user", JSON.stringify(provisionalUser));
+            localStorage.setItem("authToken", token);
+            showToast.warning(
+              role === "seller"
+                ? "Complete your seller profile to continue."
+                : "Complete your profile to continue.",
+            );
             setIsLoading(false);
             return;
           }
@@ -137,6 +169,7 @@ export const UserProvider = ({ children }) => {
             emailVerified: currentUser.emailVerified,
             ...dbProfile,
             profileMissingFields: missingFields,
+            profileNeedsSetup: missingFields.length > 0,
           };
 
           setUser(userData);

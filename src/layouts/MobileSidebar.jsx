@@ -23,13 +23,13 @@ const MobileSidebar = ({ isOpen, onClose, categories = [], quickLinks = [] }) =>
     <>
       {/* --- BACKDROP --- */}
       <div
-        className={`fixed h-[calc(100vh+4rem)] w-full inset-0 bg-zoop-obsidian/60 z-[200] transition-opacity duration-300 ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+        className={`fixed inset-0 bg-zoop-obsidian/60 z-[200] transition-opacity duration-300 ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
         onClick={onClose}
       />
 
       {/* --- SIDEBAR PANEL --- */}
       <aside
-        className={`fixed top-14 left-0 h-[calc(100vh-0rem)] w-[320px] bg-white z-[201] shadow-2xl transform transition-transform duration-500 ease-in-out flex flex-col ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
+        className={`fixed top-0 left-0 h-screen w-[320px] max-w-[88vw] bg-white z-[201] shadow-2xl transform transition-transform duration-500 ease-in-out flex flex-col overflow-hidden ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
         {/* 1. USER HEADER SECTION */}
         <div className="bg-zoop-obsidian p-8 flex items-center justify-between">
@@ -196,7 +196,7 @@ const MobileSidebar = ({ isOpen, onClose, categories = [], quickLinks = [] }) =>
         </div>
 
         {/* 3. FOOTER LOGOUT/LOGIN */}
-        <div className="p-4 border-t border-gray-50 bg-white">
+        <div className="border-t border-white/60 bg-gradient-to-t from-white via-white/95 to-white/80 p-4 backdrop-blur-xl">
           {!user ? (
             <Link
               to="/login"

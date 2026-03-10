@@ -106,8 +106,20 @@ const Payouts = () => {
               <tbody className="divide-y divide-gray-100">
                 {rows.map((row) => (
                   <tr key={row.id}>
-                    <td className="px-6 py-4 font-bold text-zoop-obsidian">{row.orderId}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{row.productId}</td>
+                    <td className="px-6 py-4">
+                      <p className="font-bold text-zoop-obsidian">
+                        {row.displayOrderId || row.orderId}
+                      </p>
+                      {row.customer?.name && (
+                        <p className="text-xs text-gray-500">{row.customer.name}</p>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-600">
+                      <p className="font-bold text-zoop-obsidian">
+                        {row.productTitle || row.productId}
+                      </p>
+                      <p className="text-xs text-gray-500">{row.productId}</p>
+                    </td>
                     <td className="px-6 py-4 font-bold tabular-nums">{fmtInr(row.grossAmount)}</td>
                     <td className="px-6 py-4 text-sm">
                       <span className="tabular-nums">{fmtInr(row.commissionAmount)}</span> ({row.commissionPercent}%)

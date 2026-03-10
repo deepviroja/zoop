@@ -3,26 +3,27 @@
 * {
   scroll-behavior: smooth;
   scrollbar-width: thin;
-  scrollbar-color: #c9c9c9 #f3f3f3;
+  scrollbar-color: #9fb774 rgba(251, 249, 247, 0.9);
 }
 
 *::-webkit-scrollbar {
-  width: 8px;
-  height: 0px;
+  width: 10px;
+  height: 10px;
 }
 
 *::-webkit-scrollbar-track {
-  background: #f3f3f3;
-  border-radius: 10px;
+  background: rgba(251, 249, 247, 0.85);
+  border-radius: 999px;
 }
 
 *::-webkit-scrollbar-thumb {
-  background: #c9c9c9;
-  border-radius: 10px;
+  background: linear-gradient(180deg, #a3e635 0%, #7b9261 100%);
+  border: 2px solid rgba(251, 249, 247, 0.85);
+  border-radius: 999px;
 }
 
 *::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+  background: linear-gradient(180deg, #8cd11b 0%, #667950 100%);
 }
 /* 1. THEME VARIABLES (Only Variables Here) */
 @theme {
@@ -45,9 +46,16 @@ body {
 }
 
 html,
+body,
 #root {
+  height: 100%;
   max-width: 100%;
   overflow-x: hidden;
+}
+
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #8ea664 transparent;
 }
 
 img,

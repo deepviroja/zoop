@@ -502,14 +502,25 @@ const Monetization = () => {
               <tbody className="divide-y divide-gray-100">
                 {payoutQueue.map((p) => (
                   <tr key={p.id}>
-                    <td className="px-6 py-4 font-bold text-zoop-obsidian">
-                      {p.id}
+                    <td className="px-6 py-4">
+                      <p className="font-bold text-zoop-obsidian">{p.id}</p>
+                      {p.transferRef && (
+                        <p className="text-xs text-gray-500">{p.transferRef}</p>
+                      )}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600">
-                      {p.sellerId}
+                      <p className="font-bold text-zoop-obsidian">
+                        {p.sellerName || p.sellerId}
+                      </p>
+                      <p className="text-xs text-gray-500">{p.sellerId}</p>
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600">
-                      {p.orderId}
+                      <p className="font-bold text-zoop-obsidian">
+                        {p.displayOrderId || p.orderId}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {p.productTitle || p.productId}
+                      </p>
                     </td>
                     <td className="px-6 py-4 font-black text-zoop-moss">
                       <span className="tabular-nums">{fmtInr(p.payoutAmount)}</span>
