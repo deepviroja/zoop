@@ -9,6 +9,7 @@ import { Heart } from "../../assets/icons/Heart";
 import { contentApi, ordersApi } from "../../services/api";
 import { productsApi } from "../../services/api";
 import ProductCard from "../../components/product/ProductCard";
+import { formatInrWithSymbol } from "../../utils/currency";
 
 const Cart = () => {
   const { cartItems, removeFromCart, updateQuantity, getCartTotal, clearCart } =
@@ -225,7 +226,10 @@ const Cart = () => {
                               {item.type || "Standard"}
                             </span>
                             <span className="text-[10px] text-gray-400 font-bold">
-                              ₹{(item.price || 0).toLocaleString()} / unit
+                              {formatInrWithSymbol(item.price || 0, {
+                                maximumFractionDigits: 0,
+                              })}{" "}
+                              / unit
                             </span>
                           </div>
                         </div>
@@ -246,7 +250,10 @@ const Cart = () => {
                       </div>
                       <div className="text-right shrink-0">
                         <p className="font-900 text-xl md:text-2xl text-zoop-obsidian">
-                          ₹{(item.price * item.quantity).toLocaleString()}
+                          {formatInrWithSymbol(
+                            Number(item.price || 0) * Number(item.quantity || 0),
+                            { maximumFractionDigits: 0 },
+                          )}
                         </p>
                         {item.quantity > 1 && (
                           <p className="text-[10px] text-gray-400 font-bold mt-1 uppercase">
@@ -368,7 +375,10 @@ const Cart = () => {
               </div>
               {discount > 0 && (
                 <p className="text-xs text-green-600 font-bold mt-2">
-                  ✓ Coupon applied! You saved ₹{discount}
+                  ✓ Coupon applied! You saved{" "}
+                  {formatInrWithSymbol(discount, {
+                    maximumFractionDigits: 0,
+                  })}
                 </p>
               )}
             </div>
@@ -380,7 +390,9 @@ const Cart = () => {
                   Subtotal ({cartItems.length} items)
                 </span>
                 <span className="font-black text-lg">
-                  ₹{subtotal.toLocaleString()}
+                  {formatInrWithSymbol(subtotal, {
+                    maximumFractionDigits: 0,
+                  })}
                 </span>
               </div>
 
@@ -389,7 +401,11 @@ const Cart = () => {
                   <span className="text-gray-600 font-medium">
                     Shipping (National)
                   </span>
-                  <span className="font-bold">₹{shipping}</span>
+                  <span className="font-bold">
+                    {formatInrWithSymbol(shipping, {
+                      maximumFractionDigits: 0,
+                    })}
+                  </span>
                 </div>
               )}
 
@@ -405,14 +421,20 @@ const Cart = () => {
 
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600 font-medium">Tax (5%)</span>
-                <span className="font-bold">₹{tax}</span>
+                <span className="font-bold">
+                  {formatInrWithSymbol(tax, {
+                    maximumFractionDigits: 0,
+                  })}
+                </span>
               </div>
 
               {discount > 0 && (
                 <div className="flex justify-between text-sm">
                   <span className="text-green-600 font-medium">Discount</span>
                   <span className="text-green-600 font-black">
-                    -₹{discount}
+                    -{formatInrWithSymbol(discount, {
+                      maximumFractionDigits: 0,
+                    })}
                   </span>
                 </div>
               )}
@@ -425,7 +447,9 @@ const Cart = () => {
                   Total Amount
                 </span>
                 <span className="text-3xl md:text-4xl font-900 text-zoop-obsidian">
-                  ₹{total.toLocaleString()}
+                  {formatInrWithSymbol(total, {
+                    maximumFractionDigits: 0,
+                  })}
                 </span>
               </div>
 

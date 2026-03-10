@@ -19,7 +19,7 @@ import {
 } from "../../utils/liveValidation";
 
 const CompleteProfile = () => {
-  const { user } = useUser();
+  const { user, refreshUser } = useUser();
   const { showToast } = useToast();
   const { brandName, replaceBrandText } = useSiteConfig();
   const navigate = useNavigate();
@@ -43,10 +43,10 @@ const CompleteProfile = () => {
     pincode: "",
   });
 
-  const redirectTo = useMemo(
-    () => location.state?.from || "/",
-    [location.state],
-  );
+  const redirectTo = useMemo(() => {
+    const nextPath = location.state?.from || "/";
+    return nextPath === "/complete-profile" ? "/" : nextPath;
+  }, [location.state]);
 
   useEffect(() => {
     let cancelled = false;
@@ -163,7 +163,11 @@ const CompleteProfile = () => {
         pincode: formData.pincode.trim(),
         defaultLocation: formData.city.trim(),
       });
-      showToast("Profile completed successfully", "success");
+      await refreshUser({
+        suppressMissingProfileToast: true,
+        suppressIncompleteProfileToast: true,
+      });
+      showToast("Profile created successfully", "success");
       navigate(redirectTo, { replace: true });
     } catch (error) {
       showToast(error?.message || "Could not save your profile", "error");
@@ -331,11 +335,6 @@ const CompleteProfile = () => {
                     {errors.pincode}
                   </p>
                 )}
-              </div>
-
-              <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-                Pending account state: the admin panel will no longer treat this
-                account as deleted while these fields are incomplete.
               </div>
 
               <button

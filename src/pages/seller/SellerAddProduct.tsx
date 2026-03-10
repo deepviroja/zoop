@@ -778,7 +778,7 @@ export const SellerAddProduct = () => {
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">Selling Price (₹) (Auto)</label>
+                                <label className="block text-sm font-bold text-gray-700 mb-2">Selling Price (Rs.) (Auto)</label>
                                 <input
                                     type="number"
                                     name="price"
@@ -790,7 +790,7 @@ export const SellerAddProduct = () => {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">MRP (₹) *</label>
+                                <label className="block text-sm font-bold text-gray-700 mb-2">MRP (Rs.) *</label>
                                 <input
                                     type="number"
                                     name="mrp"
@@ -855,7 +855,7 @@ export const SellerAddProduct = () => {
                                             <div key={variant.id} className="flex flex-col gap-2 rounded-xl border border-gray-100 bg-white p-3 md:flex-row md:items-center md:justify-between">
                                                 <div>
                                                     <p className="font-black text-zoop-obsidian">{variant.label}</p>
-                                                    <p className="text-xs text-gray-500">{variant.type}: {variant.value} • ₹{variant.price || formData.price || 0} • Stock {variant.stock || formData.stock || 0}</p>
+                                                    <p className="text-xs text-gray-500">{variant.type}: {variant.value} • Rs. {variant.price || formData.price || 0} • Stock {variant.stock || formData.stock || 0}</p>
                                                 </div>
                                                 <button type="button" onClick={() => removeVariantOption(variant.id)} className="text-xs font-black text-red-600">Remove</button>
                                             </div>

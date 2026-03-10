@@ -21,7 +21,7 @@ import { normalizeDocumentUrl } from "../../utils/documentLinks";
 
 const SellerProfile = () => {
   const location = useLocation();
-  const { user } = useUser();
+  const { user, refreshUser } = useUser();
   const { showToast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [activeTab, setActiveTab] = useState("profile");
@@ -139,7 +139,11 @@ const SellerProfile = () => {
         gstCertificateUrl: profileData.gstCertificateUrl,
         bio: profileData.bio,
       })
-      .then(() => {
+      .then(async () => {
+        await refreshUser({
+          suppressMissingProfileToast: true,
+          suppressIncompleteProfileToast: true,
+        });
         showToast("Seller profile updated", "success");
         setIsEditing(false);
       })

@@ -59,7 +59,7 @@ const SellerSubscription = () => {
               }`}
             >
               <h3 className="text-2xl font-black text-zoop-obsidian">{plan.name}</h3>
-              <p className="text-4xl font-black mt-3">₹{Number(plan.price || 0).toLocaleString("en-IN")}</p>
+              <p className="text-4xl font-black mt-3">Rs. {Number(plan.price || 0).toLocaleString("en-IN")}</p>
               <p className="text-xs text-gray-500 mt-1">{plan.durationDays || 30} days</p>
               <ul className="mt-4 space-y-2">
                 {(plan.features || []).map((feature, idx) => (
@@ -100,4 +100,3 @@ const SellerSubscription = () => {
 };
 
 export default SellerSubscription;
-

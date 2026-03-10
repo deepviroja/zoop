@@ -21,6 +21,31 @@ const statusColor = (s) =>
           ? "bg-red-100 text-red-700"
           : "bg-yellow-100 text-yellow-700";
 
+const getFriendlyDashboardError = (error) => {
+  const message = String(error?.message || "").trim();
+  const normalized = message.toLowerCase();
+
+  if (
+    normalized.includes("network") ||
+    normalized.includes("fetch") ||
+    normalized.includes("timeout") ||
+    normalized.includes("load failed")
+  ) {
+    return {
+      title: "Dashboard is taking longer than usual",
+      description:
+        "Your internet connection looks slow or the request is still finishing. Please wait a moment and retry.",
+      detail: message,
+    };
+  }
+
+  return {
+    title: "Error loading dashboard",
+    description: message || "We could not load the seller dashboard right now.",
+    detail: "",
+  };
+};
+
 const SellerDashboard = () => {
   const { user } = useUser();
   const navigate = useNavigate();
@@ -44,7 +69,7 @@ const SellerDashboard = () => {
         const d = await sellerApi.getDashboard();
         setData(d);
       } catch (e) {
-        setError(e.message);
+        setError(getFriendlyDashboardError(e));
       } finally {
         setLoading(false);
       }
@@ -64,7 +89,7 @@ const SellerDashboard = () => {
       const p = await productsApi.getAll({ sellerId: user?.uid || "" });
       setProducts(Array.isArray(p) ? p : []);
     } catch (e) {
-      setError(e.message);
+      setError(getFriendlyDashboardError(e));
     } finally {
       setTabLoading(false);
     }
@@ -119,7 +144,7 @@ const SellerDashboard = () => {
       setOrders(safeOrders);
       setSalesSeries(buildSalesSeries(safeOrders, timeRange));
     } catch (e) {
-      setError(e.message);
+      setError(getFriendlyDashboardError(e));
     } finally {
       setTabLoading(false);
     }
@@ -168,9 +193,14 @@ const SellerDashboard = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="bg-white p-8 rounded-2xl text-center max-w-md shadow">
           <p className="text-red-500 font-black text-lg mb-4">
-            Error loading dashboard
+            {error?.title || "Error loading dashboard"}
           </p>
-          <p className="text-gray-500 mb-6">{error}</p>
+          <p className="text-gray-500 mb-2">
+            {error?.description || "We could not load the seller dashboard right now."}
+          </p>
+          {error?.detail && (
+            <p className="mb-6 text-xs text-gray-400">{error.detail}</p>
+          )}
           <button
             onClick={() => window.location.reload()}
             className="px-6 py-3 bg-zoop-moss text-zoop-obsidian rounded-xl font-black"

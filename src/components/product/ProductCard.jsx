@@ -11,6 +11,7 @@ import { ShoppingCart } from "../../assets/icons/ShoppingCart";
 import StarRating from "./StarRating";
 import { optimizeCloudinaryUrl } from "../../utils/cloudinary";
 import { getDeliveryEstimate } from "../../utils/delivery";
+import { formatInrWithSymbol } from "../../utils/currency";
 
 const ProductCard = ({ product, view = "grid" }) => {
   const { addToCart, isInCart } = useCart();
@@ -188,15 +189,16 @@ const ProductCard = ({ product, view = "grid" }) => {
               <div>
                 <div className="flex items-baseline gap-2">
                   <span className="text-2xl font-black text-zoop-obsidian">
-                    ₹{(product.price || 0).toLocaleString()}
+                    {formatInrWithSymbol(product.price || 0, {
+                      maximumFractionDigits: 0,
+                    })}
                   </span>
                   {(product.mrp || product.originalPrice) &&
                     (product.mrp || product.originalPrice) > product.price && (
                       <span className="text-sm text-gray-400 line-through">
-                        ₹
-                        {(
-                          product.mrp || product.originalPrice
-                        ).toLocaleString()}
+                        {formatInrWithSymbol(product.mrp || product.originalPrice, {
+                          maximumFractionDigits: 0,
+                        })}
                       </span>
                     )}
                 </div>
@@ -369,12 +371,16 @@ const ProductCard = ({ product, view = "grid" }) => {
           <div className="flex items-center justify-between mt-3">
             <div className="flex items-baseline gap-2">
               <span className="text-xl font-black text-zoop-obsidian">
-                ₹{(product.price || 0).toLocaleString()}
+                {formatInrWithSymbol(product.price || 0, {
+                  maximumFractionDigits: 0,
+                })}
               </span>
               {(product.mrp || product.originalPrice) &&
                 (product.mrp || product.originalPrice) > product.price && (
                   <span className="text-sm text-gray-400 line-through">
-                    ₹{(product.mrp || product.originalPrice).toLocaleString()}
+                    {formatInrWithSymbol(product.mrp || product.originalPrice, {
+                      maximumFractionDigits: 0,
+                    })}
                   </span>
                 )}
             </div>
@@ -438,7 +444,9 @@ const ProductCard = ({ product, view = "grid" }) => {
                   {product.title || product.name}
                 </h3>
                 <p className="text-zoop-obsidian font-black text-xl mt-1">
-                  ₹{(product.price || 0).toLocaleString()}
+                  {formatInrWithSymbol(product.price || 0, {
+                    maximumFractionDigits: 0,
+                  })}
                 </p>
               </div>
             </div>

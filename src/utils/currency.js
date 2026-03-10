@@ -15,4 +15,4 @@ export const formatInr = (value, options = {}) => {
 };
 
 export const formatInrWithSymbol = (value, options = {}) =>
-  `₹${formatInr(value, options)}`;
+  `Rs. ${formatInr(value, options)}`;

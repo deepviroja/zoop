@@ -72,6 +72,7 @@ const AdminLayout = lazy(() => import("./layouts/AdminLayout"));
 const AdminStats = lazy(() => import("./pages/admin/AdminStats"));
 const VerifySellers = lazy(() => import("./pages/admin/VerifySellers"));
 const ContentCuration = lazy(() => import("./pages/admin/ContentCuration"));
+const AdminOrders = lazy(() => import("./pages/admin/AdminOrders"));
 const SupportTickets = lazy(() => import("./pages/admin/SupportTickets"));
 const Monetization = lazy(() => import("./pages/admin/Monetization"));
 const UserManagement = lazy(() => import("./pages/admin/UserManagement"));
@@ -226,6 +227,7 @@ function App() {
               <Route index element={<AdminStats />} />
               <Route path="verify" element={<VerifySellers />} />
               <Route path="contentcuration" element={<ContentCuration />} />
+              <Route path="orders" element={<AdminOrders />} />
               <Route path="website-control" element={<AdminWebsiteControl />} />
               <Route path="ads" element={<AdminAdsManagement />} />
               <Route path="subscriptions" element={<AdminSubscriptionManagement />} />

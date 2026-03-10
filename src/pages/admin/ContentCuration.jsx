@@ -5,9 +5,10 @@ import { Eye } from '../../assets/icons/Eye';
 import { adminApi } from '../../services/api';
 import { useToast } from '../../context/ToastContext';
 import StarRating from '../../components/product/StarRating';
+import { formatInrWithSymbol } from '../../utils/currency';
 
 const ContentCuration = () => {
-  const [filter, setFilter] = useState('all'); // all, pending, approved, rejected
+  const [filter, setFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
 
   const [products, setProducts] = useState([]);
@@ -35,30 +36,46 @@ const ContentCuration = () => {
     pending: products.filter(p => (p.moderationStatus || 'pending') === 'pending').length,
     approved: products.filter(p => p.moderationStatus === 'approved').length,
     rejected: products.filter(p => p.moderationStatus === 'rejected').length,
+    removed: products.filter(p => p.moderationStatus === 'removed').length,
     total: products.length,
   };
 
-  const handleApprove = (productId) => {
-    adminApi.updateProductModeration(productId, 'approved')
+  const updateModeration = (productId, moderationStatus, moderationNote = '') => {
+    adminApi.updateProductModeration(productId, moderationStatus, moderationNote)
       .then(() => {
-        setProducts((prev) => prev.map((p) => p.id === productId ? { ...p, moderationStatus: 'approved' } : p));
-        showToast('Product approved', 'success');
+        setProducts((prev) =>
+          prev.map((p) =>
+            p.id === productId
+              ? { ...p, moderationStatus, moderationNote }
+              : p,
+          ),
+        );
+        showToast(
+          moderationStatus === 'approved'
+            ? 'Product approved'
+            : moderationStatus === 'removed'
+              ? 'Product removed from catalog'
+              : 'Product moderation updated',
+          moderationStatus === 'approved' ? 'success' : 'warning',
+        );
       })
-      .catch((e) => showToast(e?.message || 'Failed to approve product', 'error'));
+      .catch((e) => showToast(e?.message || 'Failed to update product moderation', 'error'));
+  };
+
+  const handleApprove = (productId) => {
+    updateModeration(productId, 'approved');
   };
 
   const handleReject = (productId) => {
     const reason = prompt('Reason for rejection:');
     if (reason) {
-      adminApi.updateProductModeration(productId, 'rejected', reason)
-        .then(() => {
-          setProducts((prev) =>
-            prev.map((p) => (p.id === productId ? { ...p, moderationStatus: 'rejected', moderationNote: reason } : p)),
-          );
-          showToast('Product rejected', 'warning');
-        })
-        .catch((e) => showToast(e?.message || 'Failed to reject product', 'error'));
+      updateModeration(productId, 'rejected', reason);
     }
+  };
+
+  const handleRemove = (productId) => {
+    const reason = prompt('Reason for removal (optional):') || '';
+    updateModeration(productId, 'removed', reason);
   };
 
   return (
@@ -84,7 +101,7 @@ const ContentCuration = () => {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
           <div className="bg-white rounded-2xl p-6 shadow-sm">
             <p className="text-gray-500 text-sm font-medium mb-1">Pending Review</p>
             <p className="text-3xl font-black text-orange-500">{stats.pending}</p>
@@ -98,6 +115,10 @@ const ContentCuration = () => {
             <p className="text-3xl font-black text-red-500">{stats.rejected}</p>
           </div>
           <div className="bg-white rounded-2xl p-6 shadow-sm">
+            <p className="text-gray-500 text-sm font-medium mb-1">Removed</p>
+            <p className="text-3xl font-black text-gray-700">{stats.removed}</p>
+          </div>
+          <div className="bg-white rounded-2xl p-6 shadow-sm">
             <p className="text-gray-500 text-sm font-medium mb-1">Total Products</p>
             <p className="text-3xl font-black text-zoop-obsidian">{stats.total}</p>
           </div>
@@ -105,7 +126,7 @@ const ContentCuration = () => {
 
         {/* Filter Tabs */}
         <div className="bg-white rounded-2xl p-2 shadow-sm flex gap-2">
-          {['all', 'pending', 'approved', 'rejected'].map((tab) => (
+          {['all', 'pending', 'approved', 'rejected', 'removed'].map((tab) => (
             <button
               key={tab}
               onClick={() => setFilter(tab)}
@@ -159,7 +180,11 @@ const ContentCuration = () => {
 
                 <div className="flex items-center justify-between mb-3">
                   <StarRating rating={Number(product.rating) || 0} totalReviews={Number(product.ratingCount) || 0} size={12} />
-                  <p className="font-black text-zoop-obsidian">₹{(product.price || 0).toLocaleString()}</p>
+                  <p className="font-black text-zoop-obsidian">
+                    {formatInrWithSymbol(product.price || 0, {
+                      maximumFractionDigits: 0,
+                    })}
+                  </p>
                 </div>
 
                 <div className="space-y-2 mb-4 pb-4 border-b border-gray-100">
@@ -206,12 +231,28 @@ const ContentCuration = () => {
                       </button>
                     </>
                   )}
-                  {product.moderationStatus === 'rejected' && (
+                  {product.moderationStatus === 'approved' && (
+                    <>
+                      <button
+                        onClick={() => handleReject(product.id)}
+                        className="flex-1 bg-amber-500 hover:bg-amber-600 text-white py-2.5 rounded-lg font-bold text-sm transition-all"
+                      >
+                        Reject
+                      </button>
+                      <button
+                        onClick={() => handleRemove(product.id)}
+                        className="flex-1 bg-gray-900 hover:bg-black text-white py-2.5 rounded-lg font-bold text-sm transition-all"
+                      >
+                        Remove
+                      </button>
+                    </>
+                  )}
+                  {(product.moderationStatus === 'rejected' || product.moderationStatus === 'removed') && (
                     <button
                       onClick={() => handleApprove(product.id)}
                       className="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-2.5 rounded-lg font-bold text-sm transition-all"
                     >
-                      Re-review
+                      Re-approve
                     </button>
                   )}
                   <button

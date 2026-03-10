@@ -94,7 +94,7 @@ const AdminSubscriptionManagement = () => {
               <h3 className="text-lg font-black text-zoop-obsidian">{plan.name}</h3>
               <span className="text-xs font-black text-gray-400">{plan.durationDays} days</span>
             </div>
-            <p className="text-2xl font-black mt-2">₹{Number(plan.price || 0).toLocaleString("en-IN")}</p>
+            <p className="text-2xl font-black mt-2">Rs. {Number(plan.price || 0).toLocaleString("en-IN")}</p>
             <p className="text-xs text-gray-500 mt-1">Sidebar Color: {plan.sidebarColor || "-"}</p>
             <ul className="mt-3 space-y-1">
               {(plan.features || []).map((f, idx) => (
@@ -111,4 +111,3 @@ const AdminSubscriptionManagement = () => {
 };
 
 export default AdminSubscriptionManagement;
-

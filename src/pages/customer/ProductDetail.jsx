@@ -20,6 +20,7 @@ import { optimizeCloudinaryUrl } from "../../utils/cloudinary";
 import Seo from "../../components/shared/Seo";
 import { getDeliveryEstimate } from "../../utils/delivery";
 import { useSiteConfig } from "../../context/SiteConfigContext";
+import { formatInrWithSymbol } from "../../utils/currency";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -473,19 +474,26 @@ const ProductDetail = () => {
             <div className="pb-6 border-b border-gray-200">
               <div className="flex items-baseline gap-3">
                 <span className="text-4xl font-900 text-zoop-obsidian">
-                  ₹{(product.price || 0).toLocaleString()}
+                  {formatInrWithSymbol(product.price || 0, {
+                    maximumFractionDigits: 0,
+                  })}
                 </span>
                 {product.originalPrice &&
                   product.originalPrice > product.price && (
                     <>
                       <span className="text-xl text-gray-400 line-through">
-                        ₹{(product.originalPrice || 0).toLocaleString()}
+                        {formatInrWithSymbol(product.originalPrice || 0, {
+                          maximumFractionDigits: 0,
+                        })}
                       </span>
                       <span className="text-green-600 font-black text-sm">
-                        Save ₹
-                        {(
-                          product.originalPrice - product.price
-                        ).toLocaleString()}
+                        Save{" "}
+                        {formatInrWithSymbol(
+                          product.originalPrice - product.price,
+                          {
+                            maximumFractionDigits: 0,
+                          },
+                        )}
                       </span>
                     </>
                   )}
@@ -648,7 +656,9 @@ const ProductDetail = () => {
                             {item.title || item.name}
                           </p>
                           <p className="mt-1 text-sm text-gray-500">
-                            ₹{Number(item.price || 0).toLocaleString("en-IN")}
+                            {formatInrWithSymbol(item.price || 0, {
+                              maximumFractionDigits: 0,
+                            })}
                           </p>
                         </div>
                         {index < comboProducts.length - 1 && (
@@ -662,7 +672,11 @@ const ProductDetail = () => {
                       <p className="text-xs font-black uppercase tracking-[0.24em] text-zoop-moss">
                         Bundle total
                       </p>
-                      <p className="text-2xl font-black">₹{comboTotal.toLocaleString("en-IN")}</p>
+                      <p className="text-2xl font-black">
+                        {formatInrWithSymbol(comboTotal, {
+                          maximumFractionDigits: 0,
+                        })}
+                      </p>
                     </div>
                     <button
                       type="button"

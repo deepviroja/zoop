@@ -4,6 +4,7 @@ import { Filter } from "../../assets/icons/Filter";
 import { X } from "../../assets/icons/X";
 import { ChevronDown } from "../../assets/icons/ChevronDown";
 import AdBanner from "../shared/AdBanner";
+import { formatInrWithSymbol } from "../../utils/currency";
 
 const ProductFilterSidebar = ({
   showFilters,
@@ -42,7 +43,7 @@ const ProductFilterSidebar = ({
       lg:block lg:w-[19rem] xl:w-[20.5rem] flex-shrink-0
       ${
         showFilters
-          ? "fixed inset-0 z-[100] bg-black/45 backdrop-blur-[2px] lg:relative lg:z-0 lg:bg-transparent lg:backdrop-blur-none"
+          ? "fixed inset-0 z-40 bg-black/45 backdrop-blur-[2px] lg:relative lg:z-0 lg:bg-transparent lg:backdrop-blur-none"
           : "hidden"
       }
     `}
@@ -50,7 +51,7 @@ const ProductFilterSidebar = ({
       <div
         ref={sidebarRef}
         className={`ml-auto flex h-full w-full max-w-[24rem] flex-col overflow-hidden bg-white px-4 pb-0 pt-4 shadow-xl lg:sticky lg:max-w-none lg:rounded-[1.75rem] lg:border lg:border-[#e7dfd4] lg:bg-white/95 lg:px-5 lg:pb-5 lg:pt-5 lg:shadow-[0_18px_42px_rgba(41,32,18,0.08)] lg:backdrop-blur-xl lg:max-h-[calc(100vh-7rem)] custom-scrollbar transition-[top] duration-300 ${
-          headerVisible ? "lg:top-32" : "lg:top-20"
+          headerVisible ? "lg:top-24" : "lg:top-6"
         }`}
       >
         {/* Mobile Header */}
@@ -221,8 +222,12 @@ const ProductFilterSidebar = ({
                   className="w-full accent-zoop-obsidian"
                 />
                 <div className="flex justify-between text-xs text-gray-500">
-                  <span>₹0</span>
-                  <span>₹{maxPrice?.toLocaleString()}</span>
+                  <span>{formatInrWithSymbol(0, { maximumFractionDigits: 0 })}</span>
+                  <span>
+                    {formatInrWithSymbol(maxPrice || 0, {
+                      maximumFractionDigits: 0,
+                    })}
+                  </span>
                 </div>
               </div>
             )}

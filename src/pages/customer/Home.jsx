@@ -5,10 +5,6 @@ import { ChevronRight } from "../../assets/icons/ChevronRight";
 import { Zap } from "../../assets/icons/Zap";
 import { Shoe } from "../../assets/icons/Shoe";
 import { Dress } from "../../assets/icons/Dress";
-import { Globe } from "../../assets/icons/Globe";
-import { ShieldCheck } from "../../assets/icons/ShieldCheck";
-import { TrendingUp } from "../../assets/icons/TrendingUp";
-import { Store } from "../../assets/icons/Store";
 import { useUser } from "../../context/UserContext";
 import ProductCard from "../../components/product/ProductCard";
 import AdBanner from "../../components/shared/AdBanner";
@@ -17,6 +13,7 @@ import { optimizeCloudinaryUrl } from "../../utils/cloudinary";
 import Seo from "../../components/shared/Seo";
 import { normalizeCityName } from "../../utils/cityMapping";
 import { useSiteConfig } from "../../context/SiteConfigContext";
+import { formatInrWithSymbol } from "../../utils/currency";
 import men_cat from "../../assets/images/men_cat.png";
 import women_cat from "../../assets/images/women_cat.png";
 import kids_cat from "../../assets/images/kids_cat.png";
@@ -51,7 +48,7 @@ const Home = () => {
   const [contentLoading, setContentLoading] = useState(true);
   const [productsLoading, setProductsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { siteConfig, brandName, replaceBrandText } = useSiteConfig();
+  const { siteConfig, brandName } = useSiteConfig();
 
   // Fetch all dynamic content in parallel
   const fetchContent = useCallback(async () => {
@@ -252,36 +249,6 @@ const Home = () => {
   }, [products]);
 
   const activeSlide = heroSlides[currentSlide] || {};
-  const sameDayCutoffText =
-    siteConfig?.homeSameDayCutoffText || "Order before 6 PM for same-day delivery";
-  const techHighlights = [
-    {
-      icon: Zap,
-      title: sameDayCutoffText,
-      description: `Fast-routing inventory for ${localCity} shoppers.`,
-    },
-    {
-      icon: Globe,
-      title: "Responsive by default",
-      description: "Layouts stay centered and usable across small and large screens.",
-    },
-    {
-      icon: ShieldCheck,
-      title: "Profile-complete accounts",
-      description: "Pending users finish setup before they reach carts, orders, or admin-sensitive flows.",
-    },
-    {
-      icon: Store,
-      title: "Seller-first operations",
-      description: "Verified sellers, controlled uploads, and better panel alignment.",
-    },
-    {
-      icon: TrendingUp,
-      title: "Clean inventory signals",
-      description: "Broken images fall back safely instead of leaving blank product cards.",
-    },
-  ];
-
   if (error) {
     return (
       <div className="min-h-[50vh] flex flex-col items-center justify-center p-8 text-center">
@@ -591,7 +558,9 @@ const Home = () => {
                     <span className="font-black text-lg">Rs. {Number(product.price || 0).toLocaleString("en-IN")}</span>
                     {product.mrp && product.mrp > product.price && (
                       <span className="text-xs text-gray-400 line-through">
-                        ₹{product.mrp}
+                        {formatInrWithSymbol(product.mrp, {
+                          maximumFractionDigits: 0,
+                        })}
                       </span>
                     )}
                   </div>
@@ -691,11 +660,18 @@ const Home = () => {
                     </h4>
                     <div className="flex items-center gap-2 mt-1">
                       <span className="text-lg font-black text-zoop-obsidian">
-                        Rs. {Number(product.price || 0).toLocaleString("en-IN")}
+                        {formatInrWithSymbol(product.price || 0, {
+                          maximumFractionDigits: 0,
+                        })}
                       </span>
                       {(product.mrp || product.originalPrice) && (
                         <span className="text-xs text-gray-400 line-through">
-                          Rs. {Number(product.mrp || product.originalPrice || 0).toLocaleString("en-IN")}
+                          {formatInrWithSymbol(
+                            product.mrp || product.originalPrice || 0,
+                            {
+                              maximumFractionDigits: 0,
+                            },
+                          )}
                         </span>
                       )}
                       {product.discountPercent > 0 && (
@@ -711,40 +687,6 @@ const Home = () => {
           </div>
         </section>
       )}
-      <section className="relative overflow-hidden rounded-[2rem] border border-[#ddd6c8] bg-[linear-gradient(135deg,#fffdf8,#f6f2e8)] px-4 py-6 shadow-[0_16px_40px_rgba(26,26,26,0.07)] sm:px-6 md:px-8">
-        <div className="absolute inset-0 opacity-[0.08]" style={{ backgroundImage: "radial-gradient(circle at 20% 20%, #a3e635 0, transparent 26%), radial-gradient(circle at 80% 80%, #a65e46 0, transparent 18%)" }} />
-        <div className="relative z-10">
-          <div className="mx-auto max-w-3xl text-center">
-            <p className="text-[11px] font-black uppercase tracking-[0.28em] text-zoop-copper">
-              {replaceBrandText("Why Zoop feels cleaner now")}
-            </p>
-            <h2 className="mt-3 text-2xl font-black tracking-tight text-zoop-obsidian md:text-4xl">
-              {replaceBrandText("A sharper marketplace shell for Zoop users and admins")}
-            </h2>
-          </div>
-          <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
-            {techHighlights.map((item) => {
-              const Icon = item.icon;
-              return (
-                <article
-                  key={item.title}
-                  className="rounded-[1.4rem] border border-white/80 bg-white/80 p-4 text-center shadow-sm backdrop-blur"
-                >
-                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-zoop-obsidian text-zoop-moss">
-                    <Icon width={22} height={22} />
-                  </div>
-                  <h3 className="mt-4 text-sm font-black uppercase tracking-[0.12em] text-zoop-obsidian">
-                    {item.title}
-                  </h3>
-                  <p className="mt-2 text-sm leading-6 text-gray-600">
-                    {item.description}
-                  </p>
-                </article>
-              );
-            })}
-          </div>
-        </div>
-      </section>
       <section className="space-y-4">
         <AdBanner type="horizontal" slotId="home_bottom" />
       </section>

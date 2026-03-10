@@ -177,7 +177,7 @@ const AdminAdsManagement = () => {
                     {slot.id} • {slot.placement}
                   </p>
                   <p className="text-xs text-gray-500 mt-1">
-                    Price: ₹{Number(slot.price || 0).toLocaleString("en-IN")}{" "}
+                    Price: Rs. {Number(slot.price || 0).toLocaleString("en-IN")}{" "}
                     {slot.active ? "• Active" : "• Inactive"}
                   </p>
                 </div>
@@ -301,8 +301,8 @@ const AdminAdsManagement = () => {
                     {ad.active ? "active" : "inactive"}
                   </p>
                   <p className="text-xs text-gray-500 mt-1">
-                    Paid: ₹{Number(ad.paidAmount || 0).toLocaleString("en-IN")}{" "}
-                    / Required: ₹
+                    Paid: Rs. {Number(ad.paidAmount || 0).toLocaleString("en-IN")}{" "}
+                    / Required: Rs.
                     {Number(ad.requiredAmount || 0).toLocaleString("en-IN")}
                   </p>
                   <div className="flex flex-wrap gap-2 mt-2">

@@ -31,6 +31,7 @@ import { ChevronRight } from "../assets/icons/ChevronRight";
 import { User } from "../assets/icons/User";
 import { LogOut } from "../assets/icons/LogOut";
 import { useSiteConfig } from "../context/SiteConfigContext";
+import { formatInrWithSymbol } from "../utils/currency";
 
 const CustomerLayout = () => {
   const { location, updateLocation, isLoading, user, logout } = useUser();
@@ -396,8 +397,10 @@ const CustomerLayout = () => {
                               {product.title || product.name}
                             </p>
                             <p className="text-xs text-gray-500 truncate">
-                              {product.brand || brandName} • ₹
-                              {(product.price || 0).toLocaleString()}
+                              {product.brand || brandName} •{" "}
+                              {formatInrWithSymbol(product.price || 0, {
+                                maximumFractionDigits: 0,
+                              })}
                             </p>
                           </div>
                           <ChevronRight
@@ -768,7 +771,9 @@ const CustomerLayout = () => {
                           </p>
                           <div className="flex items-center gap-2">
                             <span className="text-zoop-obsidian font-black text-sm">
-                              ₹{(product.price || 0).toLocaleString()}
+                              {formatInrWithSymbol(product.price || 0, {
+                                maximumFractionDigits: 0,
+                              })}
                             </span>
                             {Number(product.stock || 0) > 0 && (
                               <span className="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-bold">

@@ -9,6 +9,7 @@ import { Wallet } from "../assets/icons/Wallet";
 import { Users } from "../assets/icons/Users";
 import { Store } from "../assets/icons/Store";
 import { User } from "../assets/icons/User";
+import { ShoppingCart } from "../assets/icons/ShoppingCart";
 import { NavLink, Outlet, Link } from "react-router-dom";
 
 import { useNavigate } from "react-router-dom";
@@ -63,6 +64,7 @@ const AdminLayout = () => {
     { to: "/admin", label: "Stats", icon: LayoutDashboard, end: true },
     { to: "/admin/verify", label: "Verify Sellers", icon: ShieldCheck },
     { to: "/admin/contentcuration", label: "Content Curation", icon: FileText },
+    { to: "/admin/orders", label: "Orders", icon: ShoppingCart },
     { to: "/admin/website-control", label: "Website Control", icon: Globe },
     { to: "/admin/ads", label: "Ads", icon: Activity },
     { to: "/admin/subscriptions", label: "Subscriptions", icon: Zap },

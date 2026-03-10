@@ -87,7 +87,7 @@ const SellerAds = () => {
           {slots.length === 0 && <option value="home_top">Home Top</option>}
           {slots.map((slot) => (
             <option key={slot.id} value={slot.id}>
-              {slot.name} ({slot.placement}) - ₹{Number(slot.price || 0).toLocaleString("en-IN")}
+              {slot.name} ({slot.placement}) - Rs. {Number(slot.price || 0).toLocaleString("en-IN")}
             </option>
           ))}
         </select>
@@ -144,7 +144,7 @@ const SellerAds = () => {
                   Slot: {ad.slotId} • Status: {ad.status} • {ad.active ? "Active" : "Inactive"}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
-                  Paid: ₹{Number(ad.paidAmount || 0).toLocaleString("en-IN")} / Required: ₹
+                  Paid: Rs. {Number(ad.paidAmount || 0).toLocaleString("en-IN")} / Required: Rs.
                   {Number(ad.requiredAmount || 0).toLocaleString("en-IN")}
                 </p>
                 {ad.mediaUrl && (

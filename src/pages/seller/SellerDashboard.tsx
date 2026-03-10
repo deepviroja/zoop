@@ -118,7 +118,7 @@ const SellerDashboard = () => {
                             </div>
                         </div>
                         <p className="text-white/80 text-sm font-medium mb-1">Total Sales</p>
-                        <h3 className="text-3xl font-black">₹{(stats.revenue / 1000).toFixed(1)}k</h3>
+                        <h3 className="text-3xl font-black">Rs. {(stats.revenue / 1000).toFixed(1)}k</h3>
                     </div>
 
                     <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 text-white shadow-lg">
@@ -186,7 +186,7 @@ const SellerDashboard = () => {
                                             }}
                                         >
                                             <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-black opacity-0 group-hover:opacity-100 transition-opacity">
-                                                ₹{data.sales}k
+                                                Rs. {data.sales}k
                                             </span>
                                         </div>
                                     </div>

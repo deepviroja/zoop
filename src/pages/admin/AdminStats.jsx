@@ -25,8 +25,94 @@ const Skeleton = ({ className = "" }) => (
 const statValueClass =
   "break-words text-[clamp(1.9rem,2vw,2.45rem)] font-black leading-none tracking-tight tabular-nums";
 
+const buildProductInsights = (products, orders) => {
+  const metricsByProduct = {};
+
+  (orders || []).forEach((order) => {
+    (order.items || []).forEach((item) => {
+      if (!item?.productId) return;
+      if (!metricsByProduct[item.productId]) {
+        metricsByProduct[item.productId] = {
+          quantitySold: 0,
+          revenue: 0,
+          orderCount: 0,
+        };
+      }
+      metricsByProduct[item.productId].quantitySold += Number(item.quantity || 0);
+      metricsByProduct[item.productId].revenue +=
+        Number(item.price || 0) * Number(item.quantity || 0);
+      metricsByProduct[item.productId].orderCount += 1;
+    });
+  });
+
+  const rankedProducts = (products || []).map((product) => {
+    const metrics = metricsByProduct[product.id] || {
+      quantitySold: 0,
+      revenue: 0,
+      orderCount: 0,
+    };
+    return {
+      ...product,
+      quantitySold: metrics.quantitySold,
+      revenue: metrics.revenue,
+      orderCount: metrics.orderCount,
+      ratingCount: Number(product.ratingCount || 0),
+      rating: Number(product.rating || 0),
+      trendScore:
+        metrics.quantitySold * 5 +
+        Number(product.ratingCount || 0) * 3 +
+        Number(product.rating || 0),
+    };
+  });
+
+  const nonZeroSales =
+    rankedProducts.filter((product) => product.quantitySold > 0).length > 0
+      ? rankedProducts.filter((product) => product.quantitySold > 0)
+      : rankedProducts;
+
+  return [
+    {
+      id: "trending",
+      label: "Trending",
+      metricLabel: "Trend score",
+      items: [...rankedProducts]
+        .sort((a, b) => b.trendScore - a.trendScore)
+        .slice(0, 4),
+      metricValue: (item) => item.trendScore.toLocaleString(),
+    },
+    {
+      id: "most-bought",
+      label: "Most Bought",
+      metricLabel: "Units sold",
+      items: [...rankedProducts]
+        .sort((a, b) => b.quantitySold - a.quantitySold)
+        .slice(0, 4),
+      metricValue: (item) => item.quantitySold.toLocaleString(),
+    },
+    {
+      id: "less-bought",
+      label: "Less Bought",
+      metricLabel: "Units sold",
+      items: [...nonZeroSales]
+        .sort((a, b) => a.quantitySold - b.quantitySold)
+        .slice(0, 4),
+      metricValue: (item) => item.quantitySold.toLocaleString(),
+    },
+    {
+      id: "most-reviewed",
+      label: "Most Reviews",
+      metricLabel: "Reviews",
+      items: [...rankedProducts]
+        .sort((a, b) => b.ratingCount - a.ratingCount)
+        .slice(0, 4),
+      metricValue: (item) => item.ratingCount.toLocaleString(),
+    },
+  ];
+};
+
 const AdminStats = () => {
   const [analytics, setAnalytics] = useState(null);
+  const [productInsights, setProductInsights] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [timeRange, setTimeRange] = useState("week");
@@ -35,8 +121,18 @@ const AdminStats = () => {
     const load = async () => {
       try {
         setLoading(true);
-        const data = await adminApi.getAnalytics({ range: timeRange });
+        const [data, ordersResponse, productsResponse] = await Promise.all([
+          adminApi.getAnalytics({ range: timeRange }),
+          adminApi.getAllOrders({ limit: "500" }),
+          adminApi.getProductsForCuration(),
+        ]);
         setAnalytics(data);
+        setProductInsights(
+          buildProductInsights(
+            Array.isArray(productsResponse) ? productsResponse : [],
+            Array.isArray(ordersResponse?.orders) ? ordersResponse.orders : [],
+          ),
+        );
       } catch (e) {
         setError(e.message);
       } finally {
@@ -387,6 +483,59 @@ const AdminStats = () => {
               </div>
             )}
           </div>
+        </div>
+
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+          {productInsights.map((group) => (
+            <div key={group.id} className="bg-white rounded-2xl p-6 shadow-sm">
+              <div className="flex items-center justify-between mb-5">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-widest text-gray-400">
+                    Product Signals
+                  </p>
+                  <h2 className="text-xl font-black text-zoop-obsidian mt-1">
+                    {group.label}
+                  </h2>
+                </div>
+                <Link
+                  to="/admin/contentcuration"
+                  className="text-xs font-bold text-zoop-moss hover:underline"
+                >
+                  View Products
+                </Link>
+              </div>
+              {loading ? (
+                <div className="space-y-3">
+                  {[0, 1, 2, 3].map((idx) => (
+                    <Skeleton key={idx} className="h-16" />
+                  ))}
+                </div>
+              ) : group.items.length > 0 ? (
+                <div className="space-y-3">
+                  {group.items.map((item) => (
+                    <div key={item.id} className="rounded-xl bg-gray-50 p-4">
+                      <p className="font-black text-zoop-obsidian line-clamp-2">
+                        {item.name || item.title}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {item.brand || "Brand"} • {item.category || item.categoryId || "Category"}
+                      </p>
+                      <div className="mt-3 flex items-center justify-between text-xs font-bold text-gray-600">
+                        <span>
+                          {group.metricLabel}: {group.metricValue(item)}
+                        </span>
+                        <span>
+                          Revenue: {formatInr(item.revenue || 0, { maximumFractionDigits: 0 })}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-gray-400">No product signals available yet.</p>
+              )}
+            </div>
+          ))}
         </div>
       </div>
     </div>

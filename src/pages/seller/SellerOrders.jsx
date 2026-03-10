@@ -345,7 +345,7 @@ const SellerOrders = () => {
                           <cfg.icon width={14} height={14} /> {cfg.label}
                         </span>
                         <p className="font-black text-xl text-zoop-obsidian">
-                          ₹{(order.totalAmount || 0).toLocaleString()}
+                          Rs. {(order.totalAmount || 0).toLocaleString()}
                         </p>
                         <span className="text-gray-400 text-sm">
                           {isExpanded ? "▲" : "▼"}
@@ -400,7 +400,7 @@ const SellerOrders = () => {
                                   {(item.product?.sku || item.productId)
                                     ? `ID: ${item.product?.sku || item.productId} • `
                                     : ""}
-                                  Qty: {item.quantity} × ₹{item.price}
+                                  Qty: {item.quantity} × Rs. {item.price}
                                 </p>
                                 {(item.seller?.displayName || item.seller?.businessName) && (
                                   <p className="text-[11px] text-gray-500 mt-1">
@@ -454,7 +454,7 @@ const SellerOrders = () => {
                                 )}
                               </div>
                               <p className="font-black text-zoop-obsidian">
-                                ₹{(item.price * item.quantity).toLocaleString()}
+                                Rs. {(item.price * item.quantity).toLocaleString()}
                               </p>
                             </div>
                           ))}

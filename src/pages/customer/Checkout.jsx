@@ -16,6 +16,7 @@ import {
   getPincodeValidationMessage,
 } from "../../utils/liveValidation";
 import { getCountryByCode, getStateByCodeAndCountry, getStatesOfCountry } from "../../utils/locationData";
+import { formatInrWithSymbol } from "../../utils/currency";
 
 const RAZORPAY_CHECKOUT_SRC = "https://checkout.razorpay.com/v1/checkout.js";
 
@@ -454,7 +455,9 @@ const Checkout = () => {
             <div className="flex justify-between items-center">
               <span className="text-sm text-gray-600">Total Amount</span>
               <span className="text-2xl font-900 text-zoop-moss">
-                ₹{finalTotal.toLocaleString()}
+                {formatInrWithSymbol(finalTotal, {
+                  maximumFractionDigits: 0,
+                })}
               </span>
             </div>
           </div>
@@ -861,7 +864,9 @@ const Checkout = () => {
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Subtotal</span>
                   <span className="font-bold">
-                    ₹{subtotal.toLocaleString()}
+                    {formatInrWithSymbol(subtotal, {
+                      maximumFractionDigits: 0,
+                    })}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
@@ -870,18 +875,28 @@ const Checkout = () => {
                     {shipping === 0 ? (
                       <span className="text-green-600">FREE</span>
                     ) : (
-                      `₹${shipping}`
+                      formatInrWithSymbol(shipping, {
+                        maximumFractionDigits: 0,
+                      })
                     )}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Tax (5%)</span>
-                  <span className="font-bold">₹{tax}</span>
+                  <span className="font-bold">
+                    {formatInrWithSymbol(tax, {
+                      maximumFractionDigits: 0,
+                    })}
+                  </span>
                 </div>
                 {selectedOfferDiscount > 0 && (
                   <div className="flex justify-between text-sm text-green-700">
                     <span>{selectedOffer?.title || "Offer"} discount</span>
-                    <span className="font-bold">-₹{selectedOfferDiscount.toLocaleString()}</span>
+                    <span className="font-bold">
+                      -{formatInrWithSymbol(selectedOfferDiscount, {
+                        maximumFractionDigits: 0,
+                      })}
+                    </span>
                   </div>
                 )}
               </div>
@@ -931,8 +946,16 @@ const Checkout = () => {
                             </p>
                             <p className="text-xs text-gray-500">{offer.description}</p>
                             <p className="mt-1 text-[11px] font-bold uppercase tracking-wider text-[#8b5e3c]">
-                              {offer.discountType === "flat" ? `Flat ₹${offer.discountValue}` : `${offer.discountValue}% off`} on {offer.scope || "order"}
-                              {offer.minOrderAmount ? ` • Min ₹${offer.minOrderAmount}` : ""}
+                              {offer.discountType === "flat"
+                                ? `Flat ${formatInrWithSymbol(offer.discountValue, {
+                                    maximumFractionDigits: 0,
+                                  })}`
+                                : `${offer.discountValue}% off`} on {offer.scope || "order"}
+                              {offer.minOrderAmount
+                                ? ` • Min ${formatInrWithSymbol(offer.minOrderAmount, {
+                                    maximumFractionDigits: 0,
+                                  })}`
+                                : ""}
                             </p>
                           </div>
                         </label>
@@ -945,7 +968,9 @@ const Checkout = () => {
               <div className="flex justify-between items-center pt-4">
                 <span className="text-sm font-bold text-gray-600">Total</span>
                 <span className="text-2xl font-900 text-zoop-obsidian">
-                  ₹{currentTotal.toLocaleString()}
+                  {formatInrWithSymbol(currentTotal, {
+                    maximumFractionDigits: 0,
+                  })}
                 </span>
               </div>
 
@@ -987,7 +1012,10 @@ const Checkout = () => {
                           </p>
                         )}
                         <p className="font-black text-xs text-zoop-obsidian mt-1">
-                          ₹{(item.price * item.quantity).toLocaleString()}
+                          {formatInrWithSymbol(
+                            Number(item.price || 0) * Number(item.quantity || 0),
+                            { maximumFractionDigits: 0 },
+                          )}
                         </p>
                       </div>
                     </div>

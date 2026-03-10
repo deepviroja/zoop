@@ -39,6 +39,7 @@ const Monetization = () => {
     active: true,
   });
   const [error, setError] = useState("");
+  const [payoutStatusFilter, setPayoutStatusFilter] = useState("all");
 
   const [apiUnavailable, setApiUnavailable] = useState(false);
 
@@ -83,17 +84,14 @@ const Monetization = () => {
     void load();
   }, []);
 
-  const payoutQueue = useMemo(
-    () =>
-      Array.isArray(overview?.payouts)
-        ? overview.payouts.filter((p) =>
-            ["PENDING_TRANSFER", "AWAITING_SETTLEMENT", "ON_HOLD"].includes(
-              p.status,
-            ),
-          )
-        : [],
+  const payoutRows = useMemo(
+    () => (Array.isArray(overview?.payouts) ? overview.payouts : []),
     [overview],
   );
+  const visiblePayouts = useMemo(() => {
+    if (payoutStatusFilter === "all") return payoutRows;
+    return payoutRows.filter((row) => row.status === payoutStatusFilter);
+  }, [payoutRows, payoutStatusFilter]);
 
   const saveCommission = async () => {
     setSaving(true);
@@ -436,10 +434,14 @@ const Monetization = () => {
                   <p className="text-sm text-gray-500">{offer.description}</p>
                   <p className="mt-1 text-xs font-bold uppercase tracking-wider text-[#8b5e3c]">
                     {offer.discountType === "flat"
-                      ? `Flat ₹${offer.discountValue}`
+                      ? `Flat ${fmtInr(offer.discountValue, {
+                          maximumFractionDigits: 0,
+                        })}`
                       : `${offer.discountValue}% off`}{" "}
-                    • {offer.scope || "order"} • Min ₹
-                    {offer.minOrderAmount || 0}
+                    • {offer.scope || "order"} • Min{" "}
+                    {fmtInr(offer.minOrderAmount || 0, {
+                      maximumFractionDigits: 0,
+                    })}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -468,13 +470,41 @@ const Monetization = () => {
 
       <div className="bg-white rounded-3xl border border-gray-100 overflow-hidden">
         <div className="p-6 border-b border-gray-100">
-          <h2 className="text-2xl font-black text-zoop-obsidian">
-            Payout Queue
-          </h2>
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <h2 className="text-2xl font-black text-zoop-obsidian">
+                Seller Payouts
+              </h2>
+              <p className="mt-1 text-sm text-gray-500">
+                Waiting, transferred, and held payouts in one place.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { id: "all", label: "All" },
+                { id: "PENDING_TRANSFER", label: "Pending Transfer" },
+                { id: "AWAITING_SETTLEMENT", label: "Awaiting Settlement" },
+                { id: "ON_HOLD", label: "On Hold" },
+                { id: "TRANSFERRED", label: "Transferred" },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setPayoutStatusFilter(tab.id)}
+                  className={`rounded-full px-4 py-2 text-xs font-black uppercase tracking-wider ${
+                    payoutStatusFilter === tab.id
+                      ? "bg-zoop-obsidian text-white"
+                      : "bg-gray-100 text-gray-600"
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
         {loading ? (
           <p className="p-6 text-gray-500 font-bold">Loading...</p>
-        ) : payoutQueue.length === 0 ? (
+        ) : visiblePayouts.length === 0 ? (
           <p className="p-6 text-gray-500 font-bold">No payout records yet.</p>
         ) : (
           <div className="overflow-x-auto scrollbar-gap">
@@ -484,10 +514,12 @@ const Monetization = () => {
                   {[
                     "Payout ID",
                     "Seller",
+                    "Customer",
                     "Order",
+                    "Product",
                     "Payout Amount",
                     "Status",
-                    "Available",
+                    "Available / Released",
                     "Action",
                   ].map((h) => (
                     <th
@@ -500,7 +532,7 @@ const Monetization = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {payoutQueue.map((p) => (
+                {visiblePayouts.map((p) => (
                   <tr key={p.id}>
                     <td className="px-6 py-4">
                       <p className="font-bold text-zoop-obsidian">{p.id}</p>
@@ -516,11 +548,23 @@ const Monetization = () => {
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600">
                       <p className="font-bold text-zoop-obsidian">
-                        {p.displayOrderId || p.orderId}
+                        {p.customer?.name || "-"}
                       </p>
                       <p className="text-xs text-gray-500">
+                        {p.customer?.email || "-"}
+                      </p>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-600">
+                      <p className="font-bold text-zoop-obsidian">
+                        {p.displayOrderId || p.orderId}
+                      </p>
+                      <p className="text-xs text-gray-500">{p.orderId}</p>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-600">
+                      <p className="font-bold text-zoop-obsidian">
                         {p.productTitle || p.productId}
                       </p>
+                      <p className="text-xs text-gray-500">{p.productId}</p>
                     </td>
                     <td className="px-6 py-4 font-black text-zoop-moss">
                       <span className="tabular-nums">{fmtInr(p.payoutAmount)}</span>
@@ -541,7 +585,13 @@ const Monetization = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-500">
-                      {p.availableAt ? new Date(p.availableAt).toLocaleString() : "-"}
+                      {p.status === "TRANSFERRED"
+                        ? p.releasedAt
+                          ? new Date(p.releasedAt).toLocaleString()
+                          : "Released"
+                        : p.availableAt
+                          ? new Date(p.availableAt).toLocaleString()
+                          : p.holdReason || "-"}
                     </td>
                     <td className="px-6 py-4">
                       {p.status === "PENDING_TRANSFER" ? (
@@ -551,6 +601,10 @@ const Monetization = () => {
                         >
                           Release
                         </button>
+                      ) : p.status === "TRANSFERRED" ? (
+                        <span className="text-xs font-bold text-green-600">
+                          Released
+                        </span>
                       ) : (
                         <span className="text-xs font-bold text-gray-400">
                           Waiting

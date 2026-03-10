@@ -3005,7 +3005,7 @@
   export const searchPlaceholders = [
     "Surat ka best bandhani saree",
     "homemade banana chips Delhi",
-    "Lucknow chikankari under ₹999",
+    "Lucknow chikankari under Rs. 999",
     "Nike shoes same-day delivery",
     "Sharma ji ka special achaar",
     "Jaipur block print kurti",

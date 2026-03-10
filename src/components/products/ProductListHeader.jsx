@@ -18,7 +18,7 @@ const ProductListHeader = ({
   return (
     <div
       className={`bg-white rounded-2xl p-4 md:p-6 mb-6 shadow-sm sticky z-20 backdrop-blur-md bg-white/90 transition-[top] duration-300 ${
-        headerVisible ? "top-0 md:top-[4.5rem]" : "top-0"
+        headerVisible ? "top-[4.5rem]" : "top-4"
       }`}
     >
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">

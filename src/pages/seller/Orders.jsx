@@ -182,7 +182,7 @@ const Orders = () => {
                     <div className="flex flex-col justify-between items-end gap-4 min-w-[160px]">
                       <div className="text-right">
                         <p className="text-2xl font-900 text-zoop-obsidian">
-                          ₹{(order.totalAmount || 0).toLocaleString()}
+                          Rs. {(order.totalAmount || 0).toLocaleString()}
                         </p>
                         <p className="text-[10px] font-bold text-gray-400 uppercase">
                           Order Total

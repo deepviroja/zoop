@@ -270,7 +270,7 @@ const MobileSearch = () => {
                         </p>
                         <div className="flex items-center gap-2">
                           <span className="text-zoop-obsidian font-black text-sm">
-                            ₹{(product.price || 0).toLocaleString()}
+                            Rs. {(product.price || 0).toLocaleString()}
                           </span>
                           {product.stock > 0 && (
                             <span className="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-bold">

@@ -250,7 +250,7 @@ const OrderHistory = () => {
                       {statusIcon(order.status)} {order.status}
                     </span>
                     <p className="mt-2 font-black text-xl text-zoop-obsidian">
-                      ₹{(order.totalAmount || 0).toLocaleString()}
+                      Rs. {(order.totalAmount || 0).toLocaleString()}
                     </p>
                   </div>
                 </div>
@@ -278,11 +278,11 @@ const OrderHistory = () => {
                             {item.title || "Product"}
                           </p>
                           <p className="text-xs text-gray-500">
-                            Qty: {item.quantity} × ₹{item.price}
+                            Qty: {item.quantity} × Rs. {item.price}
                           </p>
                         </div>
                         <p className="font-black text-zoop-obsidian whitespace-nowrap">
-                          ₹{(item.price * item.quantity).toLocaleString()}
+                          Rs. {(item.price * item.quantity).toLocaleString()}
                         </p>
                       </div>
                     ))}
