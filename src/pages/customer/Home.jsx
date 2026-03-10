@@ -249,6 +249,8 @@ const Home = () => {
   }, [products]);
 
   const activeSlide = heroSlides[currentSlide] || {};
+  const sameDayCutoffText =
+    siteConfig?.homeSameDayCutoffText || "Order before 6 PM for same-day delivery";
   if (error) {
     return (
       <div className="min-h-[50vh] flex flex-col items-center justify-center p-8 text-center">
