@@ -304,7 +304,7 @@ const summarizePayoutRows = (rows: CommissionRow[]) => ({
     .reduce((sum, row) => sum + Number(row.payoutAmount || 0), 0),
 });
 
-const buildDirectory = (items: Array<Record<string, any>>) =>
+const buildDirectory = (items: Array<Record<string, any>>): Record<string, any> =>
   items.reduce<Record<string, any>>((acc, item) => {
     acc[String(item.id || "")] = item;
     return acc;
@@ -317,7 +317,7 @@ const enrichOrderRecord = (
   order: Record<string, any>,
   usersById: Record<string, any>,
   productsById: Record<string, any>,
-) => {
+): Record<string, any> => {
   const customerProfile = usersById[String(order.userId || "")] || {};
   const items = Array.isArray(order.items)
     ? order.items.map((item: any) => {
@@ -380,7 +380,7 @@ const enrichPayoutRows = (
   usersById: Record<string, any>,
   productsById: Record<string, any>,
   ordersById: Record<string, any>,
-) =>
+): Array<Record<string, any>> =>
   rows.map((row) => {
     const product = productsById[String(row.productId || "")] || {};
     const seller = usersById[String(row.sellerId || "")] || {};
