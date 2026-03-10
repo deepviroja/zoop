@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { db, auth } from '../config/firebase';
 import * as admin from 'firebase-admin';
 import { sendAccountStatusEmail } from '../services/emailService';
+import { isPendingProfile } from '../utils/profileCompletion';
 
 // ─── SEED DATA ────────────────────────────────────────────────────────────────
 
@@ -312,6 +313,27 @@ const buildDirectory = (items: Array<Record<string, any>>): Record<string, any> 
 
 const buildDisplayOrderId = (id: string) =>
   `#${String(id || "").slice(-8).toUpperCase()}`;
+
+const getAccountStateLabel = (profile: Record<string, any> = {}) => {
+  if (
+    profile?.isDeleted ||
+    profile?.status === 'deleted' ||
+    profile?.accountState === 'deleted'
+  ) {
+    return 'deleted';
+  }
+  if (
+    profile?.disabled ||
+    profile?.status === 'banned' ||
+    profile?.accountState === 'banned'
+  ) {
+    return 'banned';
+  }
+  if (isPendingProfile(profile)) {
+    return 'pending';
+  }
+  return 'active';
+};
 
 const enrichOrderRecord = (
   order: Record<string, any>,
@@ -792,9 +814,11 @@ export const getAllUsers = async (req: Request, res: Response) => {
         email: u.email || '',
         displayName: u.displayName || '',
         role: String((u.customClaims as any)?.role || 'customer'),
-        isDeleted: true,
-        status: 'deleted',
-        deletedAt: null,
+        hasProfileDocument: false,
+        isProfileComplete: false,
+        profileMissingFields: ['name', 'phone', 'address', 'city', 'state', 'pincode'],
+        status: 'pending',
+        accountState: 'pending',
         createdAt: u.metadata?.creationTime || null,
         updatedAt: new Date().toISOString(),
       }));
@@ -833,11 +857,7 @@ export const getAllUsers = async (req: Request, res: Response) => {
         const isActiveNow =
           !!lastLoginAt &&
           Date.now() - new Date(lastLoginAt).getTime() <= 15 * 60 * 1000;
-        const accountState = u.isDeleted
-          ? 'deleted'
-          : u.disabled || u.status === 'banned'
-            ? 'banned'
-            : 'active';
+        const accountState = getAccountStateLabel(u);
         return {
           ...u,
           password: undefined,
@@ -872,9 +892,25 @@ export const getAllSellersDetails = async (_req: Request, res: Response) => {
         lastSignInTime: u.metadata?.lastSignInTime || null,
       };
     });
-    const sellers = usersSnap.docs
-      .map((d) => ({ id: d.id, ...(d.data() as any) }))
+    const userDocs = usersSnap.docs
+      .map((d) => ({ id: d.id, ...(d.data() as any) }));
+    const sellers = userDocs
       .filter((u) => String(u.role || '') === 'seller');
+    const missingSellersFromAuth = (authUsers.users || [])
+      .filter((u) => !userDocs.some((doc: any) => doc.id === u.uid))
+      .filter((u) => String((u.customClaims as any)?.role || 'customer') === 'seller')
+      .map((u: any) => ({
+        id: u.uid,
+        email: u.email || '',
+        displayName: u.displayName || '',
+        role: 'seller',
+        verificationStatus: 'pending',
+        isProfileComplete: false,
+        accountState: 'pending',
+        status: 'pending',
+        createdAt: u.metadata?.creationTime || null,
+        updatedAt: new Date().toISOString(),
+      }));
     const products = productsSnap.docs.map((d) => ({ id: d.id, ...(d.data() as any) }));
     const orders = ordersSnap.docs.map((d) => ({ id: d.id, ...(d.data() as any) }));
 
@@ -916,7 +952,7 @@ export const getAllSellersDetails = async (_req: Request, res: Response) => {
       });
     });
 
-    const result = sellers.map((s: any) => {
+    const result = [...sellers, ...missingSellersFromAuth].map((s: any) => {
       const metrics = sellerOrderMetrics[s.id] || {};
       const lastLoginAt =
         s.lastLoginAt ||
@@ -925,11 +961,7 @@ export const getAllSellersDetails = async (_req: Request, res: Response) => {
         null;
       const isActiveNow =
         !!lastLoginAt && Date.now() - new Date(lastLoginAt).getTime() <= 15 * 60 * 1000;
-      const accountState = s.isDeleted
-        ? 'deleted'
-        : s.disabled || s.status === 'banned'
-          ? 'banned'
-          : 'active';
+      const accountState = getAccountStateLabel(s);
       return {
         ...s,
         productsCount: productCountBySeller[s.id] || 0,
@@ -988,10 +1020,13 @@ export const banUser = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Deleted accounts cannot be restored from ban controls' });
     }
     await auth.updateUser(uid, { disabled: !!disabled });
+    const nextAccountState = disabled
+      ? 'banned'
+      : getAccountStateLabel({ ...userData, disabled: false });
     await db.collection('users').doc(uid).update({
       disabled: !!disabled,
-      status: disabled ? 'banned' : userData?.isDeleted ? 'deleted' : 'active',
-      accountState: disabled ? 'banned' : userData?.isDeleted ? 'deleted' : 'active',
+      status: nextAccountState,
+      accountState: nextAccountState,
       updatedAt: new Date().toISOString(),
     });
 

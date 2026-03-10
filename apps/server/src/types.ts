@@ -22,6 +22,10 @@ export interface User {
   photoURL?: string;
   phone?: string;
   isEmailVerified?: boolean;
+  isProfileComplete?: boolean;
+  profileMissingFields?: string[];
+  status?: 'pending' | 'active' | 'banned' | 'deleted';
+  accountState?: 'pending' | 'active' | 'banned' | 'deleted';
   createdAt: string;
   updatedAt: string;
   // Seller onboarding fields

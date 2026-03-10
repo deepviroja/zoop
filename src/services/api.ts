@@ -1,4 +1,5 @@
 import { API_BASE_URL } from "../config/apiBase";
+import { auth } from "../firebase";
 /**
  * Zoop API Service Layer — all frontend API calls go through here
  * Replaces scattered fetch() calls and hard-coded mock data.
@@ -7,7 +8,21 @@ import { API_BASE_URL } from "../config/apiBase";
 const API_URL = API_BASE_URL;
 
 // ─── Auth Token ───────────────────────────────────────────────────────────────
-const getAuthToken = (): string | null => localStorage.getItem('authToken');
+const getAuthToken = async (): Promise<string | null> => {
+  const cachedToken = localStorage.getItem("authToken");
+  if (cachedToken) return cachedToken;
+
+  const currentUser = auth.currentUser;
+  if (!currentUser) return null;
+
+  try {
+    const freshToken = await currentUser.getIdToken();
+    if (freshToken) localStorage.setItem("authToken", freshToken);
+    return freshToken;
+  } catch {
+    return null;
+  }
+};
 
 // ─── Base Fetcher ─────────────────────────────────────────────────────────────
 async function request<T>(
@@ -17,7 +32,7 @@ async function request<T>(
   requiresAuth = false
 ): Promise<T> {
   const headers: HeadersInit = { 'Content-Type': 'application/json' };
-  const token = getAuthToken();
+  const token = await getAuthToken();
   if (token) headers['Authorization'] = `Bearer ${token}`;
   if (requiresAuth && !token) throw new Error('Authentication required');
 

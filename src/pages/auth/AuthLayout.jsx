@@ -1,7 +1,9 @@
 import React from "react";
 import { Outlet, Link } from "react-router-dom";
+import { useSiteConfig } from "../../context/SiteConfigContext";
 
 const AuthLayout = () => {
+  const { brandName, replaceBrandText } = useSiteConfig();
   return (
     <div className="min-h-screen bg-white md:h-screen md:overflow-hidden">
       <div className="flex min-h-screen flex-col md:h-screen md:flex-row">
@@ -12,7 +14,7 @@ const AuthLayout = () => {
           to="/"
           className="text-3xl font-900 tracking-tighter text-zoop-moss z-10"
         >
-          ZOOP
+          {brandName}
           <span className="text-white text-xs align-top ml-1 font-normal italic">
             .in
           </span>
@@ -32,7 +34,7 @@ const AuthLayout = () => {
 
         {/* Footer info */}
         <div className="z-10 text-white/40 text-sm font-medium">
-          © 2026 Zoop Marketplace Global.
+          {replaceBrandText("© 2026 Zoop Marketplace Global.")}
         </div>
 
         {/* Decorative Kinetic Circles */}
@@ -48,7 +50,7 @@ const AuthLayout = () => {
             to="/"
             className="text-2xl font-900 tracking-tighter text-zoop-moss"
           >
-            ZOOP
+            {brandName}
           </Link>
         </div>
 
@@ -60,7 +62,7 @@ const AuthLayout = () => {
             {/* Global Auth Footer */}
             <div className="pt-8 border-t border-gray-100">
               <p className="text-center text-xs text-gray-400">
-                By continuing, you agree to Zoop's
+                {replaceBrandText("By continuing, you agree to Zoop's")}
                 <span className="text-zoop-obsidian font-bold underline px-1 cursor-pointer">
                   Terms of Service
                 </span>

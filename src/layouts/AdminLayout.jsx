@@ -15,31 +15,17 @@ import { useNavigate } from "react-router-dom";
 import { getAuth, signOut } from "firebase/auth";
 import { LogOut } from "../assets/icons/LogOut";
 import { BellRing } from "../assets/icons/BellRing";
-import { apiClient } from "../api/client";
 import { Globe } from "../assets/icons/Globe";
 import { Activity } from "../assets/icons/Activity";
 import { Zap } from "../assets/icons/Zap";
+import { apiClient } from "../api/client";
+import { useSiteConfig } from "../context/SiteConfigContext";
 
 const AdminLayout = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
-  const [siteConfig, setSiteConfig] = useState(null);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    let cancelled = false;
-    apiClient
-      .get("/content/site-config")
-      .then((cfg) => {
-        if (!cancelled) setSiteConfig(cfg || null);
-      })
-      .catch(() => {
-        if (!cancelled) setSiteConfig(null);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  const { siteConfig } = useSiteConfig();
 
   useEffect(() => {
     let cancelled = false;

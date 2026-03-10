@@ -42,10 +42,12 @@ import {
   getCountryByCode,
   getStateByCodeAndCountry,
 } from "../../utils/locationData";
+import { useSiteConfig } from "../../context/SiteConfigContext";
 
 const Signup = () => {
   const navigate = useNavigate();
   const { toast, showToast, hideToast } = useToast();
+  const { brandName, replaceBrandText } = useSiteConfig();
 
   const [step, setStep] = useState(1); // 1: Form, 2: OTP Verification
   const [loading, setLoading] = useState(false);
@@ -205,7 +207,7 @@ const Signup = () => {
         origin: { y: 0.6 },
         colors: ["#a3e635", "#000000"],
       });
-      setTimeout(() => navigate("/profile?edit=1&welcome=1"), 1500);
+      setTimeout(() => navigate("/complete-profile?welcome=1"), 1500);
     } catch (error) {
       console.error("Google Signup error:", error);
       const friendly = getFriendlyError(error);
@@ -235,7 +237,7 @@ const Signup = () => {
         resetPhoneRecaptcha();
         const confirmation = await sendFirebasePhoneOtp(
           response?.otpRecipient || formData.phone,
-          { containerId: "signup-phone-recaptcha", size: "normal" },
+          { containerId: "signup-phone-recaptcha", size: "invisible" },
         );
         setPhoneConfirmation(confirmation);
         setOtpExpiresAt(new Date(Date.now() + 5 * 60 * 1000).toISOString());
@@ -318,7 +320,10 @@ const Signup = () => {
         });
       }
 
-      showToast("Account created successfully! Welcome to Zoop!", "success");
+      showToast(
+        replaceBrandText("Account created successfully! Welcome to Zoop!"),
+        "success",
+      );
 
       confetti({
         particleCount: 150,
@@ -339,7 +344,7 @@ const Signup = () => {
         if (formData.role === "seller") {
           navigate("/seller/onboarding");
         } else {
-          navigate("/profile?edit=1&welcome=1");
+          navigate("/");
         }
       }, 1500);
     } catch (error) {
@@ -365,7 +370,7 @@ const Signup = () => {
         resetPhoneRecaptcha();
         const confirmation = await sendFirebasePhoneOtp(
           response?.otpRecipient || formData.phone,
-          { containerId: "signup-phone-recaptcha", size: "normal" },
+          { containerId: "signup-phone-recaptcha", size: "invisible" },
         );
         setPhoneConfirmation(confirmation);
         setOtpExpiresAt(new Date(Date.now() + 5 * 60 * 1000).toISOString());
@@ -434,14 +439,14 @@ const Signup = () => {
               to="/"
               className="inline-block text-3xl font-black text-zoop-moss mb-4"
             >
-              ZOOP<span className="text-zoop-obsidian text-xs italic">.in</span>
+              {brandName}<span className="text-zoop-obsidian text-xs italic">.in</span>
             </Link>
             <h1 className="text-2xl font-black text-zoop-obsidian mb-1">
               {step === 1 ? "Create Account" : "Verify Email"}
             </h1>
             <p className="text-gray-500 text-sm">
               {step === 1
-                ? "Join Zoop and start shopping locally"
+                ? replaceBrandText("Join Zoop and start shopping locally")
                 : `Enter the OTP sent to your ${otpChannel === "phone" ? "phone number" : "email"}`}
             </p>
           </div>
@@ -585,13 +590,6 @@ const Signup = () => {
                   </p>
                 )}
               </div>
-
-              {otpChannel === "phone" && (
-                <div
-                  id="signup-phone-recaptcha"
-                  className="overflow-hidden rounded-2xl"
-                />
-              )}
 
               <CountryPhoneField
                 label="Phone Number"
@@ -877,7 +875,7 @@ const Signup = () => {
                 </Link>
               </p>
               <p className="text-center text-sm text-gray-500 font-bold">
-                Want to sell on Zoop?{" "}
+                {replaceBrandText("Want to sell on Zoop?")}{" "}
                 <Link
                   to="/seller/signup"
                   className="text-zoop-obsidian hover:underline"

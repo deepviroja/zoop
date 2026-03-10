@@ -19,6 +19,7 @@ import { frequentlyBoughtTogether } from "../../utils/recommendations";
 import { optimizeCloudinaryUrl } from "../../utils/cloudinary";
 import Seo from "../../components/shared/Seo";
 import { getDeliveryEstimate } from "../../utils/delivery";
+import { useSiteConfig } from "../../context/SiteConfigContext";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -27,6 +28,7 @@ const ProductDetail = () => {
   const { user, location } = useUser();
   const { showToast } = useToast();
   const { toggleWishlist, isInWishlist } = useWishlist();
+  const { brandName } = useSiteConfig();
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -61,14 +63,14 @@ const ProductDetail = () => {
           image:
             data.thumbnailUrl ||
             data.image ||
-            "https://via.placeholder.com/300",
+            "/brand-mark.svg",
           images:
             data.imageUrls && data.imageUrls.length > 0
               ? data.imageUrls
               : [
                   data.thumbnailUrl ||
                     data.image ||
-                    "https://via.placeholder.com/300",
+                    "/brand-mark.svg",
                 ],
           videos: Array.isArray(data.videoUrls) ? data.videoUrls : [],
           category: data.categoryId || data.category || "Uncategorized",
@@ -284,10 +286,10 @@ const ProductDetail = () => {
   return (
     <div className="min-h-screen bg-white">
       <Seo
-        title={`${product.name} | Zoop`}
+        title={`${product.name} | ${brandName}`}
         description={(product.aboutItem || product.description || "").slice(0, 160)}
-        keywords={`${product.name}, ${product.brand || "Zoop"}, buy online, ${product.category || ""}`}
-        image={product.image || product.thumbnailUrl || "/vite.svg"}
+        keywords={`${product.name}, ${product.brand || brandName}, buy online, ${product.category || ""}`}
+        image={product.image || product.thumbnailUrl || "/brand-mark.svg"}
         canonicalPath={`/product/${product.id}`}
         type="product"
         jsonLd={{
@@ -298,7 +300,7 @@ const ProductDetail = () => {
           description: product.aboutItem || product.description || "",
           brand: {
             "@type": "Brand",
-            name: product.brand || "Zoop",
+            name: product.brand || brandName,
           },
           offers: {
             "@type": "Offer",
@@ -752,7 +754,7 @@ const ProductDetail = () => {
 
         {/* Tabs: Description, Specifications, Reviews */}
         <div className="border-t border-gray-200 pt-12">
-          <div className="flex gap-6 overflow-x-auto border-b border-gray-200 mb-8 no-scrollbar">
+          <div className="flex gap-6 overflow-x-auto border-b border-gray-200 mb-8 no-scrollbar scrollbar-gap">
             {["description", "specifications", "reviews"].map((tab) => (
               <button
                 key={tab}
@@ -914,7 +916,7 @@ const ProductDetail = () => {
             <h2 className="text-2xl font-900 text-zoop-obsidian mb-4">
               Similar Products
             </h2>
-            <div className="flex gap-4 overflow-x-auto pb-3">
+            <div className="flex gap-4 overflow-x-auto pb-3 scrollbar-gap">
               {displaySimilar.map((item) => (
                 <div key={item.id} className="min-w-[260px] max-w-[260px]">
                   <ProductCard product={item} />
@@ -929,7 +931,7 @@ const ProductDetail = () => {
             <h2 className="text-2xl font-900 text-zoop-obsidian mb-4">
               View Also
             </h2>
-            <div className="flex gap-4 overflow-x-auto pb-3">
+            <div className="flex gap-4 overflow-x-auto pb-3 scrollbar-gap">
               {(otherProducts.length > 0 ? otherProducts : secondarySuggestions).map((item) => (
                 <div key={item.id} className="min-w-[260px] max-w-[260px]">
                   <ProductCard product={item} />

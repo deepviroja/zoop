@@ -15,6 +15,7 @@ import {
   sendWelcomeEmail,
 } from "../services/emailService";
 import { sendWelcomePhoneMessage } from "../services/smsService";
+import { buildProfileCompletionState } from '../utils/profileCompletion';
 
 type SellerRecord = {
   id: string;
@@ -98,6 +99,50 @@ const removeFirebaseUserIfPresent = async (uid: string) => {
   }
 };
 
+const applyProfileState = <T extends Record<string, any>>(
+  role: string,
+  payload: T,
+): T & {
+  role: string;
+  isProfileComplete: boolean;
+  profileMissingFields: string[];
+  status: User["status"];
+  accountState: User["accountState"];
+} => {
+  const nextRole = String(role || payload?.role || 'customer');
+  const profileState = buildProfileCompletionState(nextRole, {
+    ...payload,
+    role: nextRole,
+  });
+  const isDeleted =
+    payload?.isDeleted ||
+    payload?.status === 'deleted' ||
+    payload?.accountState === 'deleted';
+  const isBanned = payload?.disabled || payload?.status === 'banned';
+  const nextStatus = (
+    isDeleted
+      ? 'deleted'
+      : isBanned
+        ? 'banned'
+        : profileState.status
+  ) as User["status"];
+  const nextAccountState = (
+    isDeleted
+      ? 'deleted'
+      : isBanned
+        ? 'banned'
+        : profileState.accountState
+  ) as User["accountState"];
+
+  return {
+    ...payload,
+    role: nextRole,
+    ...profileState,
+    status: nextStatus,
+    accountState: nextAccountState,
+  };
+};
+
 const releaseDeletedEmailForReuse = async (email: string) => {
   const normalizedEmail = normalizeEmail(email);
   if (!normalizedEmail) return;
@@ -118,8 +163,7 @@ const releaseDeletedEmailForReuse = async (email: string) => {
     getDeletedAccountRef(normalizedEmail).get(),
   ]);
   const profile = profileDoc.exists ? (profileDoc.data() as any) : null;
-  const shouldRelease =
-    !profileDoc.exists || isDeletedAccount(profile) || deletedMarker.exists;
+  const shouldRelease = deletedMarker.exists || (profileDoc.exists && isDeletedAccount(profile));
 
   if (!shouldRelease) return;
 
@@ -241,7 +285,7 @@ export const verifyOTP = async (req: Request, res: Response) => {
     await auth.setCustomUserClaims(userRecord.uid, { role: userData.role });
 
     // Create user document
-    await db.collection("users").doc(userRecord.uid).set({
+    const createdUserProfile = applyProfileState(userData.role, {
       id: userRecord.uid,
       email: userData.email,
       displayName: userData.displayName,
@@ -254,11 +298,14 @@ export const verifyOTP = async (req: Request, res: Response) => {
       role: userData.role,
       isEmailVerified: true,
       createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
       ...(userData.role === 'seller' && {
         isApproved: false,
         onboardingCompleted: false
       })
     });
+
+    await db.collection("users").doc(userRecord.uid).set(createdUserProfile);
 
     // Delete pending user and clear any deletion tombstone for a fresh signup.
     await Promise.all([
@@ -301,7 +348,7 @@ export const registerCustomer = async (req: Request, res: Response) => {
       phoneNumber: phone ? normalizePhoneNumber(phone) : undefined,
     });
 
-    const userData: User & Record<string, any> = {
+    const userData: User & Record<string, any> = applyProfileState('customer', {
       id: userRecord.uid,
       displayName: name,
       email,
@@ -314,7 +361,7 @@ export const registerCustomer = async (req: Request, res: Response) => {
       isEmailVerified: false,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-    };
+    });
 
     await db.collection('users').doc(userRecord.uid).set(userData);
     await getDeletedAccountRef(email).delete().catch(() => {});
@@ -393,7 +440,7 @@ export const registerSeller = async (req: Request, res: Response) => {
     await db.collection('sellers').doc(sellerId).set(sellerData);
 
     // 4. Update user document with role + seller onboarding details so Admin can verify
-    const userData: Record<string, any> = {
+    const userData: Record<string, any> = applyProfileState('seller', {
       id: userRecord.uid,
       displayName: ownerName,
       email,
@@ -416,7 +463,7 @@ export const registerSeller = async (req: Request, res: Response) => {
       ifscCode: banking?.ifscCode || '',
       onboardingCompletedAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-    };
+    });
     await db.collection('users').doc(userRecord.uid).set(userData, { merge: true });
     await getDeletedAccountRef(email).delete().catch(() => {});
 
@@ -463,14 +510,8 @@ export const syncUser = async (req: Request, res: Response) => {
             "This account was deleted. Sign up again to create a new account or use the account recovery email if available.",
         });
       }
-      if (mode !== "signup") {
-        return res.status(404).json({
-          error:
-            "No Zoop account exists for this Google login yet. Use Sign up with Google first.",
-        });
-      }
-      // Create user if not exists (e.g. first time Google login)
-      const userData: User & Record<string, any> = {
+      // Create a pending marketplace profile if Auth exists but Firestore does not.
+      const userData: User & Record<string, any> = applyProfileState(requestedRole, {
         id: user.uid,
         name: user.name || user.email?.split('@')[0] || 'User',
         displayName: user.name || user.email?.split('@')[0] || 'User',
@@ -489,7 +530,7 @@ export const syncUser = async (req: Request, res: Response) => {
             isApproved: false,
             onboardingCompleted: false
         })
-      };
+      });
       await db.collection('users').doc(user.uid).set(userData);
       if (deletedMarker?.exists) {
         await getDeletedAccountRef(normalizedEmail).delete().catch(() => {});
@@ -511,7 +552,7 @@ export const syncUser = async (req: Request, res: Response) => {
       requestedRole === 'seller' &&
       String(userData.role || 'customer') === 'customer'
     ) {
-      userData = {
+      userData = applyProfileState('seller', {
         ...userData,
         role: 'seller',
         verificationStatus:
@@ -522,15 +563,18 @@ export const syncUser = async (req: Request, res: Response) => {
             : undefined,
         onboardingCompleted: false,
         updatedAt: new Date().toISOString(),
-      };
+      });
       await db.collection('users').doc(user.uid).set(userData, { merge: true });
       await auth.setCustomUserClaims(user.uid, { role: 'seller' });
     }
 
     // Special Case: Auto-promote admin email to admin role
     if (user.email === 'admin@zoop.com' && userData.role !== 'admin') {
-      userData.role = 'admin';
-      await db.collection('users').doc(user.uid).update({ role: 'admin' });
+      userData = applyProfileState('admin', {
+        ...userData,
+        role: 'admin',
+      });
+      await db.collection('users').doc(user.uid).set(userData, { merge: true });
       await auth.setCustomUserClaims(user.uid, { role: 'admin' });
     }
 
@@ -576,7 +620,7 @@ export const adminCreateUser = async (req: Request, res: Response) => {
 
     await auth.setCustomUserClaims(userRecord.uid, { role: role || 'customer' });
 
-    const userData: User = {
+    const userData: User = applyProfileState(role || 'customer', {
       id: userRecord.uid,
       displayName: displayName,
       email,
@@ -584,7 +628,7 @@ export const adminCreateUser = async (req: Request, res: Response) => {
       isEmailVerified: true,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-    };
+    }) as User;
 
     await db.collection('users').doc(userRecord.uid).set(userData);
     await getDeletedAccountRef(email).delete().catch(() => {});
@@ -729,11 +773,16 @@ export const requestLoginOTP = async (req: Request, res: Response) => {
 
     const profileDoc = await db.collection("users").doc(userRecord.uid).get();
     const profile = profileDoc.exists ? (profileDoc.data() as any) : {};
-    if (!profileDoc.exists || isDeletedAccount(profile)) {
+    if (profileDoc.exists && isDeletedAccount(profile)) {
       await releaseDeletedEmailForReuse(email);
       return res.status(403).json({
         error:
           "This account has been deleted. Sign up again to create a new account or use the recovery email if available.",
+      });
+    }
+    if (!profileDoc.exists) {
+      return res.status(409).json({
+        error: 'Account setup is pending. Sign in and complete your profile first.',
       });
     }
     const otpRecipient = channel === "phone" ? normalizePhoneNumber(profile?.phone) : email;
@@ -790,7 +839,12 @@ export const verifyLoginOTP = async (req: Request, res: Response) => {
     }
     const userDoc = await db.collection("users").doc(userRecord.uid).get();
     const userData = userDoc.exists ? (userDoc.data() as any) : {};
-    if (!userDoc.exists || isDeletedAccount(userData)) {
+    if (!userDoc.exists) {
+      return res.status(409).json({
+        error: 'Account setup is pending. Sign in and complete your profile first.',
+      });
+    }
+    if (isDeletedAccount(userData)) {
       await releaseDeletedEmailForReuse(email);
       return res.status(403).json({
         error:
@@ -891,7 +945,7 @@ export const verifyPhoneSignup = async (req: Request, res: Response) => {
     }
 
     await auth.setCustomUserClaims(decoded.uid, { role: userData.role || 'customer' });
-    await db.collection('users').doc(decoded.uid).set({
+    const createdUserProfile = applyProfileState(userData.role || 'customer', {
       id: decoded.uid,
       email: userData.email,
       displayName: userData.displayName,
@@ -905,11 +959,14 @@ export const verifyPhoneSignup = async (req: Request, res: Response) => {
       isEmailVerified: false,
       isPhoneVerified: true,
       createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
       ...(userData.role === 'seller' && {
         isApproved: false,
         onboardingCompleted: false,
       }),
-    }, { merge: true });
+    });
+
+    await db.collection('users').doc(decoded.uid).set(createdUserProfile, { merge: true });
 
     await Promise.all([
       db.collection('pending_users').doc(email).delete(),
@@ -955,8 +1012,9 @@ export const verifyPhoneLogin = async (req: Request, res: Response) => {
     }
     const userDoc = await db.collection('users').doc(userRecord.uid).get();
     if (!userDoc.exists) {
-      await releaseDeletedEmailForReuse(email);
-      return res.status(404).json({ error: 'Profile not found for this account' });
+      return res.status(409).json({
+        error: 'Account setup is pending. Sign in and complete your profile first.',
+      });
     }
     const profile = userDoc.data() as any;
     if (isDeletedAccount(profile)) {
@@ -997,7 +1055,18 @@ export const getMyProfile = async (req: Request, res: Response) => {
   try {
     const user = (req as any).user;
     const userDoc = await db.collection('users').doc(user.uid).get();
-    if (!userDoc.exists) return res.status(404).json({ error: 'Profile not found' });
+    if (!userDoc.exists) {
+      const pendingProfile = applyProfileState(String(user.role || 'customer'), {
+        id: user.uid,
+        email: user.email || '',
+        displayName: user.name || user.email?.split('@')[0] || 'User',
+        phone: normalizePhoneNumber(user.phone_number),
+        role: user.role || 'customer',
+        createdAt: null,
+        updatedAt: new Date().toISOString(),
+      });
+      return res.json({ ...pendingProfile, hasProfileDocument: false });
+    }
     res.json({ id: userDoc.id, ...(userDoc.data() as any) });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
@@ -1008,6 +1077,9 @@ export const updateMyProfile = async (req: Request, res: Response) => {
   try {
     const user = (req as any).user;
     const payload = req.body || {};
+    const userRef = db.collection('users').doc(user.uid);
+    const existingDoc = await userRef.get();
+    const existingProfile = existingDoc.exists ? (existingDoc.data() as any) : {};
     const allowedCommon = [
       'displayName',
       'name',
@@ -1016,6 +1088,8 @@ export const updateMyProfile = async (req: Request, res: Response) => {
       'address',
       'addressLine1',
       'addressLine2',
+      'countryCode',
+      'country',
       'city',
       'state',
       'pincode',
@@ -1063,10 +1137,19 @@ export const updateMyProfile = async (req: Request, res: Response) => {
     Object.keys(payload).forEach((key) => {
       if (allowed.has(key)) updates[key] = payload[key];
     });
-    updates.updatedAt = new Date().toISOString();
+    const role = String(existingProfile?.role || user.role || 'customer');
+    const nextProfile = applyProfileState(role, {
+      ...existingProfile,
+      id: user.uid,
+      email: existingProfile?.email || user.email || '',
+      role,
+      createdAt: existingProfile?.createdAt || new Date().toISOString(),
+      ...updates,
+      updatedAt: new Date().toISOString(),
+    });
 
-    await db.collection('users').doc(user.uid).set(updates, { merge: true });
-    const updated = await db.collection('users').doc(user.uid).get();
+    await userRef.set(nextProfile, { merge: true });
+    const updated = await userRef.get();
     res.json({ message: 'Profile updated', profile: { id: updated.id, ...(updated.data() as any) } });
   } catch (error: any) {
     res.status(500).json({ error: error.message });

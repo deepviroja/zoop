@@ -185,12 +185,12 @@ const Cart = () => {
                     src={
                       item.image ||
                       item.thumbnailUrl ||
-                      "https://via.placeholder.com/300"
+                      "/brand-mark.svg"
                     }
                     alt={item.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     onError={(e) => {
-                      e.target.src = "https://via.placeholder.com/300";
+                      e.target.src = "/brand-mark.svg";
                     }}
                   />
                   {item.type === "Local" && (
@@ -548,7 +548,7 @@ const Cart = () => {
               Matching picks from the same categories in your cart.
             </p>
           </div>
-          <div className="flex gap-4 overflow-x-auto pb-3">
+          <div className="flex gap-4 overflow-x-auto pb-3 scrollbar-gap">
             {relatedSuggestions.map((product) => (
               <div key={product.id} className="min-w-[260px] max-w-[260px]">
                 <ProductCard product={product} />

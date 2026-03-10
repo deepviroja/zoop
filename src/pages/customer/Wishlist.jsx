@@ -95,12 +95,12 @@ const Wishlist = () => {
                         product.thumbnailUrl ||
                         (product.imageUrls && product.imageUrls[0]) ||
                         product.image ||
-                        "https://placehold.co/400x400?text=Zoop"
+                        "/brand-mark.svg"
                       }
                       alt={product.title || product.name}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                       onError={(e) => {
-                        e.target.src = "https://placehold.co/400x400?text=Zoop";
+                        e.target.src = "/brand-mark.svg";
                       }}
                     />
                   </Link>

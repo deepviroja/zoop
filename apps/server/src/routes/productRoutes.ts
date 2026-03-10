@@ -1,5 +1,9 @@
 import express from 'express';
-import { authenticate, authorize } from '../middleware/authMiddleware';
+import {
+  authenticate,
+  authorize,
+  requireCompletedProfile,
+} from '../middleware/authMiddleware';
 import { 
     getProducts, 
     getProductById, 
@@ -17,8 +21,8 @@ router.get('/:id', getProductById);
 router.get('/:id/reviews', getProductReviews);
 
 // Protected routes - require authentication
-router.post('/', authenticate, authorize(['seller', 'admin']), createProduct);
-router.put('/:id', authenticate, authorize(['seller', 'admin']), updateProduct);
-router.delete('/:id', authenticate, authorize(['seller', 'admin']), deleteProduct);
+router.post('/', authenticate, authorize(['seller', 'admin']), requireCompletedProfile, createProduct);
+router.put('/:id', authenticate, authorize(['seller', 'admin']), requireCompletedProfile, updateProduct);
+router.delete('/:id', authenticate, authorize(['seller', 'admin']), requireCompletedProfile, deleteProduct);
 
 export default router;

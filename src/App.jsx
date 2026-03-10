@@ -9,6 +9,7 @@ import {
   ProductDetailSkeleton,
 } from "./components/shared/Skeletons";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
+import ProfileCompletionGuard from "./components/auth/ProfileCompletionGuard";
 
 // Lazy Load Pages
 const Home = lazy(() => import("./pages/customer/Home"));
@@ -33,6 +34,7 @@ const IconShowcase = lazy(() => import("./pages/IconShowcase"));
 
 // Auth & Seller Pages
 const AuthLayout = lazy(() => import("./pages/auth/AuthLayout"));
+const CompleteProfile = lazy(() => import("./pages/auth/CompleteProfile"));
 const Login = lazy(() => import("./pages/auth/Login"));
 const Signup = lazy(() => import("./pages/auth/Signup"));
 const AdminLogin = lazy(() => import("./pages/admin/AdminLogin"));
@@ -90,63 +92,6 @@ function App() {
       <NetworkStatusToast />
       <Suspense fallback={<PageSkeleton />}>
         <Routes>
-          <Route path="/" element={<CustomerLayout />}>
-            <Route index element={<Home />} />
-            <Route path="search" element={<Search />} />
-            <Route path="mobile-search" element={<MobileSearch />} />
-            <Route path="cart" element={<Cart />} />
-            <Route
-              path="checkout"
-              element={
-                <ProtectedRoute>
-                  <Checkout />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="history"
-              element={
-                <ProtectedRoute>
-                  <OrderHistory />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="track" element={<Track />} />
-            <Route
-              path="wishlist"
-              element={
-                <ProtectedRoute>
-                  <Wishlist />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="profile"
-              element={
-                <ProtectedRoute>
-                  <Profile />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="products" element={<Products />} />
-            <Route path="category/:categoryName" element={<CategoryPage />} />
-            <Route
-              path="product/:id"
-              element={
-                <Suspense fallback={<ProductDetailSkeleton />}>
-                  <ProductDetail />
-                </Suspense>
-              }
-            />
-            <Route path="about" element={<About />} />
-            <Route path="contact" element={<Contact />} />
-            <Route path="privacy" element={<Privacy />} />
-            <Route path="cookies" element={<Cookies />} />
-            <Route path="terms" element={<Terms />} />
-            <Route path="help" element={<Help />} />
-            <Route path="icons" element={<IconShowcase />} />
-          </Route>
-
           <Route element={<AuthLayout />}>
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
@@ -156,71 +101,141 @@ function App() {
           {/* Admin Login - Standalone Route */}
           <Route path="/admin/login" element={<AdminLogin />} />
 
-          {/* Seller Onboarding - requires any logged-in user (NOT admin-only) */}
-          <Route
-            path="/seller/onboarding"
-            element={
-              <ProtectedRoute allowedRoles={["customer", "seller"]}>
-                <SellerOnboarding />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/seller/waiting"
-            element={
-              <ProtectedRoute allowedRoles={["customer", "seller"]}>
-                <SellerApprovalWaiting />
-              </ProtectedRoute>
-            }
-          />
+          <Route element={<ProfileCompletionGuard />}>
+            <Route path="/" element={<CustomerLayout />}>
+              <Route index element={<Home />} />
+              <Route path="search" element={<Search />} />
+              <Route path="mobile-search" element={<MobileSearch />} />
+              <Route path="cart" element={<Cart />} />
+              <Route
+                path="checkout"
+                element={
+                  <ProtectedRoute>
+                    <Checkout />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="history"
+                element={
+                  <ProtectedRoute>
+                    <OrderHistory />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="track" element={<Track />} />
+              <Route
+                path="wishlist"
+                element={
+                  <ProtectedRoute>
+                    <Wishlist />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="profile"
+                element={
+                  <ProtectedRoute>
+                    <Profile />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="products" element={<Products />} />
+              <Route path="category/:categoryName" element={<CategoryPage />} />
+              <Route
+                path="product/:id"
+                element={
+                  <Suspense fallback={<ProductDetailSkeleton />}>
+                    <ProductDetail />
+                  </Suspense>
+                }
+              />
+              <Route path="about" element={<About />} />
+              <Route path="contact" element={<Contact />} />
+              <Route path="privacy" element={<Privacy />} />
+              <Route path="cookies" element={<Cookies />} />
+              <Route path="terms" element={<Terms />} />
+              <Route path="help" element={<Help />} />
+              <Route path="icons" element={<IconShowcase />} />
+            </Route>
 
-          {/* Seller Routes - Protected */}
-          <Route
-            path="/seller"
-            element={
-              <ProtectedRoute allowedRoles={["seller"]}>
-                <SellerLayout />
-              </ProtectedRoute>
-            }
-          >
-            <Route index element={<SellerDashboard />} />
-            <Route path="dashboard" element={<SellerDashboard />} />
-            <Route path="add-product" element={<SellerAddProduct />} />
+            <Route element={<AuthLayout />}>
+              <Route
+                path="/complete-profile"
+                element={
+                  <ProtectedRoute allowedRoles={["customer", "seller", "admin"]}>
+                    <CompleteProfile />
+                  </ProtectedRoute>
+                }
+              />
+            </Route>
+
+            {/* Seller Onboarding - requires any logged-in user (NOT admin-only) */}
             <Route
-              path="edit-product/:productId"
-              element={<SellerAddProduct />}
+              path="/seller/onboarding"
+              element={
+                <ProtectedRoute allowedRoles={["customer", "seller"]}>
+                  <SellerOnboarding />
+                </ProtectedRoute>
+              }
             />
-            <Route path="products" element={<SellerProductList />} />
-            <Route path="orders" element={<SellerOrders />} />
-            <Route path="ads" element={<SellerAds />} />
-            <Route path="payouts" element={<SellerPayouts />} />
-            <Route path="subscription" element={<SellerSubscription />} />
-            <Route path="instructions" element={<SellerInstructions />} />
-            <Route path="settings" element={<StoreSettings />} />
-            <Route path="profile" element={<SellerProfile />} />
-          </Route>
+            <Route
+              path="/seller/waiting"
+              element={
+                <ProtectedRoute allowedRoles={["customer", "seller"]}>
+                  <SellerApprovalWaiting />
+                </ProtectedRoute>
+              }
+            />
 
-          {/* Admin Routes - Protected, admin-only */}
-          <Route
-            path="/admin"
-            element={
-              <ProtectedRoute adminOnly allowedRoles={["admin"]}>
-                <AdminLayout />
-              </ProtectedRoute>
-            }
-          >
-            <Route index element={<AdminStats />} />
-            <Route path="verify" element={<VerifySellers />} />
-            <Route path="contentcuration" element={<ContentCuration />} />
-            <Route path="website-control" element={<AdminWebsiteControl />} />
-            <Route path="ads" element={<AdminAdsManagement />} />
-            <Route path="subscriptions" element={<AdminSubscriptionManagement />} />
-            <Route path="guide" element={<AdminGuide />} />
-            <Route path="supporttickets" element={<SupportTickets />} />
-            <Route path="monetization" element={<Monetization />} />
-            <Route path="users" element={<UserManagement />} />
-            <Route path="sellers" element={<SellerManagement />} />
-            <Route path="profile" element={<AdminProfile />} />
+            {/* Seller Routes - Protected */}
+            <Route
+              path="/seller"
+              element={
+                <ProtectedRoute allowedRoles={["seller"]}>
+                  <SellerLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<SellerDashboard />} />
+              <Route path="dashboard" element={<SellerDashboard />} />
+              <Route path="add-product" element={<SellerAddProduct />} />
+              <Route
+                path="edit-product/:productId"
+                element={<SellerAddProduct />}
+              />
+              <Route path="products" element={<SellerProductList />} />
+              <Route path="orders" element={<SellerOrders />} />
+              <Route path="ads" element={<SellerAds />} />
+              <Route path="payouts" element={<SellerPayouts />} />
+              <Route path="subscription" element={<SellerSubscription />} />
+              <Route path="instructions" element={<SellerInstructions />} />
+              <Route path="settings" element={<StoreSettings />} />
+              <Route path="profile" element={<SellerProfile />} />
+            </Route>
+
+            {/* Admin Routes - Protected, admin-only */}
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute adminOnly allowedRoles={["admin"]}>
+                  <AdminLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<AdminStats />} />
+              <Route path="verify" element={<VerifySellers />} />
+              <Route path="contentcuration" element={<ContentCuration />} />
+              <Route path="website-control" element={<AdminWebsiteControl />} />
+              <Route path="ads" element={<AdminAdsManagement />} />
+              <Route path="subscriptions" element={<AdminSubscriptionManagement />} />
+              <Route path="guide" element={<AdminGuide />} />
+              <Route path="supporttickets" element={<SupportTickets />} />
+              <Route path="monetization" element={<Monetization />} />
+              <Route path="users" element={<UserManagement />} />
+              <Route path="sellers" element={<SellerManagement />} />
+              <Route path="profile" element={<AdminProfile />} />
+            </Route>
           </Route>
 
           <Route path="*" element={<NotFound />} />

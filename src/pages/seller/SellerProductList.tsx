@@ -71,7 +71,7 @@ export const SellerProductList = () => {
                 </div>
 
                 <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
-                    <div className="overflow-x-auto">
+                    <div className="overflow-x-auto scrollbar-gap">
                         <table className="w-full text-left">
                             <thead className="bg-gray-50 border-b border-gray-200">
                                 <tr>
@@ -96,7 +96,7 @@ export const SellerProductList = () => {
                                                 <div className="flex items-center gap-3">
                                                     <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 border border-gray-200">
                                                         <img 
-                                                            src={product.thumbnailUrl || 'https://via.placeholder.com/50'} 
+                                                            src={product.thumbnailUrl || '/brand-mark.svg'} 
                                                             alt="" 
                                                             className="w-full h-full object-cover"
                                                         />

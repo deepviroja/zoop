@@ -1,7 +1,9 @@
 import React from "react";
 import { Zap } from "../../assets/icons/Zap";
+import { useSiteConfig } from "../../context/SiteConfigContext";
 
 const Loader = ({ fullScreen = false }) => {
+    const { brandName } = useSiteConfig();
     if (fullScreen) {
         return (
             <div className="h-full fixed inset-0 bg-white z-[9999] flex flex-col items-center justify-center">
@@ -13,7 +15,7 @@ const Loader = ({ fullScreen = false }) => {
                     </div>
                 </div>
                 <h3 className="mt-8 text-xl font-900 tracking-tighter text-zoop-obsidian animate-pulse">
-                    ZOOP<span className="text-zoop-moss">.in</span>
+                    {brandName}<span className="text-zoop-moss">.in</span>
                 </h3>
                 <p className="text-xs font-bold text-gray-400 mt-2 tracking-widest uppercase">
                     Fetching inventory...

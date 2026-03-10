@@ -5,6 +5,10 @@ import { ChevronRight } from "../../assets/icons/ChevronRight";
 import { Zap } from "../../assets/icons/Zap";
 import { Shoe } from "../../assets/icons/Shoe";
 import { Dress } from "../../assets/icons/Dress";
+import { Globe } from "../../assets/icons/Globe";
+import { ShieldCheck } from "../../assets/icons/ShieldCheck";
+import { TrendingUp } from "../../assets/icons/TrendingUp";
+import { Store } from "../../assets/icons/Store";
 import { useUser } from "../../context/UserContext";
 import ProductCard from "../../components/product/ProductCard";
 import AdBanner from "../../components/shared/AdBanner";
@@ -12,6 +16,7 @@ import { contentApi, productsApi } from "../../services/api";
 import { optimizeCloudinaryUrl } from "../../utils/cloudinary";
 import Seo from "../../components/shared/Seo";
 import { normalizeCityName } from "../../utils/cityMapping";
+import { useSiteConfig } from "../../context/SiteConfigContext";
 import men_cat from "../../assets/images/men_cat.png";
 import women_cat from "../../assets/images/women_cat.png";
 import kids_cat from "../../assets/images/kids_cat.png";
@@ -42,27 +47,25 @@ const Home = () => {
   const [brands, setBrands] = useState([]);
   const [collections, setCollections] = useState([]);
   const [products, setProducts] = useState([]);
-  const [siteConfig, setSiteConfig] = useState(null);
 
   const [contentLoading, setContentLoading] = useState(true);
   const [productsLoading, setProductsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { siteConfig, brandName, replaceBrandText } = useSiteConfig();
 
   // Fetch all dynamic content in parallel
   const fetchContent = useCallback(async () => {
     try {
-      const [slides, cats, brnds, colls, config] = await Promise.all([
+      const [slides, cats, brnds, colls] = await Promise.all([
         contentApi.getHeroSlides().catch(() => []),
         contentApi.getCategories().catch(() => []),
         contentApi.getBrands().catch(() => []),
         contentApi.getCollections().catch(() => []),
-        contentApi.getSiteConfig().catch(() => null),
       ]);
       setHeroSlides(slides || []);
       setCategories(cats || []);
       setBrands(brnds || []);
       setCollections(colls || []);
-      setSiteConfig(config || null);
     } catch (err) {
       console.error("Content load error:", err);
       setError("Failed to load page content. Please refresh.");
@@ -162,9 +165,7 @@ const Home = () => {
         optimizeCloudinaryUrl(product?.imageUrls?.[0], { width: 900 }) ||
         fallbackImage ||
         CAT_IMAGES[key] ||
-        `https://placehold.co/800x800/f2ecdf/1a1a1a?text=${encodeURIComponent(
-          categoryName || "Zoop",
-        )}`
+        "/brand-mark.svg"
       );
     },
     [categoryImageFromProducts],
@@ -253,6 +254,33 @@ const Home = () => {
   const activeSlide = heroSlides[currentSlide] || {};
   const sameDayCutoffText =
     siteConfig?.homeSameDayCutoffText || "Order before 6 PM for same-day delivery";
+  const techHighlights = [
+    {
+      icon: Zap,
+      title: sameDayCutoffText,
+      description: `Fast-routing inventory for ${localCity} shoppers.`,
+    },
+    {
+      icon: Globe,
+      title: "Responsive by default",
+      description: "Layouts stay centered and usable across small and large screens.",
+    },
+    {
+      icon: ShieldCheck,
+      title: "Profile-complete accounts",
+      description: "Pending users finish setup before they reach carts, orders, or admin-sensitive flows.",
+    },
+    {
+      icon: Store,
+      title: "Seller-first operations",
+      description: "Verified sellers, controlled uploads, and better panel alignment.",
+    },
+    {
+      icon: TrendingUp,
+      title: "Clean inventory signals",
+      description: "Broken images fall back safely instead of leaving blank product cards.",
+    },
+  ];
 
   if (error) {
     return (
@@ -274,14 +302,14 @@ const Home = () => {
   return (
     <div className="max-w-[1400px] mx-auto px-3 py-4 md:p-4 space-y-6 md:space-y-8 overflow-x-hidden">
       <Seo
-        title="Zoop | Same-Day Local Shopping Across India"
-        description="Shop local-first products, same-day city delivery, trending collections, and curated categories on Zoop."
-        keywords="Zoop, same-day delivery, local shopping, ecommerce India, online marketplace"
+        title={`${brandName} | Same-Day Local Shopping Across India`}
+        description={`Shop local-first products, same-day city delivery, trending collections, and curated categories on ${brandName}.`}
+        keywords={`${brandName}, same-day delivery, local shopping, ecommerce India, online marketplace`}
         canonicalPath="/"
         jsonLd={{
           "@context": "https://schema.org",
           "@type": "WebSite",
-          name: "Zoop",
+          name: brandName,
           url: "https://zoop-88df6.web.app/",
           potentialAction: {
             "@type": "SearchAction",
@@ -358,8 +386,8 @@ const Home = () => {
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    <h1 className="text-3xl sm:text-5xl md:text-8xl font-black tracking-tighter leading-[0.95]">
-                      <span className="block text-white">ZOOP</span>
+                    <h1 className="text-3xl sm:text-5xl md:text-8xl font-black tracking-tighter leading-[0.95] text-center md:text-left">
+                      <span className="block text-white">{brandName}</span>
                       <span className="text-zoop-moss italic">
                         {activeSlide.city || localCity}
                       </span>
@@ -370,12 +398,12 @@ const Home = () => {
                   </div>
                 )}
 
-                <p className="text-xs sm:text-sm md:text-lg text-white/70 max-w-md leading-relaxed">
+                <p className="text-center text-xs sm:text-sm md:text-lg text-white/70 max-w-md leading-relaxed md:text-left">
                   {activeSlide.desc ||
                       "Curated by local experts and national stylists"}
                 </p>
 
-                <div className="flex flex-col sm:flex-row gap-3 md:gap-4 pt-3">
+                <div className="flex flex-col sm:flex-row gap-3 md:gap-4 pt-3 justify-center md:justify-start">
                   <button
                     onClick={() =>
                       navigate(`/search?q=${activeSlide.city || localCity}`)
@@ -398,7 +426,7 @@ const Home = () => {
                 </div>
 
                 {/* Quick Stats */}
-                <div className="flex flex-wrap gap-x-4 gap-y-3 md:gap-8 pt-4 border-t border-white/10">
+                <div className="flex flex-wrap gap-x-4 gap-y-3 md:gap-8 pt-4 border-t border-white/10 justify-center md:justify-start text-center md:text-left">
                   <div>
                     <p className="text-xl md:text-3xl font-black text-zoop-moss">
                       4-6hrs
@@ -535,10 +563,10 @@ const Home = () => {
                     src={
                       optimizeCloudinaryUrl(product.thumbnailUrl, { width: 700 }) ||
                       (product.imageUrls && product.imageUrls[0]) ||
-                      "https://placehold.co/300x300?text=Zoop"
+                      "/brand-mark.svg"
                     }
                     onError={(e) => {
-                      e.target.src = "https://placehold.co/300x300?text=Zoop";
+                      e.target.src = "/brand-mark.svg";
                     }}
                     alt={product.title || product.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
@@ -628,7 +656,7 @@ const Home = () => {
               View All
             </Link>
           </div>
-          <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar">
+          <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar scrollbar-gap">
             {newArrivalProducts.map((product) => (
               <div
                 key={product.id}
@@ -650,7 +678,7 @@ const Home = () => {
                       alt={product.name || product.title}
                       className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
                       onError={(e) => {
-                        e.target.src = "https://placehold.co/200x200?text=Zoop";
+                        e.target.src = "/brand-mark.svg";
                       }}
                     />
                   </div>
@@ -683,6 +711,40 @@ const Home = () => {
           </div>
         </section>
       )}
+      <section className="relative overflow-hidden rounded-[2rem] border border-[#ddd6c8] bg-[linear-gradient(135deg,#fffdf8,#f6f2e8)] px-4 py-6 shadow-[0_16px_40px_rgba(26,26,26,0.07)] sm:px-6 md:px-8">
+        <div className="absolute inset-0 opacity-[0.08]" style={{ backgroundImage: "radial-gradient(circle at 20% 20%, #a3e635 0, transparent 26%), radial-gradient(circle at 80% 80%, #a65e46 0, transparent 18%)" }} />
+        <div className="relative z-10">
+          <div className="mx-auto max-w-3xl text-center">
+            <p className="text-[11px] font-black uppercase tracking-[0.28em] text-zoop-copper">
+              {replaceBrandText("Why Zoop feels cleaner now")}
+            </p>
+            <h2 className="mt-3 text-2xl font-black tracking-tight text-zoop-obsidian md:text-4xl">
+              {replaceBrandText("A sharper marketplace shell for Zoop users and admins")}
+            </h2>
+          </div>
+          <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+            {techHighlights.map((item) => {
+              const Icon = item.icon;
+              return (
+                <article
+                  key={item.title}
+                  className="rounded-[1.4rem] border border-white/80 bg-white/80 p-4 text-center shadow-sm backdrop-blur"
+                >
+                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-zoop-obsidian text-zoop-moss">
+                    <Icon width={22} height={22} />
+                  </div>
+                  <h3 className="mt-4 text-sm font-black uppercase tracking-[0.12em] text-zoop-obsidian">
+                    {item.title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-6 text-gray-600">
+                    {item.description}
+                  </p>
+                </article>
+              );
+            })}
+          </div>
+        </div>
+      </section>
       <section className="space-y-4">
         <AdBanner type="horizontal" slotId="home_bottom" />
       </section>
@@ -771,7 +833,7 @@ const Home = () => {
             </div>
           ) : (
             <>
-              <div className="md:hidden -mx-2 px-2 flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2">
+              <div className="md:hidden -mx-2 px-2 flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2 scrollbar-gap">
                 {collectionCategories.map((cat, idx) => (
                   <Link
                     key={cat.id || idx}

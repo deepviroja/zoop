@@ -1,5 +1,9 @@
 import express from 'express';
-import { authenticate, authorize } from '../middleware/authMiddleware';
+import {
+  authenticate,
+  authorize,
+  requireCompletedProfile,
+} from '../middleware/authMiddleware';
 import {
   // Public content
   getCities,
@@ -88,82 +92,82 @@ router.get('/site-config',  getSiteConfig);
 router.get('/offers', getPublicOffers);
 
 // ─── ADMIN CONTENT MANAGEMENT ─────────────────────────────────────────────────
-router.put('/cities/:id',      authenticate, authorize(['admin']), updateCity);
+router.put('/cities/:id',      authenticate, authorize(['admin']), requireCompletedProfile, updateCity);
 router.get('/hero-slides',     getHeroSlides);
-router.post('/hero-slides',    authenticate, authorize(['admin']), createHeroSlide);
-router.put('/hero-slides/:id', authenticate, authorize(['admin']), updateHeroSlide);
-router.delete('/hero-slides/:id', authenticate, authorize(['admin']), deleteHeroSlide);
-router.put('/site-config',     authenticate, authorize(['admin']), updateSiteConfig);
-router.get('/admin/offers', authenticate, authorize(['admin']), getAdminOffers);
-router.post('/admin/offers', authenticate, authorize(['admin']), upsertOffer);
-router.put('/admin/offers/:id', authenticate, authorize(['admin']), upsertOffer);
+router.post('/hero-slides',    authenticate, authorize(['admin']), requireCompletedProfile, createHeroSlide);
+router.put('/hero-slides/:id', authenticate, authorize(['admin']), requireCompletedProfile, updateHeroSlide);
+router.delete('/hero-slides/:id', authenticate, authorize(['admin']), requireCompletedProfile, deleteHeroSlide);
+router.put('/site-config',     authenticate, authorize(['admin']), requireCompletedProfile, updateSiteConfig);
+router.get('/admin/offers', authenticate, authorize(['admin']), requireCompletedProfile, getAdminOffers);
+router.post('/admin/offers', authenticate, authorize(['admin']), requireCompletedProfile, upsertOffer);
+router.put('/admin/offers/:id', authenticate, authorize(['admin']), requireCompletedProfile, upsertOffer);
 
 // ─── ADMIN ANALYTICS ─────────────────────────────────────────────────────────
-router.get('/admin/analytics', authenticate, authorize(['admin']), getAdminAnalytics);
+router.get('/admin/analytics', authenticate, authorize(['admin']), requireCompletedProfile, getAdminAnalytics);
 
 // ─── ADMIN USER MANAGEMENT ───────────────────────────────────────────────────
-router.get('/admin/users',              authenticate, authorize(['admin']), getAllUsers);
-router.put('/admin/users/:uid/role',    authenticate, authorize(['admin']), updateUserRole);
-router.put('/admin/users/:uid/ban',     authenticate, authorize(['admin']), banUser);
-router.delete('/admin/users/:uid/remove-admin', authenticate, authorize(['admin']), removeAdminUser);
+router.get('/admin/users',              authenticate, authorize(['admin']), requireCompletedProfile, getAllUsers);
+router.put('/admin/users/:uid/role',    authenticate, authorize(['admin']), requireCompletedProfile, updateUserRole);
+router.put('/admin/users/:uid/ban',     authenticate, authorize(['admin']), requireCompletedProfile, banUser);
+router.delete('/admin/users/:uid/remove-admin', authenticate, authorize(['admin']), requireCompletedProfile, removeAdminUser);
 
 // ─── ADMIN SELLER MANAGEMENT ─────────────────────────────────────────────────
-router.get('/admin/sellers/pending',       authenticate, authorize(['admin']), getPendingSellers);
-router.get('/admin/sellers',               authenticate, authorize(['admin']), getAllSellersDetails);
-router.put('/admin/sellers/:uid/approve',  authenticate, authorize(['admin']), approveSeller);
-router.put('/admin/sellers/:uid/reject',   authenticate, authorize(['admin']), rejectSeller);
+router.get('/admin/sellers/pending',       authenticate, authorize(['admin']), requireCompletedProfile, getPendingSellers);
+router.get('/admin/sellers',               authenticate, authorize(['admin']), requireCompletedProfile, getAllSellersDetails);
+router.put('/admin/sellers/:uid/approve',  authenticate, authorize(['admin']), requireCompletedProfile, approveSeller);
+router.put('/admin/sellers/:uid/reject',   authenticate, authorize(['admin']), requireCompletedProfile, rejectSeller);
 
 // ─── ADMIN ORDERS ─────────────────────────────────────────────────────────────
-router.get('/admin/orders',          authenticate, authorize(['admin']), getAllOrders);
-router.put('/admin/orders/:id/status', authenticate, authorize(['admin']), updateOrderStatus);
+router.get('/admin/orders',          authenticate, authorize(['admin']), requireCompletedProfile, getAllOrders);
+router.put('/admin/orders/:id/status', authenticate, authorize(['admin']), requireCompletedProfile, updateOrderStatus);
 
 // ─── WISHLIST (authenticated users) ──────────────────────────────────────────
-router.get('/wishlist',                   authenticate, getWishlist);
-router.post('/wishlist',                  authenticate, addToWishlist);
-router.delete('/wishlist/:productId',     authenticate, removeFromWishlist);
+router.get('/wishlist',                   authenticate, requireCompletedProfile, getWishlist);
+router.post('/wishlist',                  authenticate, requireCompletedProfile, addToWishlist);
+router.delete('/wishlist/:productId',     authenticate, requireCompletedProfile, removeFromWishlist);
 
 // ─── SELLER DASHBOARD ─────────────────────────────────────────────────────────
-router.get('/seller/dashboard', authenticate, authorize(['seller', 'admin']), getSellerDashboardData);
-router.get('/seller/orders',    authenticate, authorize(['seller', 'admin']), getSellerOrders);
-router.put('/seller/orders/:id/status', authenticate, authorize(['seller', 'admin']), updateSellerOrderStatus);
-router.put('/seller/orders/:id/returns/:productId/status', authenticate, authorize(['seller', 'admin']), updateReturnRequestStatus);
+router.get('/seller/dashboard', authenticate, authorize(['seller', 'admin']), requireCompletedProfile, getSellerDashboardData);
+router.get('/seller/orders',    authenticate, authorize(['seller', 'admin']), requireCompletedProfile, getSellerOrders);
+router.put('/seller/orders/:id/status', authenticate, authorize(['seller', 'admin']), requireCompletedProfile, updateSellerOrderStatus);
+router.put('/seller/orders/:id/returns/:productId/status', authenticate, authorize(['seller', 'admin']), requireCompletedProfile, updateReturnRequestStatus);
 
 // ─── ADMIN: CONTENT CURATION ────────────────────────────────────────────────
-router.get('/admin/products/curation', authenticate, authorize(['admin']), getProductsForCuration);
-router.put('/admin/products/:id/moderation', authenticate, authorize(['admin']), updateProductModeration);
-router.get('/admin/monetization', authenticate, authorize(['admin']), getMonetizationOverview);
-router.get('/admin/commission-structure', authenticate, authorize(['admin']), getCommissionStructureConfig);
-router.put('/admin/commission-structure', authenticate, authorize(['admin']), updateCommissionStructureConfig);
-router.post('/admin/payouts/:id/release', authenticate, authorize(['admin']), releasePayout);
-router.get('/seller/payouts', authenticate, authorize(['seller', 'admin']), getSellerPayouts);
+router.get('/admin/products/curation', authenticate, authorize(['admin']), requireCompletedProfile, getProductsForCuration);
+router.put('/admin/products/:id/moderation', authenticate, authorize(['admin']), requireCompletedProfile, updateProductModeration);
+router.get('/admin/monetization', authenticate, authorize(['admin']), requireCompletedProfile, getMonetizationOverview);
+router.get('/admin/commission-structure', authenticate, authorize(['admin']), requireCompletedProfile, getCommissionStructureConfig);
+router.put('/admin/commission-structure', authenticate, authorize(['admin']), requireCompletedProfile, updateCommissionStructureConfig);
+router.post('/admin/payouts/:id/release', authenticate, authorize(['admin']), requireCompletedProfile, releasePayout);
+router.get('/seller/payouts', authenticate, authorize(['seller', 'admin']), requireCompletedProfile, getSellerPayouts);
 
-router.get('/admin/ads', authenticate, authorize(['admin']), getAdminAds);
-router.put('/admin/ad-slots/:id', authenticate, authorize(['admin']), upsertAdSlot);
-router.post('/admin/ads', authenticate, authorize(['admin']), upsertAd);
-router.put('/admin/ads/:id', authenticate, authorize(['admin']), upsertAd);
-router.get('/seller/ads', authenticate, authorize(['seller', 'admin']), getMyAds);
-router.post('/seller/ads', authenticate, authorize(['seller', 'admin']), createMyAd);
-router.get('/seller/ad-slots', authenticate, authorize(['seller', 'admin']), getSellerAdSlots);
+router.get('/admin/ads', authenticate, authorize(['admin']), requireCompletedProfile, getAdminAds);
+router.put('/admin/ad-slots/:id', authenticate, authorize(['admin']), requireCompletedProfile, upsertAdSlot);
+router.post('/admin/ads', authenticate, authorize(['admin']), requireCompletedProfile, upsertAd);
+router.put('/admin/ads/:id', authenticate, authorize(['admin']), requireCompletedProfile, upsertAd);
+router.get('/seller/ads', authenticate, authorize(['seller', 'admin']), requireCompletedProfile, getMyAds);
+router.post('/seller/ads', authenticate, authorize(['seller', 'admin']), requireCompletedProfile, createMyAd);
+router.get('/seller/ad-slots', authenticate, authorize(['seller', 'admin']), requireCompletedProfile, getSellerAdSlots);
 router.get('/ads/public', getPublicAdsBySlot);
-router.post('/admin/reset/activities', authenticate, authorize(['admin']), clearAdminActivities);
-router.post('/admin/reset/delete-all-products', authenticate, authorize(['admin']), superAdminDeleteAllProducts);
-router.post('/admin/reset/delete-users', authenticate, authorize(['admin']), superAdminDeleteUsersByRole);
-router.post('/admin/reset/web', authenticate, authorize(['admin']), superAdminResetWeb);
+router.post('/admin/reset/activities', authenticate, authorize(['admin']), requireCompletedProfile, clearAdminActivities);
+router.post('/admin/reset/delete-all-products', authenticate, authorize(['admin']), requireCompletedProfile, superAdminDeleteAllProducts);
+router.post('/admin/reset/delete-users', authenticate, authorize(['admin']), requireCompletedProfile, superAdminDeleteUsersByRole);
+router.post('/admin/reset/web', authenticate, authorize(['admin']), requireCompletedProfile, superAdminResetWeb);
 
-router.get('/admin/subscription-plans', authenticate, authorize(['admin']), getSubscriptionPlans);
-router.post('/admin/subscription-plans', authenticate, authorize(['admin']), upsertSubscriptionPlan);
-router.put('/admin/subscription-plans/:id', authenticate, authorize(['admin']), upsertSubscriptionPlan);
+router.get('/admin/subscription-plans', authenticate, authorize(['admin']), requireCompletedProfile, getSubscriptionPlans);
+router.post('/admin/subscription-plans', authenticate, authorize(['admin']), requireCompletedProfile, upsertSubscriptionPlan);
+router.put('/admin/subscription-plans/:id', authenticate, authorize(['admin']), requireCompletedProfile, upsertSubscriptionPlan);
 router.get('/subscription-plans', getSubscriptionPlans);
-router.post('/seller/subscription/select', authenticate, authorize(['seller', 'admin']), subscribeSellerToPlan);
+router.post('/seller/subscription/select', authenticate, authorize(['seller', 'admin']), requireCompletedProfile, subscribeSellerToPlan);
 
 // ─── SUPPORT TICKETS ────────────────────────────────────────────────────────
-router.post('/support-tickets', authenticate, createSupportTicket);
-router.get('/support-tickets/my', authenticate, getMySupportTickets);
-router.get('/admin/support-tickets', authenticate, authorize(['admin']), getAllSupportTickets);
-router.put('/admin/support-tickets/:id/status', authenticate, authorize(['admin']), updateSupportTicketStatus);
-router.post('/stock-alerts', authenticate, subscribeProductAvailability);
-router.get('/notifications/my', authenticate, getMyNotifications);
-router.put('/notifications/:id/read', authenticate, markNotificationRead);
-router.get('/reviews/my', authenticate, getMyReviews);
+router.post('/support-tickets', authenticate, requireCompletedProfile, createSupportTicket);
+router.get('/support-tickets/my', authenticate, requireCompletedProfile, getMySupportTickets);
+router.get('/admin/support-tickets', authenticate, authorize(['admin']), requireCompletedProfile, getAllSupportTickets);
+router.put('/admin/support-tickets/:id/status', authenticate, authorize(['admin']), requireCompletedProfile, updateSupportTicketStatus);
+router.post('/stock-alerts', authenticate, requireCompletedProfile, subscribeProductAvailability);
+router.get('/notifications/my', authenticate, requireCompletedProfile, getMyNotifications);
+router.put('/notifications/:id/read', authenticate, requireCompletedProfile, markNotificationRead);
+router.get('/reviews/my', authenticate, requireCompletedProfile, getMyReviews);
 
 export default router;

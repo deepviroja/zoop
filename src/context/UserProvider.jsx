@@ -11,37 +11,10 @@ import {
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import { showToast } from "../services/toastService";
+import { buildClientProfileState } from "../utils/profileCompletion";
 
 const DELETED_ACCOUNT_NOTICE =
   "This account has been deleted. Sign up again to create a new account or use the recovery email if available.";
-
-const getMissingCustomerFields = (profile = {}) => {
-  const missing = [];
-  if (!(profile.displayName || profile.name)) missing.push("name");
-  if (!profile.email) missing.push("email");
-  if (!profile.phone) missing.push("phone");
-  if (!profile.address) missing.push("address");
-  if (!profile.city) missing.push("city");
-  if (!profile.state) missing.push("state");
-  if (!profile.pincode) missing.push("pincode");
-  return missing;
-};
-
-const getMissingSellerFields = (profile = {}) => {
-  const required = [
-    "businessName",
-    "businessType",
-    "panNumber",
-    "phone",
-    "address",
-    "bankName",
-    "accountNumber",
-    "ifscCode",
-    "panCardUrl",
-    "cancelledChequeUrl",
-  ];
-  return required.filter((field) => !profile?.[field]);
-};
 
 export const UserProvider = ({ children }) => {
   const [location, setLocation] = useState(() => {
@@ -70,10 +43,11 @@ export const UserProvider = ({ children }) => {
           // Get extra data from Firestore
           let verificationStatus;
           let dbProfile = {};
-          let missingProfile = false;
+          let hasProfileDocument = false;
           try {
             const userDoc = await getDoc(doc(db, "users", currentUser.uid));
             if (userDoc.exists()) {
+              hasProfileDocument = true;
               const data = userDoc.data();
               if (
                 data?.isDeleted ||
@@ -103,14 +77,12 @@ export const UserProvider = ({ children }) => {
                 setLocation(preferredCity);
                 localStorage.setItem("zoop_city", preferredCity);
               }
-            } else {
-              missingProfile = true;
             }
           } catch (e) {
             console.warn("Failed to fetch user data from Firestore", e);
           }
 
-          if (missingProfile) {
+          if (!hasProfileDocument) {
             role = role || "customer";
             const provisionalProfile = {
               displayName:
@@ -125,10 +97,13 @@ export const UserProvider = ({ children }) => {
               pincode: "",
               photoURL: currentUser.photoURL || "",
             };
-            const missingFields =
-              role === "seller"
-                ? getMissingSellerFields(provisionalProfile)
-                : getMissingCustomerFields(provisionalProfile);
+            const profileState = buildClientProfileState({
+              ...provisionalProfile,
+              role,
+              isProfileComplete: false,
+              status: "pending",
+              accountState: "pending",
+            });
             const provisionalUser = {
               uid: currentUser.uid,
               email: currentUser.email,
@@ -136,9 +111,9 @@ export const UserProvider = ({ children }) => {
               role,
               verificationStatus,
               emailVerified: currentUser.emailVerified,
+              hasProfileDocument: false,
               ...provisionalProfile,
-              profileMissingFields: missingFields,
-              profileNeedsSetup: true,
+              ...profileState,
             };
             setUser(provisionalUser);
             localStorage.setItem("zoop_user", JSON.stringify(provisionalUser));
@@ -153,10 +128,10 @@ export const UserProvider = ({ children }) => {
           }
 
           role = role || "customer";
-          const missingFields =
-            role === "seller"
-              ? getMissingSellerFields(dbProfile)
-              : getMissingCustomerFields(dbProfile);
+          const profileState = buildClientProfileState({
+            ...dbProfile,
+            role,
+          });
 
           // Merge firebase user with role
           const userData = {
@@ -167,20 +142,20 @@ export const UserProvider = ({ children }) => {
             role: role,
             verificationStatus: verificationStatus,
             emailVerified: currentUser.emailVerified,
+            hasProfileDocument: true,
             ...dbProfile,
-            profileMissingFields: missingFields,
-            profileNeedsSetup: missingFields.length > 0,
+            ...profileState,
           };
 
           setUser(userData);
           localStorage.setItem("zoop_user", JSON.stringify(userData));
           localStorage.setItem("authToken", token);
 
-          if (role !== "admin" && missingFields.length > 0) {
+          if (role !== "admin" && profileState.missingFields.length > 0) {
             showToast.warning(
               role === "seller"
-                ? `Complete seller profile: ${missingFields.join(", ")}`
-                : `Complete your profile: ${missingFields.join(", ")}`,
+                ? `Complete seller profile: ${profileState.missingFields.join(", ")}`
+                : `Complete your profile: ${profileState.missingFields.join(", ")}`,
             );
           }
         } catch (err) {

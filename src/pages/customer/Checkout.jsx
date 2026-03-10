@@ -8,6 +8,7 @@ import { useToast } from "../../context/ToastContext";
 import { authApi, contentApi, ordersApi } from "../../services/api";
 import CountryPhoneField from "../../components/common/CountryPhoneField";
 import CountryStateCityFieldset from "../../components/common/CountryStateCityFieldset";
+import { useSiteConfig } from "../../context/SiteConfigContext";
 import {
   isValidEmail,
   isValidInternationalPhone,
@@ -37,6 +38,16 @@ const Checkout = () => {
   const { cartItems, getCartTotal, clearCart } = useCart();
   const { user, location } = useUser();
   const { showToast } = useToast();
+  const { brandName } = useSiteConfig();
+  const brandSlug = String(brandName || "order")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-");
+  const brandOrderPrefix =
+    String(brandName || "order")
+      .trim()
+      .replace(/[^a-z0-9]+/gi, "")
+      .toUpperCase() || "ORDER";
 
   const [step, setStep] = useState(1); // 1: Address, 2: Payment, 3: Review
   const [formData, setFormData] = useState({
@@ -301,7 +312,7 @@ const Checkout = () => {
 
         const paymentOrderResponse = await ordersApi.createRazorpayOrder({
           items: normalizedItems,
-          receipt: `zoop_${Date.now().toString().slice(-10)}`,
+          receipt: `${brandSlug || "order"}_${Date.now().toString().slice(-10)}`,
           notes: {
             customer_uid: user?.uid || "guest",
             customer_email: formData.email || "",
@@ -347,8 +358,8 @@ const Checkout = () => {
             key: keyId,
             amount: razorpayOrder.amount,
             currency: razorpayOrder.currency || "INR",
-            name: "Zoop",
-            description: "Order Payment",
+            name: brandName,
+            description: `${brandName} Order Payment`,
             order_id: razorpayOrder.id,
             prefill: {
               name: formData.fullName,
@@ -391,7 +402,9 @@ const Checkout = () => {
 
       const createdOrder = response?.order || {};
       setFinalTotal(createdOrder.totalAmount || currentTotal);
-      setOrderId(createdOrder.id || `ZOOP${Date.now().toString().slice(-8)}`);
+      setOrderId(
+        createdOrder.id || `${brandOrderPrefix}${Date.now().toString().slice(-8)}`,
+      );
       setOrderPlaced(true);
       clearCart();
       await ordersApi.releaseCheckout().catch(() => {});
@@ -952,7 +965,7 @@ const Checkout = () => {
                           src={
                             item.thumbnailUrl ||
                             item.image ||
-                            "https://placehold.co/80x80?text=Zoop"
+                            "/brand-mark.svg"
                           }
                           alt={item.title || item.name}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform"

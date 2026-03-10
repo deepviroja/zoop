@@ -127,9 +127,12 @@ const ContentCuration = () => {
               {/* Product Image */}
               <div className="relative aspect-square bg-gray-100">
                 <img
-                  src={product.image || product.thumbnailUrl || "https://placehold.co/400x400?text=Product"}
+                  src={product.image || product.thumbnailUrl || "/brand-mark.svg"}
                   alt={product.name || product.title}
                   className="w-full h-full object-cover"
+                  onError={(event) => {
+                    event.currentTarget.src = "/brand-mark.svg";
+                  }}
                 />
                 <div className="absolute top-3 left-3">
                   <span className={`px-3 py-1 rounded-full text-xs font-black uppercase ${
@@ -252,13 +255,24 @@ const ContentCuration = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <img
-                  src={selectedProduct.image || selectedProduct.thumbnailUrl || "https://placehold.co/400x400?text=Product"}
+                  src={selectedProduct.image || selectedProduct.thumbnailUrl || "/brand-mark.svg"}
                   alt={selectedProduct.name || selectedProduct.title}
                   className="w-full aspect-square object-cover rounded-2xl border border-gray-200"
+                  onError={(event) => {
+                    event.currentTarget.src = "/brand-mark.svg";
+                  }}
                 />
                 <div className="grid grid-cols-3 gap-2 mt-3">
                   {(selectedProduct.imageUrls || []).slice(0, 6).map((img, idx) => (
-                    <img key={idx} src={img} alt="media" className="h-20 w-full object-cover rounded-lg border border-gray-200" />
+                    <img
+                      key={idx}
+                      src={img}
+                      alt="media"
+                      className="h-20 w-full object-cover rounded-lg border border-gray-200"
+                      onError={(event) => {
+                        event.currentTarget.src = "/brand-mark.svg";
+                      }}
+                    />
                   ))}
                 </div>
               </div>

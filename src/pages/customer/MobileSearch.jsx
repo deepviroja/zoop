@@ -252,10 +252,13 @@ const MobileSearch = () => {
                           src={
                             product.thumbnailUrl ||
                             product.image ||
-                            "https://placehold.co/64x64"
+                            "/brand-mark.svg"
                           }
                           alt={product.title || product.name}
                           className="w-full h-full object-cover"
+                          onError={(event) => {
+                            event.currentTarget.src = "/brand-mark.svg";
+                          }}
                         />
                       </div>
                       <div className="flex-1 min-w-0">

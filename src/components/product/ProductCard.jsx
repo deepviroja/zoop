@@ -26,7 +26,7 @@ const ProductCard = ({ product, view = "grid" }) => {
     product.image ||
     (product.images && product.images[0]) ||
     (product.imageUrls && product.imageUrls[0]) ||
-    "https://via.placeholder.com/300";
+    "/brand-mark.svg";
   const displayImages = product.imageUrls || product.images || [displayImage];
   const optimizedDisplayImage = optimizeCloudinaryUrl(displayImage, { width: 800 });
   const optimizedDisplayImages = (displayImages || []).map((u) => optimizeCloudinaryUrl(u, { width: 800 }));
@@ -125,7 +125,7 @@ const ProductCard = ({ product, view = "grid" }) => {
               alt={productTitle}
               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
               onError={(e) => {
-                e.target.src = "https://via.placeholder.com/300";
+                e.target.src = "/brand-mark.svg";
               }}
             />
             {product.type === "Local" && (
@@ -259,7 +259,7 @@ const ProductCard = ({ product, view = "grid" }) => {
             alt={productTitle}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
             onError={(e) => {
-              e.target.src = "https://via.placeholder.com/300";
+              e.target.src = "/brand-mark.svg";
             }}
           />
 

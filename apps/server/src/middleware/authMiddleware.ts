@@ -16,10 +16,7 @@ export const authenticate = async (req: UserRequest, res: Response, next: NextFu
     const decodedToken = await admin.auth().verifyIdToken(token);
     const userDoc = await admin.firestore().collection('users').doc(decodedToken.uid).get();
     const profile = userDoc.exists ? (userDoc.data() as any) : null;
-    if (!userDoc.exists) {
-      return res.status(403).json({ error: 'Account profile not found' });
-    }
-    if (profile?.isDeleted) {
+    if (profile?.isDeleted || profile?.status === 'deleted' || profile?.accountState === 'deleted') {
       return res.status(403).json({ error: 'Account is deleted' });
     }
     if (profile?.disabled || profile?.status === 'banned') {
@@ -28,13 +25,43 @@ export const authenticate = async (req: UserRequest, res: Response, next: NextFu
     if (decodedToken.disabled) {
       return res.status(403).json({ error: 'Account is disabled' });
     }
-    (decodedToken as any).role = decodedToken.role || profile?.role || 'customer';
-    (decodedToken as any).email = decodedToken.email || profile?.email || '';
-    req.user = decodedToken;
+    const role = (decodedToken as any).role || profile?.role || 'customer';
+    const email = decodedToken.email || profile?.email || '';
+    req.user = {
+      ...decodedToken,
+      role,
+      email,
+      profileExists: userDoc.exists,
+      profileComplete: profile?.isProfileComplete === true || role === 'admin',
+      accountState: profile?.accountState || profile?.status || (userDoc.exists ? 'active' : 'pending'),
+    };
     next();
   } catch (error) {
     return res.status(401).json({ error: 'Unauthorized: Invalid token' });
   }
+};
+
+export const requireCompletedProfile = (
+  req: UserRequest,
+  res: Response,
+  next: NextFunction,
+) => {
+  if (!req.user) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  if (req.user.role === 'admin') {
+    return next();
+  }
+
+  if (req.user.profileComplete) {
+    return next();
+  }
+
+  return res.status(403).json({
+    error: 'Complete your profile before accessing this section',
+    accountState: req.user.accountState || 'pending',
+  });
 };
 
 export const authorize = (roles: string[]) => {

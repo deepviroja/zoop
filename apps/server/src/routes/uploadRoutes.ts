@@ -1,5 +1,5 @@
 import express from 'express';
-import { authenticate } from '../middleware/authMiddleware';
+import { authenticate, requireCompletedProfile } from '../middleware/authMiddleware';
 import {
   uploadMiddleware,
   uploadImage,
@@ -13,9 +13,9 @@ import {
 const router = express.Router();
 
 // Upload routes - require authentication
-router.post('/', authenticate, uploadMiddleware, uploadImage);
-router.post('/video', authenticate, uploadVideoMiddleware, uploadVideo);
-router.post('/document', authenticate, uploadDocumentMiddleware, uploadDocument);
-router.post('/delete', authenticate, deleteImage);
+router.post('/', authenticate, requireCompletedProfile, uploadMiddleware, uploadImage);
+router.post('/video', authenticate, requireCompletedProfile, uploadVideoMiddleware, uploadVideo);
+router.post('/document', authenticate, requireCompletedProfile, uploadDocumentMiddleware, uploadDocument);
+router.post('/delete', authenticate, requireCompletedProfile, deleteImage);
 
 export default router;

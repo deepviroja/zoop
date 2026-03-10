@@ -15,6 +15,13 @@ const fmtDateTime = (value) => (value ? new Date(value).toLocaleString() : "-");
 const sellerStateLabel = (seller) => {
   if (seller?.isDeleted || seller?.status === "deleted") return "deleted";
   if (seller?.disabled || seller?.status === "banned") return "banned";
+  if (
+    seller?.status === "pending" ||
+    seller?.accountState === "pending" ||
+    seller?.isProfileComplete === false
+  ) {
+    return "pending";
+  }
   return "active";
 };
 
@@ -112,7 +119,7 @@ const SellerManagement = () => {
         </div>
 
         <div className="bg-white rounded-3xl shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto scrollbar-gap">
             <table className="w-full">
               <thead>
                 <tr className="bg-gray-50">
@@ -163,6 +170,8 @@ const SellerManagement = () => {
                             className={`px-3 py-1 rounded-full text-xs font-black uppercase ${
                               sellerStateLabel(seller) === "deleted"
                                 ? "bg-gray-200 text-gray-700"
+                                : sellerStateLabel(seller) === "pending"
+                                  ? "bg-sky-100 text-sky-700"
                                 : sellerStateLabel(seller) === "banned"
                                   ? "bg-red-100 text-red-700"
                                   : "bg-green-100 text-green-700"

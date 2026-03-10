@@ -26,6 +26,13 @@ const getAccountState = (user) => {
   ) {
     return "banned";
   }
+  if (
+    user?.status === "pending" ||
+    user?.accountState === "pending" ||
+    user?.isProfileComplete === false
+  ) {
+    return "pending";
+  }
   return "active";
 };
 
@@ -59,11 +66,12 @@ const UserManagement = () => {
       const matchesSearch =
         String(user.displayName || user.name || "").toLowerCase().includes(q) ||
         String(user.email || "").toLowerCase().includes(q);
-      const matchesStatus =
-        filterStatus === "all" ||
-        (filterStatus === "active" && getAccountState(user) === "active") ||
-        (filterStatus === "suspended" && getAccountState(user) === "banned") ||
-        (filterStatus === "deleted" && getAccountState(user) === "deleted");
+        const matchesStatus =
+          filterStatus === "all" ||
+          (filterStatus === "active" && getAccountState(user) === "active") ||
+          (filterStatus === "pending" && getAccountState(user) === "pending") ||
+          (filterStatus === "suspended" && getAccountState(user) === "banned") ||
+          (filterStatus === "deleted" && getAccountState(user) === "deleted");
       return matchesSearch && matchesStatus;
     });
   }, [users, searchQuery, filterStatus]);
@@ -71,6 +79,7 @@ const UserManagement = () => {
   const stats = {
     totalUsers: users.length,
     activeUsers: users.filter((u) => getAccountState(u) === "active").length,
+    pending: users.filter((u) => getAccountState(u) === "pending").length,
     suspended: users.filter((u) => getAccountState(u) === "banned").length,
     deleted: users.filter((u) => getAccountState(u) === "deleted").length,
   };
@@ -138,6 +147,12 @@ const UserManagement = () => {
               Active
             </div>
           </div>
+          <div className="bg-gradient-to-br from-blue-50 to-sky-100 rounded-2xl p-5 border border-sky-200">
+            <div className="text-3xl font-black text-sky-700">{stats.pending}</div>
+            <div className="text-[10px] font-black uppercase tracking-widest text-sky-600 mt-1">
+              Pending
+            </div>
+          </div>
           <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl p-5 border border-orange-200">
             <div className="text-3xl font-black text-orange-700">{stats.suspended}</div>
             <div className="text-[10px] font-black uppercase tracking-widest text-orange-600 mt-1">
@@ -175,6 +190,7 @@ const UserManagement = () => {
             >
               <option value="all">All Status</option>
               <option value="active">Active</option>
+              <option value="pending">Pending</option>
               <option value="suspended">Suspended</option>
               <option value="deleted">Deleted</option>
             </select>
@@ -182,7 +198,7 @@ const UserManagement = () => {
         </div>
 
         <div className="bg-white rounded-3xl shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto scrollbar-gap">
             <table className="w-full">
               <thead>
                 <tr className="bg-gray-50">
@@ -260,6 +276,8 @@ const UserManagement = () => {
                           className={`inline-flex mt-1 ml-2 px-2 py-0.5 rounded-full text-[10px] font-black ${
                             getAccountState(user) === "deleted"
                               ? "bg-gray-200 text-gray-700"
+                              : getAccountState(user) === "pending"
+                                ? "bg-sky-100 text-sky-700"
                               : getAccountState(user) === "banned"
                                 ? "bg-red-100 text-red-700"
                                 : "bg-green-100 text-green-700"

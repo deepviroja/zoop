@@ -26,11 +26,13 @@ import {
 } from "../../utils/firebasePhoneAuth";
 import CountryPhoneField from "../../components/common/CountryPhoneField";
 import { isValidInternationalPhone } from "../../utils/liveValidation";
+import { useSiteConfig } from "../../context/SiteConfigContext";
 
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, isLoading } = useUser();
+  const { brandName, replaceBrandText } = useSiteConfig();
 
   // Where to redirect after login (support ?redirect= param)
   const from = new URLSearchParams(location.search).get("redirect") || "/";
@@ -98,10 +100,9 @@ const Login = () => {
     if (nextUser.role === "seller") return "/seller/dashboard";
     if (nextUser.role === "admin") return "/admin";
     if (
-      Array.isArray(nextUser.profileMissingFields) &&
-      nextUser.profileMissingFields.length > 0
+      nextUser.profileNeedsSetup
     ) {
-      return "/profile?edit=1&welcome=1";
+      return nextUser.profileSetupRoute || "/complete-profile";
     }
     return from;
   };
@@ -213,7 +214,7 @@ const Login = () => {
         resetPhoneRecaptcha();
         const confirmation = await sendFirebasePhoneOtp(
           response?.otpRecipient || phoneValue,
-          { containerId: "login-phone-recaptcha", size: "normal" },
+          { containerId: "login-phone-recaptcha", size: "invisible" },
         );
         setPhoneConfirmation(confirmation);
         setOtpExpiresAt(new Date(Date.now() + 5 * 60 * 1000).toISOString());
@@ -304,7 +305,7 @@ const Login = () => {
     <>
       <Seo
         title="Login | Zoop"
-        description="Access your Zoop account."
+        description={replaceBrandText("Access your Zoop account.")}
         robots="noindex,nofollow"
         canonicalPath="/login"
       />
@@ -318,7 +319,7 @@ const Login = () => {
                 to="/"
                 className="inline-block text-3xl font-black text-zoop-moss mb-4"
               >
-                ZOOP
+                {brandName}
                 <span className="text-zoop-obsidian text-xs italic">.in</span>
               </Link>
               <h1 className="text-2xl font-black text-zoop-obsidian mb-1">
@@ -375,7 +376,7 @@ const Login = () => {
             <div className="relative flex items-center justify-center mb-6">
               <div className="absolute inset-0 bg-gray-200 h-px w-full top-1/2" />
               <span className="relative bg-white px-4 text-xs font-bold text-gray-400 uppercase tracking-widest">
-                Or login with Zoop
+                {replaceBrandText("Or login with Zoop")}
               </span>
             </div>
 
@@ -545,10 +546,6 @@ const Login = () => {
                         onMetaChange={(meta) => setPhoneMeta(meta || phoneMeta)}
                         error={errors.phone}
                         defaultCountry="in"
-                      />
-                      <div
-                        id="login-phone-recaptcha"
-                        className="mt-3 overflow-hidden rounded-2xl"
                       />
                     </div>
                   )}

@@ -1,6 +1,9 @@
 @import "tailwindcss";
 
-* {
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
   scroll-behavior: smooth;
   scrollbar-width: thin;
   scrollbar-color: #9fb774 rgba(251, 249, 247, 0.9);
@@ -67,8 +70,23 @@ svg {
 
 input,
 textarea,
-select {
+select,
+button {
   min-width: 0;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-gap {
+  scrollbar-gutter: stable both-edges;
+  padding-bottom: 0.75rem;
 }
 
 /* Toast Animations */

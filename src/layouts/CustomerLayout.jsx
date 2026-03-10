@@ -30,6 +30,7 @@ import { ChevronLeft } from "../assets/icons/ChevronLeft";
 import { ChevronRight } from "../assets/icons/ChevronRight";
 import { User } from "../assets/icons/User";
 import { LogOut } from "../assets/icons/LogOut";
+import { useSiteConfig } from "../context/SiteConfigContext";
 
 const CustomerLayout = () => {
   const { location, updateLocation, isLoading, user, logout } = useUser();
@@ -45,9 +46,9 @@ const CustomerLayout = () => {
   const [unreadNotifications, setUnreadNotifications] = useState(0);
   const [notificationItems, setNotificationItems] = useState([]);
   const [showDesktopSuggestions, setShowDesktopSuggestions] = useState(false);
-  const [siteConfig, setSiteConfig] = useState(null);
   const navigate = useNavigate();
   const desktopSearchRef = useRef(null);
+  const { siteConfig, brandName, replaceBrandText } = useSiteConfig();
 
   // Update search query when URL param changes
   useEffect(() => {
@@ -63,21 +64,6 @@ const CustomerLayout = () => {
       })
       .catch(() => {
         if (!cancelled) setSearchProducts([]);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-    apiClient
-      .get("/content/site-config")
-      .then((config) => {
-        if (!cancelled) setSiteConfig(config || null);
-      })
-      .catch(() => {
-        if (!cancelled) setSiteConfig(null);
       });
     return () => {
       cancelled = true;
@@ -196,18 +182,6 @@ const CustomerLayout = () => {
   }, [locationPath.pathname, qParam]);
 
   useEffect(() => {
-    if (
-      user &&
-      user.role === "customer" &&
-      Array.isArray(user.profileMissingFields) &&
-      user.profileMissingFields.length > 0 &&
-      locationPath.pathname !== "/profile"
-    ) {
-      navigate("/profile?edit=1&welcome=1", { replace: true });
-    }
-  }, [user, locationPath.pathname, navigate]);
-
-  useEffect(() => {
     const onDocClick = (e) => {
       if (!desktopSearchRef.current) return;
       if (!desktopSearchRef.current.contains(e.target)) {
@@ -220,7 +194,6 @@ const CustomerLayout = () => {
 
   if (isLoading) return <Loader fullScreen />;
 
-  const brandName = String(siteConfig?.brandName || "ZOOP");
   const brandLogoUrl = String(siteConfig?.brandLogoUrl || "").trim();
   const brandTextColor = String(siteConfig?.brandTextColor || "#b7e84b");
   const brandFontFamily = String(siteConfig?.brandFontFamily || "inherit");
@@ -277,7 +250,7 @@ const CustomerLayout = () => {
             Maintenance Mode
           </p>
           <h1 className="text-4xl font-black">
-            Zoop is temporarily unavailable
+            {replaceBrandText("Zoop is temporarily unavailable")}
           </h1>
           <p className="text-white/70">
             {siteConfig?.maintenanceMessage ||
@@ -423,7 +396,7 @@ const CustomerLayout = () => {
                               {product.title || product.name}
                             </p>
                             <p className="text-xs text-gray-500 truncate">
-                              {product.brand || "Zoop"} • ₹
+                              {product.brand || brandName} • ₹
                               {(product.price || 0).toLocaleString()}
                             </p>
                           </div>
@@ -1089,7 +1062,7 @@ const CustomerLayout = () => {
                     to="/about"
                     className="hover:text-white transition-colors"
                   >
-                    About ZOOP
+                    {replaceBrandText("About ZOOP")}
                   </Link>
                 </li>
                 <li>
@@ -1136,7 +1109,7 @@ const CustomerLayout = () => {
 
             <div className="flex items-center gap-4">
               <span className="text-white/20 text-[10px] font-black uppercase tracking-tighter">
-                Zoop is only for Demo Purpose
+                {replaceBrandText("Zoop is only for Demo Purpose")}
               </span>
               <div className="flex gap-3">
                 <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-zoop-moss transition-all cursor-pointer group">

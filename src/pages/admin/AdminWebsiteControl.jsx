@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { adminApi, authApi, contentApi } from "../../services/api";
+import { useSiteConfig } from "../../context/SiteConfigContext";
+import { DEFAULT_BRAND_NAME } from "../../utils/branding";
 
 const AdminWebsiteControl = () => {
+  const { refreshSiteConfig } = useSiteConfig();
   const [saving, setSaving] = useState(false);
   const [contactSaving, setContactSaving] = useState(false);
   const [maintenanceSaving, setMaintenanceSaving] = useState(false);
@@ -9,7 +12,7 @@ const AdminWebsiteControl = () => {
   const [heroSlides, setHeroSlides] = useState([]);
   const [slidesSaving, setSlidesSaving] = useState(false);
   const [config, setConfig] = useState({
-    brandName: "ZOOP",
+    brandName: DEFAULT_BRAND_NAME,
     brandLogoUrl: "",
     brandTextColor: "#b7e84b",
     brandFontFamily: "inherit",
@@ -73,7 +76,7 @@ const AdminWebsiteControl = () => {
     try {
       await adminApi.updateSiteConfig({
         ...config,
-        brandName: config.brandName || "ZOOP",
+        brandName: config.brandName || DEFAULT_BRAND_NAME,
         brandLogoUrl: config.brandLogoUrl || "",
         brandTextColor: config.brandTextColor || "#b7e84b",
         brandFontFamily: config.brandFontFamily || "inherit",
@@ -99,6 +102,7 @@ const AdminWebsiteControl = () => {
           })
           .filter((item) => item.label),
       });
+      await refreshSiteConfig();
       alert("Website controls published.");
     } catch (e) {
       alert(e?.message || "Failed to publish website controls.");
@@ -114,6 +118,7 @@ const AdminWebsiteControl = () => {
         maintenanceMode: Boolean(config.maintenanceMode),
         maintenanceMessage: String(config.maintenanceMessage || "").trim(),
       });
+      await refreshSiteConfig();
       alert("Maintenance settings updated.");
     } catch (e) {
       alert(e?.message || "Failed to update maintenance settings.");
@@ -136,6 +141,7 @@ const AdminWebsiteControl = () => {
         contactMapTitle: String(config.contactMapTitle || "").trim(),
         contactMapAddress: String(config.contactMapAddress || "").trim(),
       });
+      await refreshSiteConfig();
       alert("Contact page settings updated.");
     } catch (e) {
       alert(e?.message || "Failed to update contact page settings.");
@@ -206,7 +212,7 @@ const AdminWebsiteControl = () => {
                 value={config.brandName}
                 onChange={(e) => setConfig((prev) => ({ ...prev, brandName: e.target.value }))}
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-zoop-moss outline-none"
-                placeholder="ZOOP"
+                placeholder={DEFAULT_BRAND_NAME}
               />
             </div>
             <div>

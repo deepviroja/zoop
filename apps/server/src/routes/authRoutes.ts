@@ -16,7 +16,11 @@ import {
   requestDeleteAccountOTP,
   confirmDeleteAccount,
 } from '../controllers/authController';
-import { authenticate, authorize } from '../middleware/authMiddleware';
+import {
+  authenticate,
+  authorize,
+  requireCompletedProfile,
+} from '../middleware/authMiddleware';
 import { signupWithOTP, verifyOTP } from "../controllers/authController";
 
 const router = express.Router();
@@ -33,7 +37,7 @@ router.post('/login', login);
 router.post('/register-seller', registerSeller);
 router.post('/sync', authenticate, syncUser);
 router.post('/admin-create-user', authenticate, authorize(['admin']), adminCreateUser);
-router.get('/seller-dashboard', authenticate, authorize(['seller']), getSellerDashboard);
+router.get('/seller-dashboard', authenticate, authorize(['seller']), requireCompletedProfile, getSellerDashboard);
 router.get('/profile', authenticate, getMyProfile);
 router.put('/profile', authenticate, updateMyProfile);
 router.post('/delete-account/request-otp', authenticate, requestDeleteAccountOTP);

@@ -89,7 +89,7 @@ const Payouts = () => {
         ) : rows.length === 0 ? (
           <p className="p-6 text-gray-500 font-bold">No payouts yet.</p>
         ) : (
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto scrollbar-gap">
             <table className="w-full">
               <thead className="bg-gray-50">
                 <tr>

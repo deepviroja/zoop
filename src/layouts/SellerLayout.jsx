@@ -18,29 +18,14 @@ import { LogOut } from "../assets/icons/LogOut";
 import { BellRing } from "../assets/icons/BellRing";
 import { Shield } from "../assets/icons/Shield";
 import { FileText } from "../assets/icons/FileText";
-import { apiClient } from "../api/client";
+import { useSiteConfig } from "../context/SiteConfigContext";
 
 const SellerLayout = () => {
   const { user } = useUser();
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
-  const [siteConfig, setSiteConfig] = useState(null);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    let cancelled = false;
-    apiClient
-      .get("/content/site-config")
-      .then((cfg) => {
-        if (!cancelled) setSiteConfig(cfg || null);
-      })
-      .catch(() => {
-        if (!cancelled) setSiteConfig(null);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  const { siteConfig, replaceBrandText } = useSiteConfig();
 
   useEffect(() => {
     let cancelled = false;
@@ -75,7 +60,9 @@ const SellerLayout = () => {
           <p className="text-xs font-black uppercase tracking-[0.28em] text-zoop-moss">
             Maintenance Mode
           </p>
-          <h1 className="text-4xl font-black">Seller panel is temporarily unavailable</h1>
+          <h1 className="text-4xl font-black">
+            {replaceBrandText("Seller panel is temporarily unavailable")}
+          </h1>
           <p className="text-white/70">
             {siteConfig?.maintenanceMessage ||
               "We are applying website updates. Please check back shortly."}
