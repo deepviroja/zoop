@@ -47,7 +47,7 @@ const BottomNav = () => {
 
   return (
     <nav
-      className={`fixed bottom-0 left-0 right-0 bg-zoop-obsidian border-t border-white/10 z-50 md:hidden safe-bottom transition-transform duration-300 ease-in-out ${
+      className={`fixed bottom-0 left-0 right-0 bg-zoop-moss/5 backdrop-blur-2xl text-zoop-obsidian border-t border-white/20 shadow-[0_-10px_40px_rgba(0,0,0,0.18)] z-50 md:hidden safe-bottom transition-transform duration-300 ease-in-out ${
         isVisible ? "translate-y-0" : "translate-y-full"
       }`}
     >
@@ -61,7 +61,7 @@ const BottomNav = () => {
               to={item.path}
               className={({ isActive }) =>
                 `flex flex-col items-center justify-center gap-1 transition-all relative ${
-                  isActive ? "text-zoop-moss" : "text-white"
+                  isActive ? "text-zoop-obsidian" : "text-zoop-moss"
                 }`
               }
             >
@@ -71,7 +71,7 @@ const BottomNav = () => {
                     <Icon
                       width={22}
                       height={22}
-                      className={isActive ? "text-zoop-moss" : "text-white"}
+                      className={isActive ? "text-zoop-moss" : "text-zoop-obsidian/50"}
                     />
                     {item.badge > 0 && (
                       <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] min-w-[16px] h-4 rounded-full flex items-center justify-center font-black px-1">
@@ -80,12 +80,12 @@ const BottomNav = () => {
                     )}
                   </div>
                   <span
-                    className={`text-[10px] font-bold ${isActive ? "text-zoop-moss" : "text-white"}`}
+                    className={`text-[10px] font-bold ${isActive ? "text-zoop-moss" : "text-zoop-obsidian/50"}`}
                   >
                     {item.name}
                   </span>
                   {isActive && (
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-zoop-moss rounded-b-full" />
+                    <div className="absolute top-1 w-22 h-14 backdrop-blur-2xl bg-zoop-obsidian/10 rounded-full" />
                   )}
                 </>
               )}

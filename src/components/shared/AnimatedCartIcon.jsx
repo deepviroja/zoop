@@ -6,7 +6,7 @@ import * as motion from 'motion/react';
 
 const { motion: Motion, AnimatePresence } = motion;
 
-const AnimatedCartIcon = ({ className = "" }) => {
+const AnimatedCartIcon = ({ className = "", stroke = "#b7e84b" }) => {
   const { getCartCount, recentlyAdded } = useCart();
   const count = getCartCount();
 
@@ -22,7 +22,7 @@ const AnimatedCartIcon = ({ className = "" }) => {
       >
         {/* Shopping Cart Icon */}
         <div className="relative">
-          <ShoppingCart width={28} height={28} stroke="currentColor" className="text-white hover:text-zoop-moss transition-colors" />
+          <ShoppingCart width={28} height={28} stroke={stroke} className="text-white hover:text-zoop-moss transition-colors" />
           
           {/* Animated Fill Effect - Items in Cart */}
           <AnimatePresence>

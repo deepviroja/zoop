@@ -373,6 +373,10 @@ const Login = () => {
               Continue with Google
             </button>
 
+            <p className="text-[11px] text-gray-500 text-center mt-2">
+              If Google sign-in loops back, finish by setting a password on the Profile Completion page—accounts often need a password before social login sticks.
+            </p>
+
             <div className="relative flex items-center justify-center mb-6">
               <div className="absolute inset-0 bg-gray-200 h-px w-full top-1/2" />
               <span className="relative bg-white px-4 text-xs font-bold text-gray-400 uppercase tracking-widest">

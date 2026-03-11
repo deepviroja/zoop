@@ -3,6 +3,7 @@
     "rules": "firestore.rules"
   },
   "hosting": {
+    "site": "zoop-88df6",
     "public": "dist",
     "ignore": [
       "firebase.json",

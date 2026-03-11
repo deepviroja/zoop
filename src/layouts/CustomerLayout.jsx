@@ -23,10 +23,11 @@ import { Menu } from "../assets/icons/Menu";
 import { X } from "../assets/icons/X";
 import { ChevronDown } from "../assets/icons/ChevronDown";
 import { Zap } from "../assets/icons/Zap";
+import { Heart } from "../assets/icons/Heart";
 import { Instagram } from "../assets/icons/Instagram";
 import { Facebook } from "../assets/icons/Facebook";
 import { Box } from "../assets/icons/Box";
-import { Star } from "../assets/icons/Star";
+// Heart replaces Star for wishlist to align with updated UX
 import { BellRing } from "../assets/icons/BellRing";
 import { ChevronLeft } from "../assets/icons/ChevronLeft";
 import { ChevronRight } from "../assets/icons/ChevronRight";
@@ -113,6 +114,7 @@ const CustomerLayout = () => {
   // On mobile the header is always visible (like BottomNav).
   // On desktop (md+) it hides on scroll-down and reappears on scroll-up.
   const [scrollDir, setScrollDir] = useState("up");
+  const [isCompact, setIsCompact] = useState(false);
   const lastScrollYRef = useRef(0);
 
   useEffect(() => {
@@ -120,10 +122,13 @@ const CustomerLayout = () => {
       // Only apply auto-hide on desktop (≥768px)
       if (window.innerWidth < 768) {
         lastScrollYRef.current = window.scrollY;
+        setIsCompact(window.scrollY > 80);
         return;
       }
       const currentScrollY = window.scrollY;
       const delta = Math.abs(currentScrollY - lastScrollYRef.current);
+
+      setIsCompact(currentScrollY > 90);
 
       // Always reveal when near top to avoid "stuck hidden" state
       if (currentScrollY <= 8) {
@@ -148,6 +153,11 @@ const CustomerLayout = () => {
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Always jump to top after navigation
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [locationPath.pathname]);
 
   const desktopLiveResults =
     searchQuery.trim() === ""
@@ -313,34 +323,37 @@ const CustomerLayout = () => {
 
       {/* --- HEADER (Sticky Liquid) --- */}
       <header
-        className={`bg-zoop-obsidian/40 backdrop-blur-3xl text-white sticky top-0 z-50 transition-all duration-500 shadow-xl border-b border-white/10`}
+        className={`supports-[backdrop-filter]:backdrop-blur-2xl bg-zoop-moss/5 text-white sticky top-1 z-50 transition-all duration-500 shadow-[0_16px_60px_rgba(0,0,0,0.1)] m-1 rounded-2xl shadow-rounded-2xl border-b border-white/15 ${
+          isCompact ? "backdrop-saturate-150" : "backdrop-saturate-200"
+        }`}
       >
         <div className="max-w-[1400px] mx-auto px-4 relative">
           <div
             className={`flex items-center justify-between gap-4 transition-all duration-500 overflow-visible ${
-              scrollDir === "down" ? "h-14 py-2" : "h-16 py-0"
+              scrollDir === "down"
+                ? "h-12 py-1"
+                : isCompact
+                  ? "h-14 py-1"
+                  : "h-18 py-2"
             }`}
           >
             {/* LOGO */}
             <Link
               to="/"
-              className="text-3xl tracking-tighter whitespace-nowrap flex items-center gap-2"
+              className="text-3xl pl-4 tracking-tighter whitespace-nowrap flex items-center gap-2"
             >
-              {brandLogoUrl ? (
-                <img
-                  src={brandLogoUrl}
-                  alt={brandName}
-                  className="h-8 w-8 rounded object-cover bg-white"
-                />
-              ) : null}
-              <span style={brandStyle}>{brandName}</span>
+              <span style={brandStyle}>
+                {isCompact ? (brandName || "Z")[0] : brandName}
+              </span>
             </Link>
 
             {/* DESKTOP SEARCH BAR - SMART CAPSULE */}
             <form
               ref={desktopSearchRef}
               onSubmit={handleSearch}
-              className={`hidden md:flex flex-1 items-center bg-white rounded-full shadow-lg max-w-3xl mx-8 relative transition-all duration-300 ring-2 ${
+              className={`hidden md:flex flex-1 items-center bg-white/90 backdrop-blur-xl rounded-full shadow-lg ${
+                isCompact ? "max-w-2xl" : "max-w-3xl"
+              } mx-8 relative transition-all duration-300 ring-2 ${
                 searchQuery
                   ? "ring-zoop-moss/50 shadow-zoop-moss/20 shadow-2xl"
                   : "ring-transparent"
@@ -381,7 +394,9 @@ const CustomerLayout = () => {
                   }}
                   onFocus={() => setShowDesktopSuggestions(true)}
                   placeholder="Search products, brands, categories"
-                  className="w-full pl-4 pr-12 py-3 text-zoop-obsidian bg-transparent focus:outline-none text-sm font-medium placeholder:text-gray-400"
+                  className={`w-full pl-4 pr-12 ${
+                    isCompact ? "py-2.5 text-xs" : "py-3 text-sm"
+                  } text-zoop-obsidian bg-transparent focus:outline-none font-medium placeholder:text-gray-400`}
                 />
 
                 {/* Clear Button */}
@@ -656,7 +671,7 @@ const CustomerLayout = () => {
                           to="/wishlist"
                           className="flex items-center h-8 gap-2 py-1 px-0 rounded-md hover:bg-gray-100 transition-colors text-sm font-bold text-gray-700"
                         >
-                          <Star width={18} height={18} />
+                          <Heart width={18} height={18} />
                           My Wishlist
                         </Link>
                       </div>
@@ -668,7 +683,7 @@ const CustomerLayout = () => {
                 <>
                   <Link
                     to="/seller/signup"
-                    className="hidden lg:block hover:text-zoop-moss transition-colors"
+                    className="hidden lg:block hover:text-zoop-moss text-zoop-obsidian transition-colors"
                   >
                     Become a Seller
                   </Link>
@@ -702,13 +717,13 @@ const CustomerLayout = () => {
                   to="/wishlist"
                   className="hover:scale-110 active:scale-95 transition-transform"
                 >
-                  <Star width={24} height={24} stroke="white" />
+                  <Heart width={24} height={24} stroke="#1a1a1a" />
                 </Link>
-                <AnimatedCartIcon />
+                <AnimatedCartIcon stroke="#1a1a1a" />
               </div>
               <button onClick={() => setSidebarOpen(true)} className="block">
                 <div className="relative group">
-                  <div className="h-10 w-10 bg-zoop-moss hover:bg-zoop-canvas rounded-xl flex items-center justify-center cursor-pointer transition-all group">
+                  <div className="h-10 w-10 bg-zoop-moss hover:bg-zoop-canvas rounded-xl flex items-center justify-center cursor-pointer transition-all group shadow-lg">
                     <Menu width={24} height={24} stroke="#000" />
                   </div>
                   <span className="absolute -top-1 right-0 flex h-3 w-3">
@@ -989,7 +1004,7 @@ const CustomerLayout = () => {
             </div>
             <div className="flex items-start gap-4">
               <div className="bg-white/10 p-3 rounded-lg">
-                <Star width={32} height={32} stroke="#b7e84b" />
+                <Heart width={32} height={32} stroke="#b7e84b" />
               </div>
               <div>
                 <h4 className="font-bold text-lg">Artisan First</h4>

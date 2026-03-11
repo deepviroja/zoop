@@ -40,10 +40,10 @@ const ProductFilterSidebar = ({
   return (
     <aside
       className={`
-      lg:block lg:w-[19rem] xl:w-[20.5rem] flex-shrink-0 lg:sticky transition-[top] duration-300 ${headerVisible ? "lg:top-24" : "lg:top-6"} h-fit
+      lg:block lg:w-[19rem] xl:w-[20.5rem] flex-shrink-0 lg:sticky lg:z-30 transition-[top] duration-300 ${headerVisible ? "lg:top-46" : "lg:top-6"} h-fit
       ${
         showFilters
-          ? "fixed inset-0 z-40 bg-black/45 backdrop-blur-[2px] lg:relative lg:z-0 lg:bg-transparent lg:backdrop-blur-none"
+          ? "fixed inset-0 bg-black/45 backdrop-blur-[2px] lg:relative lg:z-30 lg:bg-transparent lg:backdrop-blur-none"
           : "hidden"
       }
     `}

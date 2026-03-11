@@ -197,7 +197,7 @@ const SellerLayout = () => {
                 `px-5 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-3 shrink-0 ${
                   isActive
                     ? "bg-zoop-moss text-zoop-obsidian shadow-[0_0_20px_rgba(183,232,75,0.3)] scale-105"
-                    : "text-white/40 hover:text-white hover:bg-white/5"
+                    : "text-white/75 hover:text-white hover:bg-white/5"
                 }`
               }
             >

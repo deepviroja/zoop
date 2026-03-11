@@ -863,6 +863,9 @@ const Signup = () => {
                 </svg>
                 Sign up with Google
               </button>
+              <p className="text-[11px] text-gray-500 text-center mt-2">
+                If Google sign-in loops back, finish by setting a password on the Profile Completion page—accounts often need a password before social login sticks.
+              </p>
 
               {/* Login & Seller Links */}
               <p className="text-center text-gray-600 text-sm">

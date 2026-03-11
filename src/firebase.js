@@ -6,9 +6,9 @@ import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "firebase/app-ch
 // Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyAY5yTsMRrGetXHKbjw4WZxvGBEyf_VBBI",
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "zoop-88df6.firebaseapp.com",
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "zoop-88df6.web.app",
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "zoop-88df6",
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "zoop-88df6.firebasestorage.app",
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "zoop-88df6.appspot.com",
   messagingSenderId:
     import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "225057326778",
   appId:

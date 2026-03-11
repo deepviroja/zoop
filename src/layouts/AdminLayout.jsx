@@ -138,7 +138,7 @@ const AdminLayout = () => {
                 `px-4 py-3 rounded-xl text-sm font-bold transition-all flex items-center gap-3 group shrink-0 ${
                   isActive
                     ? "bg-zoop-obsidian text-white shadow-lg translate-x-2"
-                    : "text-gray-500 hover:bg-zoop-clay/20"
+                    : "text-zoop-obsidian/80 hover:bg-zoop-clay/20"
                 }`
               }
             >
