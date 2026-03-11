@@ -313,7 +313,7 @@ const CustomerLayout = () => {
 
       {/* --- HEADER (Sticky Liquid) --- */}
       <header
-        className={`bg-zoop-obsidian/85 backdrop-blur-[20px] text-white sticky top-0 z-50 transition-all duration-500 shadow-xl border-b border-white/5`}
+        className={`bg-zoop-obsidian/40 backdrop-blur-3xl text-white sticky top-0 z-50 transition-all duration-500 shadow-xl border-b border-white/10`}
       >
         <div className="max-w-[1400px] mx-auto px-4 relative">
           <div
@@ -706,10 +706,7 @@ const CustomerLayout = () => {
                 </Link>
                 <AnimatedCartIcon />
               </div>
-              <button
-                onClick={() => setSidebarOpen(true)}
-                className="hidden md:block"
-              >
+              <button onClick={() => setSidebarOpen(true)} className="block">
                 <div className="relative group">
                   <div className="h-10 w-10 bg-zoop-moss hover:bg-zoop-canvas rounded-xl flex items-center justify-center cursor-pointer transition-all group">
                     <Menu width={24} height={24} stroke="#000" />
@@ -720,12 +717,6 @@ const CustomerLayout = () => {
                   </span>
                 </div>
               </button>
-              <MobileSidebar
-                isOpen={isSidebarOpen}
-                onClose={() => setSidebarOpen(false)}
-                categories={customerSidebarCategories}
-                quickLinks={customerSidebarQuickLinks}
-              />
             </div>
           </div>
           <div className="md:hidden flex items-center gap-2 overflow-x-auto no-scrollbar pb-3">
@@ -907,6 +898,15 @@ const CustomerLayout = () => {
           </div>
         )}
       </header>
+
+      {/* MOBILE SIDEBAR MODAL ROOT */}
+      <MobileSidebar
+        isOpen={isSidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        categories={customerSidebarCategories}
+        quickLinks={customerSidebarQuickLinks}
+      />
+
       {/* --- SUB NAV --- */}
       <nav className="bg-white border-b border-gray-200 shadow-sm z-30">
         <div className="max-w-[1400px] mx-auto px-4 py-3">

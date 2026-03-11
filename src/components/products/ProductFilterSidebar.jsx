@@ -51,7 +51,7 @@ const ProductFilterSidebar = ({
       <div className="space-y-5">
         <div
           ref={sidebarRef}
-          className="ml-auto flex h-full w-full max-w-[24rem] flex-col overflow-hidden bg-white px-4 pb-0 pt-4 shadow-xl lg:max-w-none lg:rounded-[1.75rem] lg:border lg:border-[#e7dfd4] lg:bg-white/95 lg:px-5 lg:pb-5 lg:pt-5 lg:shadow-[0_18px_42px_rgba(41,32,18,0.08)] lg:backdrop-blur-xl lg:max-h-[calc(100vh-25rem)] custom-scrollbar overflow-y-auto"
+          className="ml-auto flex h-full w-full max-w-[24rem] flex-col overflow-hidden bg-white px-4 pb-0 pt-4 shadow-xl lg:max-w-none lg:rounded-[1.75rem] lg:border lg:border-[#e7dfd4] lg:bg-white/95 lg:px-5 lg:pb-5 lg:pt-5 lg:shadow-[0_18px_42px_rgba(41,32,18,0.08)] lg:backdrop-blur-xl lg:max-h-[calc(100vh-7rem)] custom-scrollbar overflow-y-auto"
         >
           {/* Mobile Header */}
           <div className="lg:hidden flex justify-between items-center border-b border-gray-100 pb-4 mb-4">
