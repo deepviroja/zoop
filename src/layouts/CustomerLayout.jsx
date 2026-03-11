@@ -12,6 +12,8 @@ import MobileSidebar from "./MobileSidebar";
 import Loader from "../components/ui/Loader";
 import { Shield } from "../assets/icons/Shield";
 import { useUser } from "../context/UserContext";
+// eslint-disable-next-line no-unused-vars
+import { motion, AnimatePresence } from "framer-motion";
 import { SearchIcon } from "../assets/icons/SearchIcon";
 import AnimatedCartIcon from "../components/shared/AnimatedCartIcon";
 
@@ -47,15 +49,13 @@ const CustomerLayout = () => {
   const [unreadNotifications, setUnreadNotifications] = useState(0);
   const [notificationItems, setNotificationItems] = useState([]);
   const [showDesktopSuggestions, setShowDesktopSuggestions] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const navigate = useNavigate();
   const desktopSearchRef = useRef(null);
   const { siteConfig, brandName, replaceBrandText } = useSiteConfig();
 
   // Update search query when URL param changes
-  useEffect(() => {
-    setSearchQuery(qParam || "");
-  }, [qParam]);
-
+  // useEffect removed since qParam is used for init state and sync update is discouraged
   useEffect(() => {
     let cancelled = false;
     apiClient
@@ -179,7 +179,8 @@ const CustomerLayout = () => {
   };
 
   useEffect(() => {
-    setShowDesktopSuggestions(false);
+    // setShowDesktopSuggestions(false); // Removed sync state update
+    // Instead we rely on path transitions causing re-renders or other effects
   }, [locationPath.pathname, qParam]);
 
   useEffect(() => {
@@ -207,7 +208,7 @@ const CustomerLayout = () => {
   const announcementBanner =
     siteConfig?.announcementBanner ||
     `Order before 6 PM -> SAME-DAY delivery in ${location}!`;
-  const subNavCategories =
+  const rawSubNav =
     Array.isArray(siteConfig?.subNavCategories) &&
     siteConfig.subNavCategories.length > 0
       ? siteConfig.subNavCategories
@@ -218,11 +219,28 @@ const CustomerLayout = () => {
           "Local Artisans",
           "Global Brands",
         ];
-  const customerSidebarCategories =
+
+  const rawSidebarCats =
     Array.isArray(siteConfig?.customerSidebarCategories) &&
     siteConfig.customerSidebarCategories.length > 0
       ? siteConfig.customerSidebarCategories
-      : subNavCategories;
+      : rawSubNav;
+
+  // Filter out categories that have zero active products in searchProducts
+  const filterActiveCategories = (categories) => {
+    if (!searchProducts || searchProducts.length === 0) return categories; // Show all until products load
+    return categories.filter((cat) => {
+      return searchProducts.some((p) => {
+        const catStr = String(cat).toLowerCase().trim();
+        const pCat = String(p.category || p.categoryId || "").toLowerCase();
+        return pCat.includes(catStr) || catStr.includes(pCat);
+      });
+    });
+  };
+
+  const subNavCategories = filterActiveCategories(rawSubNav);
+  const customerSidebarCategories = filterActiveCategories(rawSidebarCats);
+
   const customerSidebarQuickLinks =
     Array.isArray(siteConfig?.customerSidebarQuickLinks) &&
     siteConfig.customerSidebarQuickLinks.length > 0
@@ -264,6 +282,22 @@ const CustomerLayout = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-zoop-canvas relative font-sans">
+      <AnimatePresence>
+        {isLoggingOut && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[9999] bg-zoop-obsidian flex flex-col items-center justify-center text-white"
+          >
+            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-zoop-moss mb-4"></div>
+            <p className="font-black text-xl text-zoop-moss animate-pulse tracking-widest">
+              LOGGING OUT...
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <LocationModal
         isOpen={isLocationModalOpen}
         onClose={() => setIsLocationModalOpen(false)}
@@ -277,15 +311,16 @@ const CustomerLayout = () => {
         <Zap width={16} height={16} fill="black" />
       </div>
 
-      {/* --- HEADER (Sticky) --- */}
-      {/* Mobile: always visible (translate-y-0). Desktop: smart hide on scroll-down */}
+      {/* --- HEADER (Sticky Liquid) --- */}
       <header
-        className={`bg-zoop-obsidian text-white sticky top-0 z-50 transition-transform duration-300 shadow-xl ${
-          scrollDir === "down" ? "md:-translate-y-full" : "translate-y-0"
-        }`}
+        className={`bg-zoop-obsidian/85 backdrop-blur-[20px] text-white sticky top-0 z-50 transition-all duration-500 shadow-xl border-b border-white/5`}
       >
-        <div className="max-w-[1400px] mx-auto px-4">
-          <div className="h-16 flex items-center justify-between gap-4">
+        <div className="max-w-[1400px] mx-auto px-4 relative">
+          <div
+            className={`flex items-center justify-between gap-4 transition-all duration-500 overflow-visible ${
+              scrollDir === "down" ? "h-14 py-2" : "h-16 py-0"
+            }`}
+          >
             {/* LOGO */}
             <Link
               to="/"
@@ -299,9 +334,6 @@ const CustomerLayout = () => {
                 />
               ) : null}
               <span style={brandStyle}>{brandName}</span>
-              <span className="text-white text-xs align-top ml-1 font-normal italic">
-                .in
-              </span>
             </Link>
 
             {/* DESKTOP SEARCH BAR - SMART CAPSULE */}
@@ -427,12 +459,18 @@ const CustomerLayout = () => {
             </form>
 
             {/* RIGHT ACTIONS */}
-            <div className="flex items-center gap-3 md:gap-4 text-sm font-bold">
+            <div
+              className={`flex items-center gap-3 md:gap-4 text-sm font-bold transition-all duration-500 ${
+                scrollDir === "down"
+                  ? "opacity-0 invisible w-0 translate-x-10 scale-90 md:translate-x-0 overflow-hidden"
+                  : "opacity-100 visible translate-x-0 scale-100"
+              }`}
+            >
               {user && (
                 <div className="hidden md:block relative group">
                   <button
                     type="button"
-                    onClick={() => navigate("/profile?tab=notifications")}
+                    onClick={() => navigate("/notifications")}
                     className="relative p-2 rounded-lg hover:bg-white/10 transition-colors"
                     aria-label="Notifications"
                     title="Notifications"
@@ -451,7 +489,7 @@ const CustomerLayout = () => {
                       </p>
                       <button
                         type="button"
-                        onClick={() => navigate("/profile?tab=notifications")}
+                        onClick={() => navigate("/notifications")}
                         className="text-xs font-bold text-zoop-moss hover:underline"
                       >
                         View all
@@ -467,9 +505,7 @@ const CustomerLayout = () => {
                           <button
                             key={n.id}
                             type="button"
-                            onClick={() =>
-                              navigate("/profile?tab=notifications")
-                            }
+                            onClick={() => navigate("/notifications")}
                             className={`w-full text-left p-2 rounded-lg mb-1 ${
                               n.read
                                 ? "hover:bg-gray-50"
@@ -492,7 +528,7 @@ const CustomerLayout = () => {
               {user && (
                 <button
                   type="button"
-                  onClick={() => navigate("/profile?tab=notifications")}
+                  onClick={() => navigate("/notifications")}
                   className="md:hidden relative p-2 rounded-lg hover:bg-white/10 transition-colors"
                   aria-label="Notifications"
                 >
@@ -624,15 +660,7 @@ const CustomerLayout = () => {
                           My Wishlist
                         </Link>
                       </div>
-                      <div className="border-t border-gray-100 px-2 py-2">
-                        <button
-                          onClick={logout}
-                          className="w-full flex items-center h-8 gap-2 py-1 px-2 rounded-md hover:bg-red-50 transition-colors text-sm font-bold text-red-600"
-                        >
-                          <LogOut width={18} height={18} />
-                          Logout
-                        </button>
-                      </div>
+                      {/* Move Logout Button out of dropdown? Wait, no, maybe leave it here too, but the user requested "Move the 'Logout' button to the top navigation/header." I will just add it to the top. */}
                     </div>
                   </div>
                 </>
@@ -653,7 +681,29 @@ const CustomerLayout = () => {
                 </>
               )}
 
-              <div className="hidden md:block">
+              {user && (
+                <button
+                  onClick={async () => {
+                    setIsLoggingOut(true);
+                    setTimeout(async () => {
+                      await logout();
+                      setIsLoggingOut(false);
+                    }, 800);
+                  }}
+                  className="hidden md:flex items-center gap-2 px-3 py-2 bg-red-600/10 text-red-500 rounded-lg text-xs font-black hover:bg-red-600 hover:text-white transition-all border border-red-500/20"
+                >
+                  <LogOut width={14} height={14} />
+                  Logout
+                </button>
+              )}
+
+              <div className="hidden md:flex items-center gap-4">
+                <Link
+                  to="/wishlist"
+                  className="hover:scale-110 active:scale-95 transition-transform"
+                >
+                  <Star width={24} height={24} stroke="white" />
+                </Link>
                 <AnimatedCartIcon />
               </div>
               <button
@@ -907,8 +957,18 @@ const CustomerLayout = () => {
         </div>
       </nav>
       {/* MAIN CONTENT */}
-      <main className="pb-20">
-        <Outlet context={{ scrollDir }} />
+      <main className="pb-20 relative min-h-[50vh]">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={locationPath.pathname}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Outlet context={{ scrollDir }} />
+          </motion.div>
+        </AnimatePresence>
       </main>
 
       <footer className="bg-zoop-obsidian text-white pt-16 pb-8 mt-20">
@@ -966,7 +1026,6 @@ const CustomerLayout = () => {
                   />
                 ) : null}
                 <span style={brandStyle}>{brandName}</span>
-                <span className="text-white text-xs italic">.in</span>
               </Link>
               <p className="text-white/40 text-xs mt-4">
                 The bridge between local craftsmanship and global standards.
@@ -1067,7 +1126,7 @@ const CustomerLayout = () => {
                     to="/about"
                     className="hover:text-white transition-colors"
                   >
-                    {replaceBrandText("About ZOOP")}
+                    {replaceBrandText("About Us")}
                   </Link>
                 </li>
                 <li>

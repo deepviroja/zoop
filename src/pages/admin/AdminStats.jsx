@@ -6,7 +6,7 @@ import { Package } from "../../assets/icons/Package";
 import { Activity } from "../../assets/icons/Activity";
 import { ShoppingCart } from "../../assets/icons/ShoppingCart";
 import { adminApi } from "../../services/api";
-import { formatInr, formatInrWithSymbol } from "../../utils/currency";
+import { formatInrWithSymbol } from "../../utils/currency";
 
 const statusColor = (s) =>
   s === "delivered" || s === "completed"
@@ -38,7 +38,9 @@ const buildProductInsights = (products, orders) => {
           orderCount: 0,
         };
       }
-      metricsByProduct[item.productId].quantitySold += Number(item.quantity || 0);
+      metricsByProduct[item.productId].quantitySold += Number(
+        item.quantity || 0,
+      );
       metricsByProduct[item.productId].revenue +=
         Number(item.price || 0) * Number(item.quantity || 0);
       metricsByProduct[item.productId].orderCount += 1;
@@ -146,7 +148,11 @@ const AdminStats = () => {
     label: item.label || item.key,
     value: Number(item.value || 0),
   }));
-  const maxSales = Math.max(...(salesData.map((d) => d.value).length ? salesData.map((d) => d.value) : [1]));
+  const maxSales = Math.max(
+    ...(salesData.map((d) => d.value).length
+      ? salesData.map((d) => d.value)
+      : [1]),
+  );
 
   const categoryStats = (analytics?.categoryStats || [])
     .slice(0, 5)
@@ -283,15 +289,14 @@ const AdminStats = () => {
               <h2 className="text-xl font-black text-zoop-obsidian">
                 Sales Overview
               </h2>
-              <span className="text-sm text-gray-500">
-                This {timeRange}
-              </span>
+              <span className="text-sm text-gray-500">This {timeRange}</span>
             </div>
             <div className="overflow-x-auto pb-2">
               <div className="flex min-w-[640px] items-end justify-between gap-3 h-72">
                 {(salesData.length > 0
                   ? salesData
-                  : [{ label: "-", value: 0 }]).map((data, i) => (
+                  : [{ label: "-", value: 0 }]
+                ).map((data, i) => (
                   <div
                     key={i}
                     className="flex min-w-[56px] flex-1 flex-col items-center gap-3"
@@ -391,7 +396,10 @@ const AdminStats = () => {
                         {order.displayOrderId || order.id}
                       </p>
                       <p className="text-xs text-gray-500">
-                        {(order.customer?.name || order.customer?.email || "Customer")} • {order.items} item(s)
+                        {order.customer?.name ||
+                          order.customer?.email ||
+                          "Customer"}{" "}
+                        • {order.items} item(s)
                       </p>
                       {order.primaryProduct?.title && (
                         <p className="text-xs text-gray-500 truncate">
@@ -505,34 +513,69 @@ const AdminStats = () => {
                 </Link>
               </div>
               {loading ? (
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {[0, 1, 2, 3].map((idx) => (
-                    <Skeleton key={idx} className="h-16" />
+                    <Skeleton key={idx} className="h-20" />
                   ))}
                 </div>
               ) : group.items.length > 0 ? (
-                <div className="space-y-3">
-                  {group.items.map((item) => (
-                    <div key={item.id} className="rounded-xl bg-gray-50 p-4">
-                      <p className="font-black text-zoop-obsidian line-clamp-2">
-                        {item.name || item.title}
-                      </p>
-                      <p className="text-xs text-gray-500 mt-1">
-                        {item.brand || "Brand"} • {item.category || item.categoryId || "Category"}
-                      </p>
-                      <div className="mt-3 flex items-center justify-between text-xs font-bold text-gray-600">
-                        <span>
-                          {group.metricLabel}: {group.metricValue(item)}
-                        </span>
-                        <span>
-                          Revenue: {formatInr(item.revenue || 0, { maximumFractionDigits: 0 })}
-                        </span>
+                <div className="space-y-4">
+                  {group.items.map((item, index) => (
+                    <div
+                      key={item.id}
+                      className="relative group overflow-hidden rounded-2xl bg-white border border-gray-100 p-4 transition-all duration-300 hover:shadow-2xl hover:border-zoop-moss/30 hover:-translate-y-1"
+                    >
+                      <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-zoop-moss/20 to-transparent rounded-bl-full -z-10 transition-transform group-hover:scale-150" />
+
+                      <div className="flex gap-4">
+                        <div className="text-xl font-900 text-gray-200 mt-1 select-none w-6">
+                          #{index + 1}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-black text-zoop-obsidian line-clamp-2 leading-snug group-hover:text-zoop-moss transition-colors">
+                            {item.name || item.title}
+                          </p>
+                          <div className="flex items-center gap-2 mt-1.5">
+                            <span className="text-[10px] font-black uppercase tracking-wider text-white bg-zoop-obsidian px-2 py-0.5 rounded-md">
+                              {item.brand || "Brand"}
+                            </span>
+                            <span className="text-[10px] font-black uppercase tracking-wider text-zoop-obsidian bg-gray-100 px-2 py-0.5 rounded-md truncate">
+                              {item.category || item.categoryId || "Category"}
+                            </span>
+                          </div>
+
+                          <div className="mt-4 pt-3 border-t border-gray-50 flex items-center justify-between">
+                            <div className="flex flex-col">
+                              <span className="text-[9px] font-black tracking-widest uppercase text-gray-400">
+                                {group.metricLabel}
+                              </span>
+                              <span className="text-sm font-black text-zoop-obsidian">
+                                {group.metricValue(item)}
+                              </span>
+                            </div>
+                            <div className="w-px h-8 bg-gray-100 mx-2" />
+                            <div className="flex flex-col items-end">
+                              <span className="text-[9px] font-black tracking-widest uppercase text-gray-400">
+                                Revenue
+                              </span>
+                              <span className="text-sm font-black text-green-600">
+                                {formatInrWithSymbol(item.revenue || 0, {
+                                  maximumFractionDigits: 0,
+                                })}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-gray-400">No product signals available yet.</p>
+                <div className="text-center py-10 bg-gray-50 rounded-2xl border border-gray-100 border-dashed">
+                  <p className="text-sm font-bold text-gray-400">
+                    No signals found
+                  </p>
+                </div>
               )}
             </div>
           ))}

@@ -31,6 +31,7 @@ const Cookies = lazy(() => import("./pages/static/Cookies"));
 const Terms = lazy(() => import("./pages/static/Terms"));
 const Help = lazy(() => import("./pages/static/Help"));
 const IconShowcase = lazy(() => import("./pages/IconShowcase"));
+const Notifications = lazy(() => import("./pages/shared/Notifications"));
 
 // Auth & Seller Pages
 const AuthLayout = lazy(() => import("./pages/auth/AuthLayout"));
@@ -65,7 +66,9 @@ const SellerSubscription = lazy(
   () => import("./pages/seller/SellerSubscription"),
 );
 const StoreSettings = lazy(() => import("./pages/seller/StoreSettings"));
-const SellerInstructions = lazy(() => import("./pages/seller/SellerInstructions"));
+const SellerInstructions = lazy(
+  () => import("./pages/seller/SellerInstructions"),
+);
 
 // Admin Pages
 const AdminLayout = lazy(() => import("./layouts/AdminLayout"));
@@ -77,10 +80,14 @@ const SupportTickets = lazy(() => import("./pages/admin/SupportTickets"));
 const Monetization = lazy(() => import("./pages/admin/Monetization"));
 const UserManagement = lazy(() => import("./pages/admin/UserManagement"));
 const SellerManagement = lazy(() => import("./pages/admin/SellerManagement"));
-const AdminWebsiteControl = lazy(() => import("./pages/admin/AdminWebsiteControl"));
+const AdminWebsiteControl = lazy(
+  () => import("./pages/admin/AdminWebsiteControl"),
+);
 const AdminProfile = lazy(() => import("./pages/admin/AdminProfile"));
 const AdminGuide = lazy(() => import("./pages/admin/AdminGuide"));
-const AdminAdsManagement = lazy(() => import("./pages/admin/AdminAdsManagement"));
+const AdminAdsManagement = lazy(
+  () => import("./pages/admin/AdminAdsManagement"),
+);
 const AdminSubscriptionManagement = lazy(
   () => import("./pages/admin/AdminSubscriptionManagement"),
 );
@@ -158,13 +165,16 @@ function App() {
               <Route path="terms" element={<Terms />} />
               <Route path="help" element={<Help />} />
               <Route path="icons" element={<IconShowcase />} />
+              <Route path="notifications" element={<Notifications />} />
             </Route>
 
             <Route element={<AuthLayout />}>
               <Route
                 path="/complete-profile"
                 element={
-                  <ProtectedRoute allowedRoles={["customer", "seller", "admin"]}>
+                  <ProtectedRoute
+                    allowedRoles={["customer", "seller", "admin"]}
+                  >
                     <CompleteProfile />
                   </ProtectedRoute>
                 }
@@ -230,7 +240,10 @@ function App() {
               <Route path="orders" element={<AdminOrders />} />
               <Route path="website-control" element={<AdminWebsiteControl />} />
               <Route path="ads" element={<AdminAdsManagement />} />
-              <Route path="subscriptions" element={<AdminSubscriptionManagement />} />
+              <Route
+                path="subscriptions"
+                element={<AdminSubscriptionManagement />}
+              />
               <Route path="guide" element={<AdminGuide />} />
               <Route path="supporttickets" element={<SupportTickets />} />
               <Route path="monetization" element={<Monetization />} />

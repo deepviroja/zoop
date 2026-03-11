@@ -4,7 +4,7 @@ const hasValue = (value) =>
 export const getMissingCustomerProfileFields = (profile = {}) => {
   const missing = [];
   if (!(profile.displayName || profile.name)) missing.push("name");
-  if (!profile.email) missing.push("email");
+  // if (!profile.email) missing.push("email"); // Removed email constraint
   if (!hasValue(profile.phone)) missing.push("phone");
   if (!hasValue(profile.address)) missing.push("address");
   if (!hasValue(profile.city)) missing.push("city");

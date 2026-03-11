@@ -109,7 +109,11 @@ const AdminLayout = () => {
         <div className="flex justify-between items-center mb-10 flex-shrink-0">
           <div className="inline-flex items-center gap-2">
             {siteConfig?.brandLogoUrl ? (
-              <img src={siteConfig.brandLogoUrl} alt="brand" className="h-8 w-8 rounded object-cover" />
+              <img
+                src={siteConfig.brandLogoUrl}
+                alt="brand"
+                className="h-8 w-8 rounded object-cover"
+              />
             ) : null}
             <h2 className="text-zoop-copper font-900 tracking-tighter uppercase italic text-2xl">
               {siteConfig?.adminPanelTitle || "Admin Control"}
@@ -184,7 +188,7 @@ const AdminLayout = () => {
             Admin Console
           </p>
           <Link
-            to="/admin/profile?tab=notifications"
+            to="/admin/notifications"
             className="relative inline-flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-gray-100 text-sm font-bold text-zoop-obsidian"
             aria-label="Admin notifications"
           >

@@ -1,6 +1,161 @@
 import React, { useEffect, useState } from "react";
 import { adminApi } from "../../services/api";
 
+const AdCard = ({ ad, load, setError, handleDeleteAd }) => {
+  const [duration, setDuration] = useState(7);
+  const isExpired = ad.expiresAt && new Date().getTime() > ad.expiresAt;
+
+  useEffect(() => {
+    if (isExpired && ad.status === "PUBLISHED") {
+      adminApi
+        .deleteAd(ad.id)
+        .then(load)
+        .catch(() => {});
+    }
+  }, [isExpired, ad.id, ad.status, load]);
+
+  if (isExpired && ad.status === "PUBLISHED") return null;
+
+  return (
+    <div className="flex flex-col rounded-2xl bg-white border border-gray-100 shadow-sm overflow-hidden hover:shadow-xl transition-shadow">
+      {ad.mediaUrl ? (
+        <div className="h-40 w-full bg-gray-100 relative">
+          <img
+            src={ad.mediaUrl}
+            alt={ad.title}
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute top-2 right-2 flex gap-2">
+            <span
+              className={`px-2 py-1 rounded-md text-[10px] font-black uppercase ${ad.active ? "bg-green-500 text-white" : "bg-gray-500 text-white"}`}
+            >
+              {ad.active ? "Active" : "Inactive"}
+            </span>
+            <span
+              className={`px-2 py-1 rounded-md text-[10px] font-black uppercase ${ad.status === "PUBLISHED" ? "bg-blue-500 text-white" : ad.status === "REJECTED" ? "bg-red-500 text-white" : "bg-yellow-500 text-white"}`}
+            >
+              {ad.status}
+            </span>
+          </div>
+        </div>
+      ) : (
+        <div className="h-40 w-full bg-zoop-obsidian flex items-center justify-center relative">
+          <span className="text-white/50 font-black tracking-widest uppercase">
+            No Media
+          </span>
+          <div className="absolute top-2 right-2 flex gap-2">
+            <span
+              className={`px-2 py-1 rounded-md text-[10px] font-black uppercase ${ad.active ? "bg-green-500 text-white" : "bg-gray-500 text-white"}`}
+            >
+              {ad.active ? "Active" : "Inactive"}
+            </span>
+            <span
+              className={`px-2 py-1 rounded-md text-[10px] font-black uppercase ${ad.status === "PUBLISHED" ? "bg-blue-500 text-white" : ad.status === "REJECTED" ? "bg-red-500 text-white" : "bg-yellow-500 text-white"}`}
+            >
+              {ad.status}
+            </span>
+          </div>
+        </div>
+      )}
+      <div className="p-4 flex flex-col flex-1">
+        <h3 className="font-900 text-lg text-zoop-obsidian leading-tight mb-1 line-clamp-1">
+          {ad.title}
+        </h3>
+        <p className="text-xs text-gray-400 font-bold mb-3">{ad.slotId}</p>
+
+        {ad.status === "PUBLISHED" && ad.expiresAt && (
+          <p className="text-xs text-gray-500 font-medium mb-3 bg-blue-50/50 p-2 rounded-lg">
+            Expires: {new Date(ad.expiresAt).toLocaleDateString()}
+          </p>
+        )}
+
+        <div className="mt-auto space-y-3">
+          {ad.status !== "PUBLISHED" && (
+            <div className="bg-gray-50 p-3 rounded-xl border border-gray-100 flex flex-col gap-2">
+              <label className="text-xs font-bold text-gray-600">
+                Approval Duration (Days)
+              </label>
+              <input
+                type="number"
+                value={duration}
+                onChange={(e) => setDuration(Number(e.target.value))}
+                min="1"
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-zoop-moss"
+              />
+              <div className="flex gap-2 mt-1">
+                <button
+                  onClick={async () => {
+                    try {
+                      const expiresAt =
+                        new Date().getTime() + duration * 24 * 60 * 60 * 1000;
+                      await adminApi.updateAd(ad.id, {
+                        ...ad,
+                        status: "PUBLISHED",
+                        active: true,
+                        expiresAt,
+                      });
+                      await load();
+                    } catch (err) {
+                      setError(err?.message || "Failed to approve ad");
+                    }
+                  }}
+                  className="flex-1 px-3 py-2 border-2 border-green-500 text-green-600 rounded-lg font-black text-xs uppercase hover:bg-green-50 transition-colors"
+                >
+                  Approve
+                </button>
+                <button
+                  onClick={async () => {
+                    try {
+                      await adminApi.updateAd(ad.id, {
+                        ...ad,
+                        status: "REJECTED",
+                        active: false,
+                      });
+                      await load();
+                    } catch (err) {
+                      setError(err?.message || "Failed to reject ad");
+                    }
+                  }}
+                  className="flex-1 px-3 py-2 border-2 border-red-500 text-red-600 rounded-lg font-black text-xs uppercase hover:bg-red-50 transition-colors"
+                >
+                  Reject
+                </button>
+              </div>
+            </div>
+          )}
+
+          <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-50">
+            {ad.status === "PUBLISHED" && (
+              <button
+                onClick={async () => {
+                  try {
+                    await adminApi.updateAd(ad.id, {
+                      ...ad,
+                      active: !ad.active,
+                    });
+                    await load();
+                  } catch (err) {
+                    setError(err?.message || "Failed to toggle ad");
+                  }
+                }}
+                className={`flex-1 py-2 rounded-lg font-black text-[10px] uppercase transition-colors ${ad.active ? "bg-yellow-100 text-yellow-700 hover:bg-yellow-200" : "bg-green-100 text-green-700 hover:bg-green-200"}`}
+              >
+                {ad.active ? "Pause" : "Resume"}
+              </button>
+            )}
+            <button
+              onClick={() => handleDeleteAd(ad.id)}
+              className="px-3 py-2 rounded-lg bg-gray-100 text-red-600 text-[10px] font-black uppercase hover:bg-red-50 transition-colors"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const AdminAdsManagement = () => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState({ slots: [], ads: [] });
@@ -284,116 +439,28 @@ const AdminAdsManagement = () => {
         {loading ? (
           <p className="text-gray-500">Loading...</p>
         ) : (
-          <div className="space-y-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {(data.ads || [])
               .filter(
                 (ad) =>
                   activeSlotFilter === "all" || ad.slotId === activeSlotFilter,
               )
               .map((ad) => (
-                <div
+                <AdCard
                   key={ad.id}
-                  className="p-3 rounded-xl bg-gray-50 border border-gray-100"
-                >
-                  <p className="font-bold">{ad.title}</p>
-                  <p className="text-xs text-gray-500">
-                    {ad.slotId} • {ad.status} •{" "}
-                    {ad.active ? "active" : "inactive"}
-                  </p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Paid: Rs. {Number(ad.paidAmount || 0).toLocaleString("en-IN")}{" "}
-                    / Required: Rs.
-                    {Number(ad.requiredAmount || 0).toLocaleString("en-IN")}
-                  </p>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    <select
-                      value={ad.slotId || "home_top"}
-                      onChange={async (e) => {
-                        try {
-                          await adminApi.updateAd(ad.id, {
-                            ...ad,
-                            slotId: e.target.value,
-                          });
-                          await load();
-                        } catch (err) {
-                          setError(err?.message || "Failed to update ad");
-                        }
-                      }}
-                      aria-label={`Move ${ad.title} to another slot`}
-                      className="px-2 py-1.5 border border-gray-200 rounded-lg text-xs"
-                    >
-                      {(data.slots || []).map((slot) => (
-                        <option key={slot.id} value={slot.id}>
-                          {slot.name}
-                        </option>
-                      ))}
-                    </select>
-                    <button
-                      onClick={async () => {
-                        try {
-                          await adminApi.updateAd(ad.id, {
-                            ...ad,
-                            status: "PUBLISHED",
-                            active: true,
-                          });
-                          await load();
-                        } catch (err) {
-                          setError(err?.message || "Failed to approve ad");
-                        }
-                      }}
-                      className="px-3 py-1.5 rounded-lg bg-green-50 text-green-700 text-xs font-black uppercase"
-                    >
-                      Approve &amp; Publish
-                    </button>
-                    <button
-                      onClick={async () => {
-                        try {
-                          await adminApi.updateAd(ad.id, {
-                            ...ad,
-                            status: "REJECTED",
-                            active: false,
-                          });
-                          await load();
-                        } catch (err) {
-                          setError(err?.message || "Failed to reject ad");
-                        }
-                      }}
-                      className="px-3 py-1.5 rounded-lg bg-red-50 text-red-700 text-xs font-black uppercase"
-                    >
-                      Reject
-                    </button>
-                    <button
-                      onClick={async () => {
-                        try {
-                          await adminApi.updateAd(ad.id, {
-                            ...ad,
-                            active: !ad.active,
-                          });
-                          await load();
-                        } catch (err) {
-                          setError(err?.message || "Failed to toggle ad");
-                        }
-                      }}
-                      className="px-3 py-1.5 rounded-lg bg-gray-100 text-gray-700 text-xs font-black uppercase"
-                    >
-                      {ad.active ? "Deactivate" : "Activate"}
-                    </button>
-                    <button
-                      onClick={() => handleDeleteAd(ad.id)}
-                      className="px-3 py-1.5 rounded-lg bg-red-100 text-red-700 text-xs font-black uppercase hover:bg-red-200 transition-colors"
-                    >
-                      Delete Ad
-                    </button>
-                  </div>
-                </div>
+                  ad={ad}
+                  load={load}
+                  setError={setError}
+                  handleDeleteAd={handleDeleteAd}
+                />
               ))}
             {(data.ads || []).filter(
               (ad) =>
                 activeSlotFilter === "all" || ad.slotId === activeSlotFilter,
             ).length === 0 && (
-              <p className="text-sm text-gray-400 italic py-4 text-center">
-                No ads found.
-              </p>
+              <div className="col-span-full py-16 flex flex-col items-center justify-center bg-gray-50 rounded-2xl border border-gray-100 border-dashed">
+                <p className="text-gray-400 font-bold">No ads found</p>
+              </div>
             )}
           </div>
         )}

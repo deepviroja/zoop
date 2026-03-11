@@ -55,7 +55,7 @@ const SEED_COLLECTIONS = [
 ];
 
 const SEED_FOOTER_LINKS = [
-  { group: 'Shop Zoop',     links: [{ label: 'Men',      href: '/category/men' }, { label: 'Women', href: '/category/women' }, { label: 'Kids', href: '/category/kids' }, { label: 'Electronics', href: '/category/electronics' }, { label: 'Home Decor', href: '/category/home' }] },
+  { group: 'Shop',     links: [{ label: 'Men',      href: '/category/men' }, { label: 'Women', href: '/category/women' }, { label: 'Kids', href: '/category/kids' }, { label: 'Electronics', href: '/category/electronics' }, { label: 'Home Decor', href: '/category/home' }] },
   { group: 'Sell With Us',  links: [{ label: 'Become a Seller', href: '/seller/onboarding' }, { label: 'Seller Dashboard', href: '/seller/dashboard' }, { label: 'Seller Policies', href: '/terms' }, { label: 'Support for Sellers', href: '/help' }] },
   { group: 'Support',       links: [{ label: 'Help Center', href: '/help' }, { label: 'Track Order', href: '/track' }, { label: 'Contact Us', href: '/contact' }, { label: 'Privacy Policy', href: '/terms' }, { label: 'Terms & Conditions', href: '/terms' }] },
 ];
@@ -523,7 +523,7 @@ export const getSiteConfig = async (_req: Request, res: Response) => {
     const defaultConfig = {
       sameDayCities: ['Surat', 'Mumbai'],
       maintenanceMode: false,
-      maintenanceMessage: 'Zoop is under scheduled maintenance. Please check back shortly.',
+      maintenanceMessage: 'Website is under scheduled maintenance. Please check back shortly.',
       featuredCategoryId: 'men',
       announcementBanner: 'Same-Day Delivery active in Surat!',
       brandName: 'ZOOP',

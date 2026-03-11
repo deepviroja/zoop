@@ -52,7 +52,7 @@ app.use(express.json({ limit: '10mb' }));
 // ─── Routes ──────────────────────────────────────────────────────────────────
 app.use('/api', (req, res, next) => {
   if (req.path === '/' || req.path === '') {
-    return res.json({ message: 'Zoop API v2', status: 'running' });
+    return res.json({ message: ' API v2', status: 'running' });
   }
   next();
 });
@@ -64,7 +64,7 @@ app.use('/api/upload',   uploadRoutes);
 app.use('/api/content',  contentRoutes);
 
 // Health checks for Render
-app.get('/', (_req, res) => res.send('Zoop API v2 is running ✅'));
+app.get('/', (_req, res) => res.send('API v2 is running ✅'));
 app.get('/health', (_req, res) => res.json({ 
   status: 'ok', 
   timestamp: new Date().toISOString(),
@@ -87,7 +87,7 @@ const PORT = process.env.PORT || 5000;
 
 // Important: Listen on '0.0.0.0' for Render to detect the port
 app.listen(Number(PORT), '0.0.0.0', async () => {
-  console.log(`🚀 Zoop Server running on http://0.0.0.0:${PORT}`);
+  console.log(`🚀 Server running on http://0.0.0.0:${PORT}`);
   
   // Seed content data on startup
   try {

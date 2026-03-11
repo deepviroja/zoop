@@ -29,8 +29,12 @@ const ProductCard = ({ product, view = "grid" }) => {
     (product.imageUrls && product.imageUrls[0]) ||
     "/brand-mark.svg";
   const displayImages = product.imageUrls || product.images || [displayImage];
-  const optimizedDisplayImage = optimizeCloudinaryUrl(displayImage, { width: 800 });
-  const optimizedDisplayImages = (displayImages || []).map((u) => optimizeCloudinaryUrl(u, { width: 800 }));
+  const optimizedDisplayImage = optimizeCloudinaryUrl(displayImage, {
+    width: 800,
+  });
+  const optimizedDisplayImages = (displayImages || []).map((u) =>
+    optimizeCloudinaryUrl(u, { width: 800 }),
+  );
   const productTitle = product.title || product.name || "Product image";
 
   const [imageIndex, setImageIndex] = useState(0);
@@ -110,7 +114,10 @@ const ProductCard = ({ product, view = "grid" }) => {
               100,
           )
         : 0;
-  const deliveryEstimate = getDeliveryEstimate(product, user?.city || user?.defaultLocation);
+  const deliveryEstimate = getDeliveryEstimate(
+    product,
+    user?.city || user?.defaultLocation,
+  );
 
   if (view === "list") {
     return (
@@ -158,7 +165,9 @@ const ProductCard = ({ product, view = "grid" }) => {
                 </div>
                 <button
                   onClick={handleLike}
-                  aria-label={isLiked ? "Remove from wishlist" : "Add to wishlist"}
+                  aria-label={
+                    isLiked ? "Remove from wishlist" : "Add to wishlist"
+                  }
                   className="p-2 hover:bg-gray-50 rounded-full transition-all"
                 >
                   <Heart
@@ -173,13 +182,14 @@ const ProductCard = ({ product, view = "grid" }) => {
 
               {/* Rating */}
               <div className="mt-3">
-                <StarRating 
-                  rating={product.rating} 
-                  totalReviews={product.ratingCount || product.reviews} 
-                  size={14} 
+                <StarRating
+                  rating={product.rating}
+                  totalReviews={product.ratingCount || product.reviews}
+                  size={14}
                 />
                 <p className="text-[11px] text-gray-500 mt-1">
-                  Ordered {(Number(product.orderedCount || 0)).toLocaleString()} times
+                  Ordered {Number(product.orderedCount || 0).toLocaleString()}{" "}
+                  times
                 </p>
               </div>
             </div>
@@ -196,9 +206,12 @@ const ProductCard = ({ product, view = "grid" }) => {
                   {(product.mrp || product.originalPrice) &&
                     (product.mrp || product.originalPrice) > product.price && (
                       <span className="text-sm text-gray-400 line-through">
-                        {formatInrWithSymbol(product.mrp || product.originalPrice, {
-                          maximumFractionDigits: 0,
-                        })}
+                        {formatInrWithSymbol(
+                          product.mrp || product.originalPrice,
+                          {
+                            maximumFractionDigits: 0,
+                          },
+                        )}
                       </span>
                     )}
                 </div>
@@ -306,7 +319,7 @@ const ProductCard = ({ product, view = "grid" }) => {
           </div>
 
           {/* Quick Add to Cart (Desktop Hover) */}
-          <div className="hidden md:block absolute bottom-0 left-0 right-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-20">
+          <div className="hidden md:block absolute bottom-0 left-0 right-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-10">
             <button
               onClick={handleAddToCart}
               disabled={!isInStock}
@@ -357,13 +370,13 @@ const ProductCard = ({ product, view = "grid" }) => {
 
           {/* Rating */}
           <div className="mt-2">
-            <StarRating 
-              rating={product.rating} 
-              totalReviews={product.ratingCount || product.reviews} 
-              size={12} 
+            <StarRating
+              rating={product.rating}
+              totalReviews={product.ratingCount || product.reviews}
+              size={12}
             />
             <p className="text-[10px] text-gray-500 mt-1">
-              {(Number(product.orderedCount || 0)).toLocaleString()} ordered
+              {Number(product.orderedCount || 0).toLocaleString()} ordered
             </p>
           </div>
 
@@ -492,4 +505,3 @@ const ProductCard = ({ product, view = "grid" }) => {
 };
 
 export default ProductCard;
-

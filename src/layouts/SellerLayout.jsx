@@ -133,12 +133,20 @@ const SellerLayout = () => {
         className={`fixed top-0 left-0 h-screen w-72 bg-zoop-obsidian text-white p-8 z-50 transition-transform duration-300 md:translate-x-0 md:sticky md:top-0 shadow-2xl md:shadow-none flex flex-col ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
-        style={user?.subscription?.sidebarColor ? { backgroundColor: user.subscription.sidebarColor } : undefined}
+        style={
+          user?.subscription?.sidebarColor
+            ? { backgroundColor: user.subscription.sidebarColor }
+            : undefined
+        }
       >
         <div className="flex justify-between items-center mb-8 flex-shrink-0">
           <div className="inline-flex items-center gap-2">
             {siteConfig?.brandLogoUrl ? (
-              <img src={siteConfig.brandLogoUrl} alt="brand" className="h-8 w-8 rounded object-cover bg-white" />
+              <img
+                src={siteConfig.brandLogoUrl}
+                alt="brand"
+                className="h-8 w-8 rounded object-cover bg-white"
+              />
             ) : null}
             <h2 className="text-zoop-moss font-900 text-2xl tracking-tighter uppercase italic">
               {siteConfig?.sellerPanelTitle || "Seller Panel"}
@@ -226,7 +234,7 @@ const SellerLayout = () => {
             Seller Workspace
           </p>
           <Link
-            to="/seller/profile?tab=notifications"
+            to="/seller/notifications"
             className="relative inline-flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-gray-100 text-sm font-bold text-zoop-obsidian"
             aria-label="Seller notifications"
           >
