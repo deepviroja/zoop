@@ -11,7 +11,7 @@ const ProfileCompletionGuard = () => {
     return <Loader fullScreen />;
   }
 
-  if (!user?.profileNeedsSetup) {
+  if (!user?.profileNeedsSetup || user.role !== "seller") {
     return <Outlet />;
   }
 

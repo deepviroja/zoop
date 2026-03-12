@@ -27,7 +27,7 @@ const statusIcon = (s) =>
           : "⏳";
 
 const Skeleton = ({ className = "" }) => (
-  <div className={`bg-gray-200 animate-pulse rounded-xl ${className}`} />
+  <div className={`bg-gray-200 dark:bg-white/20 animate-pulse rounded-xl ${className}`} />
 );
 
 const STAR_PATH =
@@ -143,9 +143,9 @@ const OrderHistory = () => {
   if (error) {
     return (
       <div className="min-h-screen bg-zoop-canvas flex items-center justify-center p-6">
-        <div className="bg-white rounded-2xl p-8 text-center max-w-lg shadow-lg">
+        <div className="bg-white dark:glass-card rounded-2xl p-8 text-center max-w-lg shadow-lg dark:shadow-[0_12px_32px_rgba(0,0,0,0.5)]">
           <div className="text-5xl mb-4">📦</div>
-          <h2 className="text-xl font-black text-zoop-obsidian mb-2">
+          <h2 className="text-xl font-black text-zoop-obsidian dark:text-white mb-2">
             Couldn't load your orders
           </h2>
           <p className="text-gray-500 mb-6 text-sm">
@@ -154,7 +154,7 @@ const OrderHistory = () => {
           </p>
           <button
             onClick={() => window.location.reload()}
-            className="px-6 py-3 bg-zoop-moss text-zoop-obsidian rounded-xl font-black"
+            className="px-6 py-3 bg-zoop-moss text-zoop-obsidian dark:text-white rounded-xl font-black"
           >
             Try Again
           </button>
@@ -168,7 +168,7 @@ const OrderHistory = () => {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-black tracking-tighter text-zoop-obsidian italic">
+          <h1 className="text-3xl md:text-4xl font-black tracking-tighter text-zoop-obsidian dark:text-white italic">
             My Orders
           </h1>
           <p className="text-gray-500 mt-1">
@@ -186,7 +186,7 @@ const OrderHistory = () => {
                 className={`px-4 py-2 rounded-full text-xs font-black uppercase tracking-wider transition-all ${
                   filterStatus === s
                     ? "bg-zoop-obsidian text-white shadow"
-                    : "bg-white text-gray-600 border border-gray-200 hover:border-zoop-moss"
+                    : "bg-white dark:glass-card text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-white/10 hover:border-zoop-moss"
                 }`}
               >
                 {s}
@@ -196,9 +196,9 @@ const OrderHistory = () => {
         )}
 
         {filtered.length === 0 ? (
-          <div className="bg-white rounded-[3rem] py-32 px-12 text-center border-2 border-dashed border-zoop-clay/30">
+          <div className="bg-white dark:glass-card rounded-[3rem] py-32 px-12 text-center border-2 border-dashed border-zoop-clay/30">
             <div className="text-8xl mb-6">📦</div>
-            <h2 className="text-3xl font-black text-zoop-obsidian">
+            <h2 className="text-3xl font-black text-zoop-obsidian dark:text-white">
               {filterStatus === "all"
                 ? "No Orders Yet"
                 : `No ${filterStatus} orders`}
@@ -211,7 +211,7 @@ const OrderHistory = () => {
             {filterStatus === "all" && (
               <Link
                 to="/"
-                className="inline-block mt-8 bg-zoop-obsidian text-white px-10 py-4 rounded-full font-black text-xs uppercase tracking-widest hover:bg-zoop-moss hover:text-zoop-obsidian transition-all shadow-lg"
+                className="inline-block mt-8 bg-zoop-obsidian text-white px-10 py-4 rounded-full font-black text-xs uppercase tracking-widest hover:bg-zoop-moss hover:text-zoop-obsidian transition-all shadow-lg dark:shadow-[0_12px_32px_rgba(0,0,0,0.5)]"
               >
                 Start Shopping
               </Link>
@@ -222,7 +222,7 @@ const OrderHistory = () => {
             {filtered.map((order) => (
               <div
                 key={order.id}
-                className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg transition-all p-6"
+                className="bg-white dark:glass-card rounded-2xl border border-gray-100 dark:border-white/10 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] hover:shadow-lg transition-all p-6"
               >
                 {/* Order Header */}
                 <div className="flex items-start justify-between mb-4 pb-4 border-b border-gray-50">
@@ -230,7 +230,7 @@ const OrderHistory = () => {
                     <p className="text-xs text-gray-400 uppercase tracking-wider font-bold mb-1">
                       Order ID
                     </p>
-                    <p className="font-black text-zoop-obsidian font-mono text-sm">
+                    <p className="font-black text-zoop-obsidian dark:text-white font-mono text-sm">
                       {order.id}
                     </p>
                     <p className="text-xs text-gray-400 mt-1">
@@ -249,7 +249,7 @@ const OrderHistory = () => {
                     >
                       {statusIcon(order.status)} {order.status}
                     </span>
-                    <p className="mt-2 font-black text-xl text-zoop-obsidian">
+                    <p className="mt-2 font-black text-xl text-zoop-obsidian dark:text-white">
                       Rs. {(order.totalAmount || 0).toLocaleString()}
                     </p>
                   </div>
@@ -274,14 +274,14 @@ const OrderHistory = () => {
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-bold text-sm text-zoop-obsidian truncate">
+                          <p className="font-bold text-sm text-zoop-obsidian dark:text-white truncate">
                             {item.title || "Product"}
                           </p>
                           <p className="text-xs text-gray-500">
                             Qty: {item.quantity} × Rs. {item.price}
                           </p>
                         </div>
-                        <p className="font-black text-zoop-obsidian whitespace-nowrap">
+                        <p className="font-black text-zoop-obsidian dark:text-white whitespace-nowrap">
                           Rs. {(item.price * item.quantity).toLocaleString()}
                         </p>
                       </div>
@@ -291,11 +291,11 @@ const OrderHistory = () => {
 
                 {/* Shipping Address */}
                 {order.shippingAddress && (
-                  <div className="bg-gray-50 rounded-xl p-3 mb-4">
+                  <div className="bg-gray-50 dark:bg-white/5 rounded-xl p-3 mb-4">
                     <p className="text-xs font-black text-gray-500 uppercase tracking-wider mb-1">
                       Delivered to
                     </p>
-                    <p className="text-sm text-gray-700">
+                    <p className="text-sm text-gray-700 dark:text-gray-300">
                       {order.shippingAddress.street},{" "}
                       {order.shippingAddress.city},{" "}
                       {order.shippingAddress.state} -{" "}
@@ -308,7 +308,7 @@ const OrderHistory = () => {
                 <div className="flex gap-3 pt-2">
                   <Link
                     to={`/track?orderId=${order.id}`}
-                    className="flex-1 text-center py-2.5 border-2 border-zoop-obsidian text-zoop-obsidian rounded-xl font-black text-xs uppercase tracking-wider hover:bg-zoop-obsidian hover:text-white transition-all"
+                    className="flex-1 text-center py-2.5 border-2 border-zoop-obsidian text-zoop-obsidian dark:text-white rounded-xl font-black text-xs uppercase tracking-wider hover:bg-zoop-obsidian hover:text-white transition-all"
                   >
                     Track Order
                   </Link>
@@ -370,10 +370,10 @@ const OrderHistory = () => {
       {reviewDraft.orderId && (
         <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/40" onClick={() => setReviewDraft({ orderId: "", productId: "", rating: 5, title: "", comment: "" })} />
-          <div className="relative bg-white rounded-2xl w-full max-w-md p-6 shadow-2xl border border-gray-100">
-            <h3 className="text-lg font-black text-zoop-obsidian mb-1">Rate this product</h3>
+          <div className="relative bg-white dark:glass-card rounded-2xl w-full max-w-md p-6 shadow-2xl dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-white/10">
+            <h3 className="text-lg font-black text-zoop-obsidian dark:text-white mb-1">Rate this product</h3>
             <p className="text-sm text-gray-500 mb-4">Your feedback helps local buyers shop confidently.</p>
-            <label className="text-sm font-bold text-gray-700">How was it?</label>
+            <label className="text-sm font-bold text-gray-700 dark:text-gray-300">How was it?</label>
             <div className="grid grid-cols-5 gap-2 mt-2 mb-3">
               {[
                 { value: 1, label: "Poor" },
@@ -388,8 +388,8 @@ const OrderHistory = () => {
                   onClick={() => setReviewDraft((p) => ({ ...p, rating: item.value }))}
                   className={`rounded-xl border px-2 py-2 text-center transition-all ${
                     item.value === reviewDraft.rating
-                      ? "border-zoop-obsidian bg-zoop-obsidian text-white shadow-lg"
-                      : "border-gray-200 hover:border-gray-300"
+                      ? "border-zoop-obsidian bg-zoop-obsidian text-white shadow-lg dark:shadow-[0_12px_32px_rgba(0,0,0,0.5)]"
+                      : "border-gray-200 dark:border-white/10 hover:border-gray-300"
                   }`}
                 >
                   <svg viewBox="0 0 24 24" width={18} height={18} className="mx-auto" aria-hidden="true">
@@ -404,12 +404,12 @@ const OrderHistory = () => {
                 </button>
               ))}
             </div>
-            <p className="text-sm mb-3 font-bold text-zoop-obsidian">{reviewDraft.rating} / 5</p>
+            <p className="text-sm mb-3 font-bold text-zoop-obsidian dark:text-white">{reviewDraft.rating} / 5</p>
             <input
               type="text"
               value={reviewDraft.title}
               onChange={(e) => setReviewDraft((p) => ({ ...p, title: e.target.value }))}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2 mb-3"
+              className="w-full border border-gray-200 dark:border-white/10 rounded-xl px-3 py-2 mb-3"
               placeholder="Review title (optional)"
               maxLength={100}
             />
@@ -417,13 +417,13 @@ const OrderHistory = () => {
               rows={4}
               value={reviewDraft.comment}
               onChange={(e) => setReviewDraft((p) => ({ ...p, comment: e.target.value }))}
-              className="w-full border border-gray-200 rounded-xl p-3"
+              className="w-full border border-gray-200 dark:border-white/10 rounded-xl p-3"
               placeholder="Share your experience"
             />
             <div className="flex gap-3 mt-4">
               <button
                 onClick={() => setReviewDraft({ orderId: "", productId: "", rating: 5, title: "", comment: "" })}
-                className="flex-1 py-2.5 border border-gray-200 rounded-xl font-bold"
+                className="flex-1 py-2.5 border border-gray-200 dark:border-white/10 rounded-xl font-bold"
               >
                 Cancel
               </button>
@@ -440,20 +440,20 @@ const OrderHistory = () => {
             className="absolute inset-0 bg-black/40"
             onClick={() => setReturnDraft({ orderId: "", productId: "", reason: "" })}
           />
-          <div className="relative bg-white rounded-2xl w-full max-w-md p-6 shadow-2xl border border-gray-100">
-            <h3 className="text-lg font-black text-zoop-obsidian mb-1">Request Return</h3>
+          <div className="relative bg-white dark:glass-card rounded-2xl w-full max-w-md p-6 shadow-2xl dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-white/10">
+            <h3 className="text-lg font-black text-zoop-obsidian dark:text-white mb-1">Request Return</h3>
             <p className="text-sm text-gray-500 mb-4">Tell seller why you want to return this item.</p>
             <textarea
               rows={4}
               value={returnDraft.reason}
               onChange={(e) => setReturnDraft((p) => ({ ...p, reason: e.target.value }))}
-              className="w-full border border-gray-200 rounded-xl p-3"
+              className="w-full border border-gray-200 dark:border-white/10 rounded-xl p-3"
               placeholder="Reason for return"
             />
             <div className="flex gap-3 mt-4">
               <button
                 onClick={() => setReturnDraft({ orderId: "", productId: "", reason: "" })}
-                className="flex-1 py-2.5 border border-gray-200 rounded-xl font-bold"
+                className="flex-1 py-2.5 border border-gray-200 dark:border-white/10 rounded-xl font-bold"
               >
                 Cancel
               </button>

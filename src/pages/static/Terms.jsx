@@ -75,7 +75,7 @@ const Terms = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-gray-50 dark:bg-white/5 py-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
         {/* Header */}
         <div className="bg-gradient-to-br from-zoop-obsidian to-zoop-ink text-white rounded-2xl p-12 mb-12">
@@ -98,8 +98,8 @@ const Terms = () => {
         {/* Content */}
         <div className="space-y-8">
           {sections.map((section, idx) => (
-            <div key={idx} className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
-              <h2 className="text-2xl font-black text-zoop-obsidian mb-4 flex items-center gap-3">
+            <div key={idx} className="bg-white dark:glass-card rounded-2xl p-8 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-white/10">
+              <h2 className="text-2xl font-black text-zoop-obsidian dark:text-white mb-4 flex items-center gap-3">
                 <span className="w-8 h-8 bg-zoop-moss/20 text-zoop-moss rounded-full flex items-center justify-center text-sm font-black">
                   {idx + 1}
                 </span>
@@ -107,7 +107,7 @@ const Terms = () => {
               </h2>
               
               {section.content && (
-                <p className="text-gray-700 leading-relaxed">
+                <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
                   {section.content}
                 </p>
               )}
@@ -117,7 +117,7 @@ const Terms = () => {
                   {section.items.map((item, i) => (
                     <li key={i} className="flex items-start gap-3">
                       <Check width={20} height={20} className="text-zoop-moss flex-shrink-0 mt-0.5" />
-                      <span className="text-gray-700">{item}</span>
+                      <span className="text-gray-700 dark:text-gray-300">{item}</span>
                     </li>
                   ))}
                 </ul>
@@ -128,10 +128,10 @@ const Terms = () => {
 
         {/* Contact Section */}
         <div className="mt-12 bg-gradient-to-br from-zoop-moss/10 to-green-50 rounded-2xl p-8 border border-zoop-moss/20">
-          <h3 className="text-xl font-black text-zoop-obsidian mb-3">
+          <h3 className="text-xl font-black text-zoop-obsidian dark:text-white mb-3">
             Questions About Our Terms?
           </h3>
-          <p className="text-gray-700 mb-4">
+          <p className="text-gray-700 dark:text-gray-300 mb-4">
             If you have any questions about these Terms & Conditions, please contact our legal team.
           </p>
           <div className="flex flex-wrap gap-4">
@@ -143,7 +143,7 @@ const Terms = () => {
             </a>
             <a
               href="/contact"
-              className="inline-block px-6 py-3 bg-white border-2 border-zoop-obsidian text-zoop-obsidian rounded-xl font-bold hover:bg-zoop-obsidian hover:text-white transition-all"
+              className="inline-block px-6 py-3 bg-white dark:glass-card border-2 border-zoop-obsidian text-zoop-obsidian dark:text-white rounded-xl font-bold hover:bg-zoop-obsidian hover:text-white transition-all"
             >
               Contact Support
             </a>

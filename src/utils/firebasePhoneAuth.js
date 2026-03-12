@@ -10,7 +10,7 @@ const applyContainerStyles = (container, size) => {
   container.className =
     size === "invisible"
       ? "pointer-events-none fixed bottom-0 left-0 h-px w-px overflow-hidden opacity-0"
-      : "min-h-[78px] rounded-2xl border border-gray-200 bg-white/70 p-2";
+      : "min-h-[78px] rounded-2xl border border-gray-200 dark:border-white/10 bg-white/70 p-2";
 };
 
 const getContainer = (containerId, size) => {

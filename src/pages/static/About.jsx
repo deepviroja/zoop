@@ -86,7 +86,7 @@ const About = () => {
   }, [products]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-white/5">
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-zoop-obsidian via-zoop-ink to-zoop-clay py-20 md:py-32 overflow-hidden">
         <div className="absolute inset-0 opacity-10">
@@ -109,10 +109,10 @@ const About = () => {
       <section className="max-w-5xl mx-auto px-4 sm:px-6 py-16 md:py-24">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           <div>
-            <h2 className="text-3xl md:text-4xl font-black text-zoop-obsidian mb-6">
+            <h2 className="text-3xl md:text-4xl font-black text-zoop-obsidian dark:text-white mb-6">
               Our Story
             </h2>
-            <div className="space-y-4 text-gray-700 leading-relaxed">
+            <div className="space-y-4 text-gray-700 dark:text-gray-300 leading-relaxed">
               <p>
                 ZOOP was born from a simple observation: while e-commerce
                 platforms offered convenience, they couldn't match the speed and
@@ -133,12 +133,12 @@ const About = () => {
             </div>
           </div>
           <div className="relative">
-            <div className="aspect-square bg-gradient-to-br from-zoop-moss/20 to-zoop-copper/20 rounded-3xl p-8 flex items-center justify-center">
+            <div className="aspect-4-5 bg-gradient-to-br from-zoop-moss/20 to-zoop-copper/20 rounded-3xl p-8 flex items-center justify-center">
               <div className="text-center">
                 <div className="text-8xl font-black text-zoop-moss mb-4">
                   ZOOP
                 </div>
-                <p className="text-xl font-bold text-zoop-obsidian">
+                <p className="text-xl font-bold text-zoop-obsidian dark:text-white">
                   Local Speed.
                   <br />
                   Global Quality.
@@ -150,22 +150,22 @@ const About = () => {
       </section>
 
       {/* Stats */}
-      <section className="bg-white py-16 md:py-20">
+      <section className="bg-white dark:glass-card py-16 md:py-20">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <h2 className="text-3xl md:text-4xl font-black text-zoop-obsidian text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-black text-zoop-obsidian dark:text-white text-center mb-12">
             ZOOP by the Numbers
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {stats.map((stat, idx) => (
               <div
                 key={idx}
-                className="text-center p-6 bg-gray-50 rounded-2xl border border-gray-100"
+                className="text-center p-6 bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/10"
               >
                 <div className="mb-2 inline-flex items-start gap-1 text-4xl font-black text-zoop-moss md:text-5xl">
                   <span>{stat.value}</span>
                   <Plus width={14} height={14} className="mt-1 shrink-0 md:mt-1.5" />
                 </div>
-                <p className="text-sm md:text-base font-bold text-gray-700">
+                <p className="text-sm md:text-base font-bold text-gray-700 dark:text-gray-300">
                   {stat.label}
                 </p>
               </div>
@@ -177,10 +177,10 @@ const About = () => {
       {/* Our Values */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 py-16 md:py-24">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-black text-zoop-obsidian mb-4">
+          <h2 className="text-3xl md:text-4xl font-black text-zoop-obsidian dark:text-white mb-4">
             Our Values
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
             The principles that guide everything we do at ZOOP
           </p>
         </div>
@@ -191,17 +191,17 @@ const About = () => {
             return (
               <div
                 key={idx}
-                className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 hover:shadow-lg transition-shadow"
+                className="bg-white dark:glass-card rounded-2xl shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-white/10 p-8 hover:shadow-lg transition-shadow"
               >
                 <div
-                  className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${value.color} flex items-center justify-center mb-6 shadow-lg`}
+                  className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${value.color} flex items-center justify-center mb-6 shadow-lg dark:shadow-[0_12px_32px_rgba(0,0,0,0.5)]`}
                 >
                   <Icon width={32} height={32} className="text-white" />
                 </div>
-                <h3 className="text-2xl font-black text-zoop-obsidian mb-3">
+                <h3 className="text-2xl font-black text-zoop-obsidian dark:text-white mb-3">
                   {value.title}
                 </h3>
-                <p className="text-gray-700 leading-relaxed">
+                <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
                   {value.description}
                 </p>
               </div>
@@ -223,7 +223,7 @@ const About = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               to="/products"
-              className="px-8 py-4 bg-zoop-moss hover:bg-zoop-moss/90 text-zoop-obsidian rounded-xl font-black transition-all shadow-lg hover:scale-105"
+              className="px-8 py-4 bg-zoop-moss hover:bg-zoop-moss/90 text-zoop-obsidian dark:text-white rounded-xl font-black transition-all shadow-lg dark:shadow-[0_12px_32px_rgba(0,0,0,0.5)] hover:scale-105"
             >
               Start Shopping
             </Link>

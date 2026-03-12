@@ -17,9 +17,9 @@ const AdCard = ({ ad, load, setError, handleDeleteAd }) => {
   if (isExpired && ad.status === "PUBLISHED") return null;
 
   return (
-    <div className="flex flex-col rounded-2xl bg-white border border-gray-100 shadow-sm overflow-hidden hover:shadow-xl transition-shadow">
+    <div className="flex flex-col rounded-2xl bg-white dark:glass-card border border-gray-100 dark:border-white/10 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] overflow-hidden hover:shadow-xl transition-shadow">
       {ad.mediaUrl ? (
-        <div className="h-40 w-full bg-gray-100 relative">
+        <div className="h-40 w-full bg-gray-100 dark:bg-white/10 relative">
           <img
             src={ad.mediaUrl}
             alt={ad.title}
@@ -58,7 +58,7 @@ const AdCard = ({ ad, load, setError, handleDeleteAd }) => {
         </div>
       )}
       <div className="p-4 flex flex-col flex-1">
-        <h3 className="font-900 text-lg text-zoop-obsidian leading-tight mb-1 line-clamp-1">
+        <h3 className="font-900 text-lg text-zoop-obsidian dark:text-white leading-tight mb-1 line-clamp-1">
           {ad.title}
         </h3>
         <p className="text-xs text-gray-400 font-bold mb-3">{ad.slotId}</p>
@@ -71,8 +71,8 @@ const AdCard = ({ ad, load, setError, handleDeleteAd }) => {
 
         <div className="mt-auto space-y-3">
           {ad.status !== "PUBLISHED" && (
-            <div className="bg-gray-50 p-3 rounded-xl border border-gray-100 flex flex-col gap-2">
-              <label className="text-xs font-bold text-gray-600">
+            <div className="bg-gray-50 dark:bg-white/5 p-3 rounded-xl border border-gray-100 dark:border-white/10 flex flex-col gap-2">
+              <label className="text-xs font-bold text-gray-600 dark:text-gray-400">
                 Approval Duration (Days)
               </label>
               <input
@@ -80,7 +80,7 @@ const AdCard = ({ ad, load, setError, handleDeleteAd }) => {
                 value={duration}
                 onChange={(e) => setDuration(Number(e.target.value))}
                 min="1"
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-zoop-moss"
+                className="w-full px-3 py-2 border border-gray-200 dark:border-white/10 rounded-lg text-sm bg-white dark:glass-card focus:outline-none focus:border-zoop-moss"
               />
               <div className="flex gap-2 mt-1">
                 <button
@@ -145,7 +145,7 @@ const AdCard = ({ ad, load, setError, handleDeleteAd }) => {
             )}
             <button
               onClick={() => handleDeleteAd(ad.id)}
-              className="px-3 py-2 rounded-lg bg-gray-100 text-red-600 text-[10px] font-black uppercase hover:bg-red-50 transition-colors"
+              className="px-3 py-2 rounded-lg bg-gray-100 dark:bg-white/10 text-red-600 text-[10px] font-black uppercase hover:bg-red-50 transition-colors"
             >
               Delete
             </button>
@@ -227,7 +227,7 @@ const AdminAdsManagement = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-4xl font-900 tracking-tighter italic text-zoop-obsidian uppercase">
+        <h1 className="text-4xl font-900 tracking-tighter italic text-zoop-obsidian dark:text-white uppercase">
           Ads Management
         </h1>
         <p className="text-gray-500 mt-1">
@@ -249,12 +249,12 @@ const AdminAdsManagement = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* --- AD SLOTS FORM --- */}
-        <div className="bg-white rounded-2xl border border-gray-100 p-6 space-y-3">
-          <h2 className="text-xl font-black text-zoop-obsidian">Ad Slots</h2>
+        <div className="bg-white dark:glass-card rounded-2xl border border-gray-100 dark:border-white/10 p-6 space-y-3">
+          <h2 className="text-xl font-black text-zoop-obsidian dark:text-white">Ad Slots</h2>
           <input
             value={slotForm.id}
             onChange={(e) => setSlotForm((p) => ({ ...p, id: e.target.value }))}
-            className="w-full px-3 py-2 border border-gray-200 rounded-xl"
+            className="w-full px-3 py-2 border border-gray-200 dark:border-white/10 rounded-xl"
             placeholder="slot id"
           />
           <input
@@ -262,7 +262,7 @@ const AdminAdsManagement = () => {
             onChange={(e) =>
               setSlotForm((p) => ({ ...p, name: e.target.value }))
             }
-            className="w-full px-3 py-2 border border-gray-200 rounded-xl"
+            className="w-full px-3 py-2 border border-gray-200 dark:border-white/10 rounded-xl"
             placeholder="slot name"
           />
           <select
@@ -271,7 +271,7 @@ const AdminAdsManagement = () => {
               setSlotForm((p) => ({ ...p, placement: e.target.value }))
             }
             aria-label="Select ad slot placement"
-            className="w-full px-3 py-2 border border-gray-200 rounded-xl"
+            className="w-full px-3 py-2 border border-gray-200 dark:border-white/10 rounded-xl"
           >
             {placementOptions.map((placement) => (
               <option key={placement} value={placement}>
@@ -284,7 +284,7 @@ const AdminAdsManagement = () => {
             onChange={(e) =>
               setSlotForm((p) => ({ ...p, price: e.target.value }))
             }
-            className="w-full px-3 py-2 border border-gray-200 rounded-xl"
+            className="w-full px-3 py-2 border border-gray-200 dark:border-white/10 rounded-xl"
             placeholder="Base slot price"
             type="number"
             min="0"
@@ -294,7 +294,7 @@ const AdminAdsManagement = () => {
             onChange={(e) =>
               setSlotForm((p) => ({ ...p, description: e.target.value }))
             }
-            className="w-full px-3 py-2 border border-gray-200 rounded-xl"
+            className="w-full px-3 py-2 border border-gray-200 dark:border-white/10 rounded-xl"
             placeholder="Slot description"
           />
           <button
@@ -324,10 +324,10 @@ const AdminAdsManagement = () => {
             {(data.slots || []).map((slot) => (
               <div
                 key={slot.id}
-                className="p-3 rounded-xl border border-gray-100 bg-gray-50 flex items-start justify-between gap-3"
+                className="p-3 rounded-xl border border-gray-100 dark:border-white/10 bg-gray-50 dark:bg-white/5 flex items-start justify-between gap-3"
               >
                 <div className="flex-1 min-w-0">
-                  <p className="font-bold text-zoop-obsidian">{slot.name}</p>
+                  <p className="font-bold text-zoop-obsidian dark:text-white">{slot.name}</p>
                   <p className="text-xs text-gray-500">
                     {slot.id} • {slot.placement}
                   </p>
@@ -348,14 +348,14 @@ const AdminAdsManagement = () => {
         </div>
 
         {/* --- PUBLISH AD FORM --- */}
-        <div className="bg-white rounded-2xl border border-gray-100 p-6 space-y-3">
-          <h2 className="text-xl font-black text-zoop-obsidian">Publish Ad</h2>
+        <div className="bg-white dark:glass-card rounded-2xl border border-gray-100 dark:border-white/10 p-6 space-y-3">
+          <h2 className="text-xl font-black text-zoop-obsidian dark:text-white">Publish Ad</h2>
           <input
             value={adForm.title}
             onChange={(e) =>
               setAdForm((p) => ({ ...p, title: e.target.value }))
             }
-            className="w-full px-3 py-2 border border-gray-200 rounded-xl"
+            className="w-full px-3 py-2 border border-gray-200 dark:border-white/10 rounded-xl"
             placeholder="title"
           />
           <input
@@ -363,7 +363,7 @@ const AdminAdsManagement = () => {
             onChange={(e) =>
               setAdForm((p) => ({ ...p, mediaUrl: e.target.value }))
             }
-            className="w-full px-3 py-2 border border-gray-200 rounded-xl"
+            className="w-full px-3 py-2 border border-gray-200 dark:border-white/10 rounded-xl"
             placeholder="media URL"
           />
           <input
@@ -371,7 +371,7 @@ const AdminAdsManagement = () => {
             onChange={(e) =>
               setAdForm((p) => ({ ...p, targetUrl: e.target.value }))
             }
-            className="w-full px-3 py-2 border border-gray-200 rounded-xl"
+            className="w-full px-3 py-2 border border-gray-200 dark:border-white/10 rounded-xl"
             placeholder="target URL"
           />
           <select
@@ -380,7 +380,7 @@ const AdminAdsManagement = () => {
               setAdForm((p) => ({ ...p, slotId: e.target.value }))
             }
             aria-label="Select ad slot"
-            className="w-full px-3 py-2 border border-gray-200 rounded-xl"
+            className="w-full px-3 py-2 border border-gray-200 dark:border-white/10 rounded-xl"
           >
             {(
               data.slots || placementOptions.map((k) => ({ id: k, name: k }))
@@ -396,7 +396,7 @@ const AdminAdsManagement = () => {
               setAdForm((p) => ({ ...p, status: e.target.value }))
             }
             aria-label="Select ad status"
-            className="w-full px-3 py-2 border border-gray-200 rounded-xl"
+            className="w-full px-3 py-2 border border-gray-200 dark:border-white/10 rounded-xl"
           >
             <option value="PUBLISHED">PUBLISHED</option>
             <option value="PENDING_REVIEW">PENDING_REVIEW</option>
@@ -411,7 +411,7 @@ const AdminAdsManagement = () => {
                 setError(e?.message || "Failed to publish ad");
               }
             }}
-            className="px-4 py-2 bg-zoop-moss text-zoop-obsidian rounded-xl font-black text-xs uppercase"
+            className="px-4 py-2 bg-zoop-moss text-zoop-obsidian dark:text-white rounded-xl font-black text-xs uppercase"
           >
             Publish Ad
           </button>
@@ -419,14 +419,14 @@ const AdminAdsManagement = () => {
       </div>
 
       {/* --- ALL ADS --- */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-6">
+      <div className="bg-white dark:glass-card rounded-2xl border border-gray-100 dark:border-white/10 p-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
-          <h2 className="text-xl font-black text-zoop-obsidian">All Ads</h2>
+          <h2 className="text-xl font-black text-zoop-obsidian dark:text-white">All Ads</h2>
           <select
             value={activeSlotFilter}
             onChange={(e) => setActiveSlotFilter(e.target.value)}
             aria-label="Filter ads by slot"
-            className="px-3 py-2 border border-gray-200 rounded-xl"
+            className="px-3 py-2 border border-gray-200 dark:border-white/10 rounded-xl"
           >
             <option value="all">All Slots</option>
             {(data.slots || []).map((slot) => (
@@ -458,7 +458,7 @@ const AdminAdsManagement = () => {
               (ad) =>
                 activeSlotFilter === "all" || ad.slotId === activeSlotFilter,
             ).length === 0 && (
-              <div className="col-span-full py-16 flex flex-col items-center justify-center bg-gray-50 rounded-2xl border border-gray-100 border-dashed">
+              <div className="col-span-full py-16 flex flex-col items-center justify-center bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/10 border-dashed">
                 <p className="text-gray-400 font-bold">No ads found</p>
               </div>
             )}

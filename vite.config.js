@@ -36,7 +36,7 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/mapapi/, ""),
         headers: {
-          "User-Agent": "ZoopMarketplace/1.0 (contact@zoop.in)",
+          "User-Agent": "ZoopMarketplace/1.0 (contact@zoop.com)",
           "Accept-Language": "en",
         },
       },

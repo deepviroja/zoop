@@ -118,14 +118,14 @@ const Contact = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-gray-50 dark:bg-white/5 py-12">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-black text-zoop-obsidian mb-4">
+          <h1 className="text-4xl md:text-5xl font-black text-zoop-obsidian dark:text-white mb-4">
             Get in Touch
           </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
             Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.
           </p>
         </div>
@@ -135,15 +135,15 @@ const Contact = () => {
           {contactMethods.map((method, idx) => {
             const Icon = method.icon;
             return (
-              <div key={idx} className="bg-white rounded-2xl p-8 shadow=sm border border-gray-100 hover:shadow-lg transition-shadow">
-                <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${method.color} flex items-center justify-center mb-6 shadow-lg`}>
+              <div key={idx} className="bg-white dark:glass-card rounded-2xl p-8 shadow=sm border border-gray-100 dark:border-white/10 hover:shadow-lg transition-shadow">
+                <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${method.color} flex items-center justify-center mb-6 shadow-lg dark:shadow-[0_12px_32px_rgba(0,0,0,0.5)]`}>
                   <Icon width={32} height={32} className="text-white" />
                 </div>
-                <h3 className="text-xl font-black text-zoop-obsidian mb-3">
+                <h3 className="text-xl font-black text-zoop-obsidian dark:text-white mb-3">
                   {method.title}
                 </h3>
                 {method.details.map((detail, i) => (
-                  <p key={i} className="text-gray-600">
+                  <p key={i} className="text-gray-600 dark:text-gray-400">
                     {detail}
                   </p>
                 ))}
@@ -153,13 +153,13 @@ const Contact = () => {
         </div>
 
         {/* Contact Form */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 md:p-12">
-          <h2 className="text-2xl font-black text-zoop-obsidian mb-8">Send us a Message</h2>
+        <div className="bg-white dark:glass-card rounded-2xl shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-white/10 p-8 md:p-12">
+          <h2 className="text-2xl font-black text-zoop-obsidian dark:text-white mb-8">Send us a Message</h2>
           
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">
+                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                   Full Name *
                 </label>
                 <input
@@ -168,14 +168,14 @@ const Contact = () => {
                   value={formData.name}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-zoop-moss focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl focus:ring-2 focus:ring-zoop-moss focus:border-transparent"
                   placeholder="John Doe"
                 />
                 {errors.name && <p className="text-red-500 text-xs mt-1 font-bold">{errors.name}</p>}
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">
+                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                   Email Address *
                 </label>
                 <input
@@ -184,7 +184,7 @@ const Contact = () => {
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-zoop-moss focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl focus:ring-2 focus:ring-zoop-moss focus:border-transparent"
                   placeholder="john@example.com"
                 />
                 {errors.email && <p className="text-red-500 text-xs mt-1 font-bold">{errors.email}</p>}
@@ -201,7 +201,7 @@ const Contact = () => {
               />
 
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">
+                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                   Subject *
                 </label>
                 <select
@@ -209,7 +209,7 @@ const Contact = () => {
                   value={formData.subject}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-zoop-moss focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl focus:ring-2 focus:ring-zoop-moss focus:border-transparent"
                 >
                   <option value="">Select a subject</option>
                   <option value="order">Order Related</option>
@@ -222,7 +222,7 @@ const Contact = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                 Message *
               </label>
               <textarea
@@ -231,7 +231,7 @@ const Contact = () => {
                 onChange={handleChange}
                 required
                 rows={6}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-zoop-moss focus:border-transparent resize-none"
+                className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl focus:ring-2 focus:ring-zoop-moss focus:border-transparent resize-none"
                 placeholder="Tell us how we can help you..."
               />
               {errors.message && <p className="text-red-500 text-xs mt-1 font-bold">{errors.message}</p>}
@@ -239,7 +239,7 @@ const Contact = () => {
 
             <button
               type="submit"
-              className="w-full md:w-auto px-8 py-4 bg-zoop-moss hover:bg-zoop-moss/90 text-zoop-obsidian rounded-xl font-black transition-all shadow-lg hover:scale-105"
+              className="w-full md:w-auto px-8 py-4 bg-zoop-moss hover:bg-zoop-moss/90 text-zoop-obsidian dark:text-white rounded-xl font-black transition-all shadow-lg dark:shadow-[0_12px_32px_rgba(0,0,0,0.5)] hover:scale-105"
             >
               Send Message
             </button>
@@ -247,28 +247,28 @@ const Contact = () => {
         </div>
 
         {/* Map placeholder */}
-        <div className="mt-12 bg-gray-200 rounded-2xl h-96 flex items-center justify-center overflow-hidden">
+        <div className="mt-12 bg-gray-200 dark:bg-white/20 rounded-2xl h-96 flex items-center justify-center overflow-hidden">
           <div className="text-center">
             <MapPin width={48} height={48} className="mx-auto text-gray-400 mb-4" />
-            <p className="text-gray-600 font-bold">{siteConfig?.contactMapTitle || 'Map Location'}</p>
+            <p className="text-gray-600 dark:text-gray-400 font-bold">{siteConfig?.contactMapTitle || 'Map Location'}</p>
             <p className="text-sm text-gray-500">{siteConfig?.contactMapAddress || 'Ring Road, Surat, Gujarat'}</p>
           </div>
         </div>
 
         {user?.uid && (
-          <div className="mt-12 bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-            <h2 className="text-2xl font-black text-zoop-obsidian mb-6">My Support Tickets</h2>
+          <div className="mt-12 bg-white dark:glass-card rounded-2xl shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-white/10 p-8">
+            <h2 className="text-2xl font-black text-zoop-obsidian dark:text-white mb-6">My Support Tickets</h2>
             {myTickets.length === 0 ? (
               <p className="text-sm text-gray-500">No tickets yet.</p>
             ) : (
               <div className="space-y-4">
                 {myTickets.map((ticket) => (
-                  <div key={ticket.id} className="p-4 rounded-xl bg-gray-50 border border-gray-100">
+                  <div key={ticket.id} className="p-4 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10">
                     <div className="flex items-center justify-between gap-3">
-                      <p className="font-bold text-zoop-obsidian">{ticket.subject}</p>
-                      <span className="text-xs font-black uppercase text-gray-600">{ticket.status}</span>
+                      <p className="font-bold text-zoop-obsidian dark:text-white">{ticket.subject}</p>
+                      <span className="text-xs font-black uppercase text-gray-600 dark:text-gray-400">{ticket.status}</span>
                     </div>
-                    <p className="text-sm text-gray-600 mt-2">{ticket.message}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">{ticket.message}</p>
                     {Array.isArray(ticket.replies) && ticket.replies.length > 0 && (
                       <div className="mt-3 p-3 rounded-lg bg-green-50 border border-green-100">
                         <p className="text-xs font-bold text-green-800">Replies</p>

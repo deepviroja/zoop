@@ -191,10 +191,10 @@ const AdminWebsiteControl = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-white/5 p-6">
       <div className="max-w-5xl mx-auto space-y-6">
         <div>
-          <h1 className="text-4xl font-900 tracking-tighter italic text-zoop-obsidian uppercase">
+          <h1 className="text-4xl font-900 tracking-tighter italic text-zoop-obsidian dark:text-white uppercase">
             Website_Control
           </h1>
           <p className="text-gray-500 mt-2">
@@ -202,7 +202,7 @@ const AdminWebsiteControl = () => {
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 space-y-5">
+        <div className="bg-white dark:glass-card rounded-2xl p-6 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-white/10 space-y-5">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-black uppercase tracking-widest text-gray-500 mb-2">
@@ -211,7 +211,7 @@ const AdminWebsiteControl = () => {
               <input
                 value={config.brandName}
                 onChange={(e) => setConfig((prev) => ({ ...prev, brandName: e.target.value }))}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-zoop-moss outline-none"
+                className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl focus:ring-2 focus:ring-zoop-moss outline-none"
                 placeholder={DEFAULT_BRAND_NAME}
               />
             </div>
@@ -222,7 +222,7 @@ const AdminWebsiteControl = () => {
               <input
                 value={config.brandLogoUrl}
                 onChange={(e) => setConfig((prev) => ({ ...prev, brandLogoUrl: e.target.value }))}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-zoop-moss outline-none"
+                className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl focus:ring-2 focus:ring-zoop-moss outline-none"
                 placeholder="https://..."
               />
             </div>
@@ -235,7 +235,7 @@ const AdminWebsiteControl = () => {
                 onChange={(e) =>
                   setConfig((prev) => ({ ...prev, announcementBanner: e.target.value }))
                 }
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-zoop-moss outline-none"
+                className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl focus:ring-2 focus:ring-zoop-moss outline-none"
                 placeholder="Order before 6 PM for same-day delivery"
               />
             </div>
@@ -246,7 +246,7 @@ const AdminWebsiteControl = () => {
               <input
                 value={config.contactSupportEmail}
                 onChange={(e) => setConfig((prev) => ({ ...prev, contactSupportEmail: e.target.value }))}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-zoop-moss outline-none"
+                className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl focus:ring-2 focus:ring-zoop-moss outline-none"
                 placeholder="support@zoop.com"
               />
             </div>
@@ -257,7 +257,7 @@ const AdminWebsiteControl = () => {
               <input
                 value={config.contactSupportPhone}
                 onChange={(e) => setConfig((prev) => ({ ...prev, contactSupportPhone: e.target.value }))}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-zoop-moss outline-none"
+                className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl focus:ring-2 focus:ring-zoop-moss outline-none"
                 placeholder="+91 1800 123 4567"
               />
             </div>
@@ -270,7 +270,7 @@ const AdminWebsiteControl = () => {
               <input
                 value={config.brandTextColor}
                 onChange={(e) => setConfig((prev) => ({ ...prev, brandTextColor: e.target.value }))}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-zoop-moss outline-none"
+                className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl focus:ring-2 focus:ring-zoop-moss outline-none"
                 placeholder="#b7e84b"
               />
             </div>
@@ -281,7 +281,7 @@ const AdminWebsiteControl = () => {
               <input
                 value={config.brandFontFamily}
                 onChange={(e) => setConfig((prev) => ({ ...prev, brandFontFamily: e.target.value }))}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-zoop-moss outline-none"
+                className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl focus:ring-2 focus:ring-zoop-moss outline-none"
                 placeholder="inherit"
               />
             </div>
@@ -292,7 +292,7 @@ const AdminWebsiteControl = () => {
               <input
                 value={config.brandFontWeight}
                 onChange={(e) => setConfig((prev) => ({ ...prev, brandFontWeight: e.target.value }))}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-zoop-moss outline-none"
+                className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl focus:ring-2 focus:ring-zoop-moss outline-none"
                 placeholder="900"
               />
             </div>
@@ -306,7 +306,7 @@ const AdminWebsiteControl = () => {
               <input
                 value={config.homeHeroHeadline}
                 onChange={(e) => setConfig((prev) => ({ ...prev, homeHeroHeadline: e.target.value }))}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-zoop-moss outline-none"
+                className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl focus:ring-2 focus:ring-zoop-moss outline-none"
                 placeholder="Discover curated local-first products"
               />
             </div>
@@ -319,7 +319,7 @@ const AdminWebsiteControl = () => {
                 onChange={(e) =>
                   setConfig((prev) => ({ ...prev, homeSameDayCutoffText: e.target.value }))
                 }
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-zoop-moss outline-none"
+                className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl focus:ring-2 focus:ring-zoop-moss outline-none"
               />
             </div>
           </div>
@@ -333,7 +333,7 @@ const AdminWebsiteControl = () => {
               onChange={(e) =>
                 setConfig((prev) => ({ ...prev, subNavCategories: e.target.value }))
               }
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-zoop-moss outline-none"
+              className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl focus:ring-2 focus:ring-zoop-moss outline-none"
               placeholder="Electronics, Fashion, Handmade, Home"
             />
           </div>
@@ -348,10 +348,10 @@ const AdminWebsiteControl = () => {
           </button>
         </div>
 
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 space-y-5">
+        <div className="bg-white dark:glass-card rounded-2xl p-6 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-white/10 space-y-5">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <h2 className="text-xl font-black text-zoop-obsidian">Home Slider Control</h2>
+              <h2 className="text-xl font-black text-zoop-obsidian dark:text-white">Home Slider Control</h2>
               <p className="text-sm text-gray-500 mt-1">
                 Update slide city, text, order, active state, and image URL from here.
               </p>
@@ -359,37 +359,37 @@ const AdminWebsiteControl = () => {
             <button
               type="button"
               onClick={addSlide}
-              className="px-4 py-2 rounded-xl border border-gray-200 font-bold text-sm"
+              className="px-4 py-2 rounded-xl border border-gray-200 dark:border-white/10 font-bold text-sm"
             >
               Add Slide
             </button>
           </div>
           <div className="space-y-4">
             {heroSlides.map((slide, index) => (
-              <div key={slide.id || `new-${index}`} className="rounded-2xl border border-gray-200 p-4 space-y-4">
+              <div key={slide.id || `new-${index}`} className="rounded-2xl border border-gray-200 dark:border-white/10 p-4 space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <input
                     value={slide.title || ""}
                     onChange={(e) => handleSlideChange(index, "title", e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl"
+                    className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl"
                     placeholder="Slide title"
                   />
                   <input
                     value={slide.city || ""}
                     onChange={(e) => handleSlideChange(index, "city", e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl"
+                    className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl"
                     placeholder="City"
                   />
                   <input
                     value={slide.img || ""}
                     onChange={(e) => handleSlideChange(index, "img", e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl md:col-span-2"
+                    className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl md:col-span-2"
                     placeholder="Image URL"
                   />
                   <textarea
                     value={slide.desc || ""}
                     onChange={(e) => handleSlideChange(index, "desc", e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl md:col-span-2"
+                    className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl md:col-span-2"
                     rows={3}
                     placeholder="Slide description"
                   />
@@ -397,16 +397,16 @@ const AdminWebsiteControl = () => {
                     type="number"
                     value={slide.order || index + 1}
                     onChange={(e) => handleSlideChange(index, "order", Number(e.target.value || index + 1))}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl"
+                    className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl"
                     placeholder="Order"
                   />
-                  <label className="flex items-center gap-3 px-4 py-3 border border-gray-200 rounded-xl">
+                  <label className="flex items-center gap-3 px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl">
                     <input
                       type="checkbox"
                       checked={slide.active !== false}
                       onChange={(e) => handleSlideChange(index, "active", e.target.checked)}
                     />
-                    <span className="font-bold text-sm text-gray-700">Active slide</span>
+                    <span className="font-bold text-sm text-gray-700 dark:text-gray-300">Active slide</span>
                   </label>
                 </div>
                 {slide.id && (
@@ -434,8 +434,8 @@ const AdminWebsiteControl = () => {
           </button>
         </div>
 
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 space-y-5">
-          <h2 className="text-xl font-black text-zoop-obsidian">Sidebar Control</h2>
+        <div className="bg-white dark:glass-card rounded-2xl p-6 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-white/10 space-y-5">
+          <h2 className="text-xl font-black text-zoop-obsidian dark:text-white">Sidebar Control</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-black uppercase tracking-widest text-gray-500 mb-2">
@@ -446,7 +446,7 @@ const AdminWebsiteControl = () => {
                 onChange={(e) =>
                   setConfig((prev) => ({ ...prev, customerSidebarCategories: e.target.value }))
                 }
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl"
+                className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl"
                 placeholder="Fashion, Electronics, Home"
               />
             </div>
@@ -457,7 +457,7 @@ const AdminWebsiteControl = () => {
               <input
                 value={config.sellerPanelTitle}
                 onChange={(e) => setConfig((prev) => ({ ...prev, sellerPanelTitle: e.target.value }))}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl"
+                className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl"
               />
             </div>
             <div>
@@ -467,7 +467,7 @@ const AdminWebsiteControl = () => {
               <input
                 value={config.adminPanelTitle}
                 onChange={(e) => setConfig((prev) => ({ ...prev, adminPanelTitle: e.target.value }))}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl"
+                className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl"
               />
             </div>
             <div className="md:col-span-2">
@@ -479,7 +479,7 @@ const AdminWebsiteControl = () => {
                 onChange={(e) =>
                   setConfig((prev) => ({ ...prev, customerSidebarQuickLinks: e.target.value }))
                 }
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl"
+                className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl"
                 rows={4}
                 placeholder={"Your Orders|/history\nTrack Order|/track\nWishlist|/wishlist"}
               />
@@ -487,10 +487,10 @@ const AdminWebsiteControl = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 space-y-5">
-          <h2 className="text-xl font-black text-zoop-obsidian">Contact Page Control</h2>
-          <div className="rounded-2xl border border-dashed border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
-            <p className="font-black text-zoop-obsidian">Customer Support</p>
+        <div className="bg-white dark:glass-card rounded-2xl p-6 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-white/10 space-y-5">
+          <h2 className="text-xl font-black text-zoop-obsidian dark:text-white">Contact Page Control</h2>
+          <div className="rounded-2xl border border-dashed border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 p-4 text-sm text-gray-600 dark:text-gray-400">
+            <p className="font-black text-zoop-obsidian dark:text-white">Customer Support</p>
             <p>{config.contactSupportEmail || "support@zoop.com"}</p>
             <p>{config.contactSupportPhone || "+91 1800 123 4567"}</p>
           </div>
@@ -498,44 +498,44 @@ const AdminWebsiteControl = () => {
             <input
               value={config.contactOfficeTitle}
               onChange={(e) => setConfig((prev) => ({ ...prev, contactOfficeTitle: e.target.value }))}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl"
+              className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl"
               placeholder="Head Office"
             />
             <input
               value={config.contactMapTitle}
               onChange={(e) => setConfig((prev) => ({ ...prev, contactMapTitle: e.target.value }))}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl"
+              className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl"
               placeholder="Map title"
             />
             <input
               value={config.contactOfficeAddressLine1}
               onChange={(e) => setConfig((prev) => ({ ...prev, contactOfficeAddressLine1: e.target.value }))}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl"
+              className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl"
               placeholder="Office address line 1"
             />
             <input
               value={config.contactOfficeAddressLine2}
               onChange={(e) => setConfig((prev) => ({ ...prev, contactOfficeAddressLine2: e.target.value }))}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl"
+              className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl"
               placeholder="Office address line 2"
             />
             <input
               value={config.contactBusinessHoursLine1}
               onChange={(e) => setConfig((prev) => ({ ...prev, contactBusinessHoursLine1: e.target.value }))}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl"
+              className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl"
               placeholder="Business hours line 1"
             />
             <input
               value={config.contactBusinessHoursLine2}
               onChange={(e) => setConfig((prev) => ({ ...prev, contactBusinessHoursLine2: e.target.value }))}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl"
+              className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl"
               placeholder="Business hours line 2"
             />
             <div className="md:col-span-2">
               <input
                 value={config.contactMapAddress}
                 onChange={(e) => setConfig((prev) => ({ ...prev, contactMapAddress: e.target.value }))}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl"
+                className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl"
                 placeholder="Map address text"
               />
             </div>
@@ -550,9 +550,9 @@ const AdminWebsiteControl = () => {
           </button>
         </div>
 
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-amber-200 space-y-4">
-          <h2 className="text-xl font-black text-zoop-obsidian">Maintenance Mode</h2>
-          <label className="flex items-center gap-3 text-sm font-bold text-gray-700">
+        <div className="bg-white dark:glass-card rounded-2xl p-6 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] border border-amber-200 space-y-4">
+          <h2 className="text-xl font-black text-zoop-obsidian dark:text-white">Maintenance Mode</h2>
+          <label className="flex items-center gap-3 text-sm font-bold text-gray-700 dark:text-gray-300">
             <input
               type="checkbox"
               checked={Boolean(config.maintenanceMode)}
@@ -567,7 +567,7 @@ const AdminWebsiteControl = () => {
             onChange={(e) =>
               setConfig((prev) => ({ ...prev, maintenanceMessage: e.target.value }))
             }
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl"
+            className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl"
             rows={3}
             placeholder="Maintenance message for customers"
           />
@@ -581,11 +581,11 @@ const AdminWebsiteControl = () => {
           </button>
         </div>
 
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-red-100 space-y-4">
+        <div className="bg-white dark:glass-card rounded-2xl p-6 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] border border-red-100 space-y-4">
           <h2 className="text-xl font-black text-red-700">Super Admin Actions</h2>
           {isSuperAdmin ? (
             <>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
                 Only <span className="font-black">admin@zoop.com</span> can run these reset and delete operations.
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -647,7 +647,7 @@ const AdminWebsiteControl = () => {
               </div>
             </>
           ) : (
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
               Restricted. Login with <span className="font-black">admin@zoop.com</span> to access destructive controls.
             </p>
           )}

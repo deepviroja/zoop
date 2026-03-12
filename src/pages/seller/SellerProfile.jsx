@@ -182,7 +182,7 @@ const SellerProfile = () => {
   const statusConfig = {
     approved: {
       label: "Verified",
-      color: "bg-zoop-moss text-zoop-obsidian",
+      color: "bg-zoop-moss text-zoop-obsidian dark:text-white",
       icon: Check,
     },
     pending: {
@@ -201,12 +201,12 @@ const SellerProfile = () => {
   const StatusIcon = statusInfo.icon;
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-white/5 p-6">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-4xl font-900 tracking-tighter italic text-zoop-obsidian uppercase">
+            <h1 className="text-4xl font-900 tracking-tighter italic text-zoop-obsidian dark:text-white uppercase">
               Store_Profile
             </h1>
             <p className="text-gray-400 font-bold text-xs uppercase tracking-widest mt-1">
@@ -216,7 +216,7 @@ const SellerProfile = () => {
           {!isEditing && activeTab === "profile" && (
             <button
               onClick={() => setIsEditing(true)}
-              className="flex items-center gap-2 px-6 py-3 bg-zoop-moss text-zoop-obsidian rounded-xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-all"
+              className="flex items-center gap-2 px-6 py-3 bg-zoop-moss text-zoop-obsidian dark:text-white rounded-xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-all"
             >
               <Edit width={16} height={16} />
               Edit Profile
@@ -225,11 +225,11 @@ const SellerProfile = () => {
         </div>
 
         {/* Profile Card */}
-        <div className="bg-gradient-to-br from-zoop-obsidian via-gray-900 to-zoop-obsidian text-white rounded-3xl p-10 shadow-2xl relative overflow-hidden">
+        <div className="bg-gradient-to-br from-zoop-obsidian via-gray-900 to-zoop-obsidian text-white rounded-3xl p-10 shadow-2xl dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)] relative overflow-hidden">
           <div className="relative z-10">
             <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
               {/* Avatar */}
-              <div className="w-24 h-24 bg-zoop-moss rounded-3xl flex items-center justify-center text-zoop-obsidian font-black text-4xl shrink-0">
+              <div className="w-24 h-24 bg-zoop-moss rounded-3xl flex items-center justify-center text-zoop-obsidian dark:text-white font-black text-4xl shrink-0">
                 {(profileData.name || "S")[0].toUpperCase()}
               </div>
               <div className="flex-1">
@@ -287,7 +287,7 @@ const SellerProfile = () => {
         </div>
 
         {/* Tabs */}
-        <div className="bg-white rounded-2xl p-2 shadow-sm">
+        <div className="bg-white dark:glass-card rounded-2xl p-2 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
           <div className="flex gap-2">
             {[
               { key: "profile", label: "Business Info", icon: Store },
@@ -300,8 +300,8 @@ const SellerProfile = () => {
                   onClick={() => setActiveTab(tab.key)}
                   className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold text-sm transition-all ${
                     activeTab === tab.key
-                      ? "bg-zoop-moss text-zoop-obsidian shadow"
-                      : "bg-gray-50 text-gray-600 hover:bg-gray-100"
+                      ? "bg-zoop-moss text-zoop-obsidian dark:text-white shadow"
+                      : "bg-gray-50 dark:bg-white/5 text-gray-600 dark:text-gray-400 hover:bg-gray-100"
                   }`}
                 >
                   <Icon width={18} height={18} />
@@ -313,11 +313,11 @@ const SellerProfile = () => {
         </div>
 
         {/* Tab Content */}
-        <div className="bg-white rounded-3xl p-8 shadow-sm">
+        <div className="bg-white dark:glass-card rounded-3xl p-8 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
           {/* Profile Tab */}
           {activeTab === "profile" && (
             <div className="space-y-6">
-              <h3 className="text-2xl font-black text-zoop-obsidian mb-6">
+              <h3 className="text-2xl font-black text-zoop-obsidian dark:text-white mb-6">
                 Business Information
               </h3>
 
@@ -380,8 +380,8 @@ const SellerProfile = () => {
                         disabled={!isEditing}
                         className={`w-full px-4 py-3 border-2 rounded-xl font-bold ${
                           isEditing
-                            ? "border-gray-200 focus:border-zoop-moss outline-none"
-                            : "border-gray-100 bg-gray-50 text-gray-600"
+                            ? "border-gray-200 dark:border-white/10 focus:border-zoop-moss outline-none"
+                            : "border-gray-100 dark:border-white/10 bg-gray-50 dark:bg-white/5 text-gray-600 dark:text-gray-400"
                         }`}
                         placeholder={
                           isEditing ? `Enter ${field.label.toLowerCase()}` : "—"
@@ -392,7 +392,7 @@ const SellerProfile = () => {
                 ))}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 p-4 bg-gray-50 rounded-xl">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 p-4 bg-gray-50 dark:bg-white/5 rounded-xl">
                 {[
                   { label: "PAN Card", url: normalizeDocumentUrl(profileData.panCardUrl) },
                   { label: "Cancelled Cheque", url: normalizeDocumentUrl(profileData.cancelledChequeUrl) },
@@ -408,8 +408,8 @@ const SellerProfile = () => {
                     }}
                     className={`px-4 py-3 rounded-xl border text-sm font-black transition-all ${
                       doc.url
-                        ? "bg-white border-gray-200 text-zoop-obsidian hover:border-zoop-moss"
-                        : "bg-gray-100 border-gray-100 text-gray-400 cursor-not-allowed"
+                        ? "bg-white dark:glass-card border-gray-200 dark:border-white/10 text-zoop-obsidian dark:text-white hover:border-zoop-moss"
+                        : "bg-gray-100 dark:bg-white/10 border-gray-100 dark:border-white/10 text-gray-400 cursor-not-allowed"
                     }`}
                   >
                     View {doc.label}
@@ -430,8 +430,8 @@ const SellerProfile = () => {
                   rows={4}
                   className={`w-full px-4 py-3 border-2 rounded-xl font-medium ${
                     isEditing
-                      ? "border-gray-200 focus:border-zoop-moss outline-none"
-                      : "border-gray-100 bg-gray-50 text-gray-600"
+                      ? "border-gray-200 dark:border-white/10 focus:border-zoop-moss outline-none"
+                      : "border-gray-100 dark:border-white/10 bg-gray-50 dark:bg-white/5 text-gray-600 dark:text-gray-400"
                   }`}
                   placeholder={isEditing ? "Describe your business..." : "—"}
                 />
@@ -441,14 +441,14 @@ const SellerProfile = () => {
                 <div className="flex gap-3 pt-4">
                   <button
                     onClick={() => setIsEditing(false)}
-                    className="flex-1 px-6 py-3 bg-gray-100 text-gray-600 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-gray-200 transition-all"
+                    className="flex-1 px-6 py-3 bg-gray-100 dark:bg-white/10 text-gray-600 dark:text-gray-400 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-gray-200 transition-all"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleSaveProfile}
                     disabled={saving}
-                    className="flex-1 px-6 py-3 bg-zoop-moss text-zoop-obsidian rounded-xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-all"
+                    className="flex-1 px-6 py-3 bg-zoop-moss text-zoop-obsidian dark:text-white rounded-xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-all"
                   >
                     {saving ? "Saving..." : "Save Changes"}
                   </button>
@@ -459,7 +459,7 @@ const SellerProfile = () => {
 
           {activeTab === "notifications" && (
             <div id="seller-notifications" className="space-y-6">
-              <h3 className="text-2xl font-black text-zoop-obsidian mb-2">
+              <h3 className="text-2xl font-black text-zoop-obsidian dark:text-white mb-2">
                 Notifications
               </h3>
               {notifications.length === 0 ? (
@@ -471,12 +471,12 @@ const SellerProfile = () => {
                       key={note.id}
                       className={`p-4 rounded-xl border ${
                         note.read
-                          ? "bg-gray-50 border-gray-100"
+                          ? "bg-gray-50 dark:bg-white/5 border-gray-100 dark:border-white/10"
                           : "bg-zoop-moss/10 border-zoop-moss/30"
                       }`}
                     >
-                      <p className="font-bold text-zoop-obsidian">{note.title}</p>
-                      <p className="text-sm text-gray-600 mt-1">{note.message}</p>
+                      <p className="font-bold text-zoop-obsidian dark:text-white">{note.title}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{note.message}</p>
                       {note.createdAt && (
                         <p className="text-xs text-gray-500 mt-2">
                           {new Date(note.createdAt).toLocaleString()}
@@ -508,8 +508,8 @@ const SellerProfile = () => {
                 setDeleteFlow({ open: false, otpSent: false, otp: "", reason: "", loading: false })
               }
             />
-            <div className="relative bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl border border-gray-100">
-              <h3 className="text-lg font-black text-zoop-obsidian">Delete Seller Account</h3>
+            <div className="relative bg-white dark:glass-card rounded-2xl p-6 w-full max-w-md shadow-2xl dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-white/10">
+              <h3 className="text-lg font-black text-zoop-obsidian dark:text-white">Delete Seller Account</h3>
               <p className="text-sm text-gray-500 mt-1 mb-4">
                 OTP will be sent to your registered email for confirmation.
               </p>
@@ -517,14 +517,14 @@ const SellerProfile = () => {
                 value={deleteFlow.reason}
                 onChange={(e) => setDeleteFlow((p) => ({ ...p, reason: e.target.value }))}
                 rows={3}
-                className="w-full border border-gray-200 rounded-xl p-3 text-sm mb-3"
+                className="w-full border border-gray-200 dark:border-white/10 rounded-xl p-3 text-sm mb-3"
                 placeholder="Optional reason"
               />
               {deleteFlow.otpSent && (
                 <input
                   value={deleteFlow.otp}
                   onChange={(e) => setDeleteFlow((p) => ({ ...p, otp: e.target.value }))}
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2 mb-3"
+                  className="w-full border border-gray-200 dark:border-white/10 rounded-xl px-3 py-2 mb-3"
                   placeholder="Enter OTP"
                 />
               )}
@@ -533,7 +533,7 @@ const SellerProfile = () => {
                   onClick={() =>
                     setDeleteFlow({ open: false, otpSent: false, otp: "", reason: "", loading: false })
                   }
-                  className="flex-1 py-2.5 border border-gray-200 rounded-xl font-bold"
+                  className="flex-1 py-2.5 border border-gray-200 dark:border-white/10 rounded-xl font-bold"
                 >
                   Cancel
                 </button>

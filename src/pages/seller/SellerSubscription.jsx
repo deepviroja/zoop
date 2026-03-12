@@ -30,12 +30,12 @@ const SellerSubscription = () => {
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
       <div className="text-center space-y-3">
-        <h1 className="text-4xl md:text-5xl font-black text-zoop-obsidian italic tracking-tighter">
+        <h1 className="text-4xl md:text-5xl font-black text-zoop-obsidian dark:text-white italic tracking-tighter">
           Seller Subscription Plans
         </h1>
         {profile?.subscription?.planName ? (
-          <p className="text-sm font-bold text-gray-600">
-            Active plan: <span className="text-zoop-obsidian">{profile.subscription.planName}</span>{" "}
+          <p className="text-sm font-bold text-gray-600 dark:text-gray-400">
+            Active plan: <span className="text-zoop-obsidian dark:text-white">{profile.subscription.planName}</span>{" "}
             {profile.subscription.expiresAt
               ? `(expires ${new Date(profile.subscription.expiresAt).toLocaleDateString()})`
               : ""}
@@ -52,18 +52,18 @@ const SellerSubscription = () => {
           {plans.map((plan) => (
             <div
               key={plan.id}
-              className={`relative rounded-[2rem] p-7 border-2 shadow-sm transition-all ${
+              className={`relative rounded-[2rem] p-7 border-2 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] transition-all ${
                 activePlanId === plan.id
                   ? "border-zoop-moss bg-zoop-moss/10"
-                  : "border-gray-200 bg-white"
+                  : "border-gray-200 dark:border-white/10 bg-white dark:glass-card"
               }`}
             >
-              <h3 className="text-2xl font-black text-zoop-obsidian">{plan.name}</h3>
+              <h3 className="text-2xl font-black text-zoop-obsidian dark:text-white">{plan.name}</h3>
               <p className="text-4xl font-black mt-3">Rs. {Number(plan.price || 0).toLocaleString("en-IN")}</p>
               <p className="text-xs text-gray-500 mt-1">{plan.durationDays || 30} days</p>
               <ul className="mt-4 space-y-2">
                 {(plan.features || []).map((feature, idx) => (
-                  <li key={idx} className="text-sm text-gray-600">
+                  <li key={idx} className="text-sm text-gray-600 dark:text-gray-400">
                     • {feature}
                   </li>
                 ))}
@@ -81,7 +81,7 @@ const SellerSubscription = () => {
                 disabled={savingPlanId === plan.id}
                 className={`mt-6 w-full py-3 rounded-xl font-black text-xs uppercase tracking-widest ${
                   activePlanId === plan.id
-                    ? "bg-gray-100 text-gray-500"
+                    ? "bg-gray-100 dark:bg-white/10 text-gray-500"
                     : "bg-zoop-obsidian text-white"
                 }`}
               >

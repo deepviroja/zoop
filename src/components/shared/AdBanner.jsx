@@ -136,7 +136,7 @@ const AdBanner = ({ type = "horizontal", slotId: slotIdProp = "", size = "defaul
               </p>
             )}
             <div className="flex flex-wrap items-center gap-2.5 pt-1 md:gap-3">
-              <span className="inline-flex w-fit rounded-full bg-white px-4 py-2 text-[10px] font-black uppercase tracking-[0.16em] text-[#111111] transition-transform group-hover:translate-x-1 md:px-5 md:py-2.5 md:text-xs md:tracking-[0.2em]">
+              <span className="inline-flex w-fit rounded-full bg-white dark:glass-card px-4 py-2 text-[10px] font-black uppercase tracking-[0.16em] text-[#111111] transition-transform group-hover:translate-x-1 md:px-5 md:py-2.5 md:text-xs md:tracking-[0.2em]">
                 {displayAd.cta || "Explore now"}
               </span>
             </div>
@@ -157,7 +157,7 @@ const AdBanner = ({ type = "horizontal", slotId: slotIdProp = "", size = "defaul
               </p>
             )}
             <div className="mt-5 flex flex-wrap items-center gap-3">
-              <span className="inline-flex rounded-full bg-white px-5 py-2.5 text-[11px] font-black uppercase tracking-[0.2em] text-[#111111] transition-transform group-hover:translate-x-1">
+              <span className="inline-flex rounded-full bg-white dark:glass-card px-5 py-2.5 text-[11px] font-black uppercase tracking-[0.2em] text-[#111111] transition-transform group-hover:translate-x-1">
                 {displayAd.cta || "Explore now"}
               </span>
             </div>

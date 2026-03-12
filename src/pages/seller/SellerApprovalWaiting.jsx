@@ -32,7 +32,7 @@ const SellerApprovalWaiting = () => {
 
   return (
     <div className="min-h-screen bg-zoop-canvas flex items-center justify-center p-4">
-      <div className="bg-white max-w-xl w-full rounded-[3rem] p-10 md:p-14 shadow-2xl text-center space-y-8 relative overflow-hidden">
+      <div className="bg-white dark:glass-card max-w-xl w-full rounded-[3rem] p-10 md:p-14 shadow-2xl dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)] text-center space-y-8 relative overflow-hidden">
         {/* Background glow */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-amber-400/10 blur-[100px] rounded-full" />
 
@@ -53,7 +53,7 @@ const SellerApprovalWaiting = () => {
 
           <h1
             className={`text-4xl font-900 italic tracking-tighter uppercase mb-4 ${
-              isRejected ? "text-red-600" : "text-zoop-obsidian"
+              isRejected ? "text-red-600" : "text-zoop-obsidian dark:text-white"
             }`}
           >
             {isRejected ? "Application_Rejected" : "Under_Review"}
@@ -96,7 +96,7 @@ const SellerApprovalWaiting = () => {
                   />
                 </span>
               </div>
-              <span className="font-black text-zoop-obsidian uppercase text-sm tracking-tight">
+              <span className="font-black text-zoop-obsidian dark:text-white uppercase text-sm tracking-tight">
                 {isRejected ? "Rejected_" : "Pending Approval_"}
               </span>
             </div>
@@ -119,7 +119,7 @@ const SellerApprovalWaiting = () => {
           {/* Primary action */}
           <Link
             to="/"
-            className="block w-full bg-zoop-obsidian text-white py-5 rounded-[1.5rem] font-black text-xs uppercase tracking-[0.2em] hover:bg-zoop-moss hover:text-zoop-obsidian hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-zoop-obsidian/20"
+            className="block w-full bg-zoop-obsidian text-white py-5 rounded-[1.5rem] font-black text-xs uppercase tracking-[0.2em] hover:bg-zoop-moss hover:text-zoop-obsidian hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl dark:shadow-[0_16px_48px_rgba(0,0,0,0.5)] shadow-zoop-obsidian/20"
           >
             Return to Marketplace
           </Link>
@@ -129,7 +129,7 @@ const SellerApprovalWaiting = () => {
             Need help? Contact{" "}
             <a
               href="mailto:partners@zoop.com"
-              className="text-zoop-obsidian hover:underline"
+              className="text-zoop-obsidian dark:text-white hover:underline"
             >
               partners@zoop.com
             </a>

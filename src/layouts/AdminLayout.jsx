@@ -21,12 +21,16 @@ import { Activity } from "../assets/icons/Activity";
 import { Zap } from "../assets/icons/Zap";
 import { apiClient } from "../api/client";
 import { useSiteConfig } from "../context/SiteConfigContext";
+import { useTheme } from "../context/ThemeContext";
+import { Moon } from "../assets/icons/Moon";
+import { Sun } from "../assets/icons/Sun";
 
 const AdminLayout = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
   const navigate = useNavigate();
   const { siteConfig } = useSiteConfig();
+  const { isDarkMode, toggleTheme } = useTheme();
 
   useEffect(() => {
     let cancelled = false;
@@ -86,7 +90,7 @@ const AdminLayout = () => {
       <div className="md:hidden fixed top-0 left-0 right-0 p-4 z-50 pointer-events-none">
         <button
           onClick={() => setSidebarOpen(true)}
-          className="bg-white text-zoop-obsidian p-2 rounded-xl pointer-events-auto border border-gray-200 shadow-sm"
+          className="bg-white dark:glass-card text-zoop-obsidian dark:text-white p-2 rounded-xl pointer-events-auto border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]"
         >
           <Menu width={24} height={24} stroke="black" />
         </button>
@@ -102,7 +106,7 @@ const AdminLayout = () => {
 
       {/* --- SIDEBAR --- */}
       <aside
-        className={`fixed top-0 left-0 h-screen w-72 bg-white border-r border-zoop-clay p-6 z-50 transition-transform duration-300 md:translate-x-0 md:sticky md:top-0 shadow-2xl md:shadow-none flex flex-col ${
+        className={`fixed top-0 left-0 h-screen w-72 bg-white dark:glass-card border-r border-zoop-clay p-6 z-50 transition-transform duration-300 md:translate-x-0 md:sticky md:top-0 shadow-2xl dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)] md:shadow-none flex flex-col ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -137,7 +141,7 @@ const AdminLayout = () => {
               className={({ isActive }) =>
                 `px-4 py-3 rounded-xl text-sm font-bold transition-all flex items-center gap-3 group shrink-0 ${
                   isActive
-                    ? "bg-zoop-obsidian text-white shadow-lg translate-x-2"
+                    ? "bg-zoop-obsidian text-white shadow-lg dark:shadow-[0_12px_32px_rgba(0,0,0,0.5)] translate-x-2"
                     : "text-zoop-obsidian/80 hover:bg-zoop-clay/20"
                 }`
               }
@@ -158,6 +162,26 @@ const AdminLayout = () => {
             </NavLink>
           ))}
         </nav>
+
+        {/* THEME TOGGLE */}
+        <div className="mt-4 px-2">
+          <button
+            onClick={toggleTheme}
+            className="w-full flex items-center justify-between px-5 py-4 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/10 transition-all text-[10px] font-black uppercase tracking-widest text-zoop-obsidian dark:text-white/75 group"
+          >
+            <div className="flex items-center gap-3">
+              <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-zoop-moss text-zoop-obsidian' : 'bg-zoop-obsidian text-white'}`}>
+                {isDarkMode ? <Moon width={16} height={16} /> : <Sun width={16} height={16} />}
+              </div>
+              <span className="group-hover:translate-x-1 transition-transform">
+                {isDarkMode ? "Dark Theme" : "Light Theme"}
+              </span>
+            </div>
+            <div className={`w-10 h-5 rounded-full p-1 transition-colors ${isDarkMode ? 'bg-zoop-moss' : 'bg-gray-200'}`}>
+              <div className={`w-3 h-3 rounded-full transition-transform duration-300 ${isDarkMode ? 'translate-x-5 bg-zoop-obsidian' : 'translate-x-0 bg-white'}`} />
+            </div>
+          </button>
+        </div>
 
         <div className="mt-auto pt-6 flex-shrink-0">
           <button
@@ -183,19 +207,19 @@ const AdminLayout = () => {
 
       {/* --- MAIN CONTENT --- */}
       <main className="flex-1 w-full overflow-y-auto overscroll-contain p-4 pt-20 md:p-8 md:pt-8">
-        <div className="mb-4 flex items-center justify-between bg-white border border-gray-100 rounded-xl px-4 py-3 shadow-sm">
+        <div className="mb-4 flex items-center justify-between bg-white dark:glass-card border border-gray-100 dark:border-white/10 rounded-xl px-4 py-3 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
           <p className="text-xs font-black uppercase tracking-widest text-gray-500">
             Admin Console
           </p>
           <Link
             to="/admin/notifications"
-            className="relative inline-flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-gray-100 text-sm font-bold text-zoop-obsidian"
+            className="relative inline-flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-gray-100 text-sm font-bold text-zoop-obsidian dark:text-white"
             aria-label="Admin notifications"
           >
             <BellRing width={18} height={18} />
             <span className="hidden sm:inline">Notifications</span>
             {unreadNotifications > 0 && (
-              <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-zoop-moss text-zoop-obsidian text-[10px] font-black flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-zoop-moss text-zoop-obsidian dark:text-white text-[10px] font-black flex items-center justify-center">
                 {unreadNotifications > 9 ? "9+" : unreadNotifications}
               </span>
             )}

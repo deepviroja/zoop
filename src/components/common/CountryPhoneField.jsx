@@ -26,7 +26,7 @@ const CountryPhoneField = ({
 }) => {
   return (
     <div className="relative">
-      <label className="block text-sm font-bold text-gray-700 mb-2">
+      <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
         {label} {required ? "*" : ""}
       </label>
       <PhoneInput

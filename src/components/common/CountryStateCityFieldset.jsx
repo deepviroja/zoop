@@ -31,7 +31,7 @@ const CountryStateCityFieldset = ({
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2 relative z-10">
       <div>
-        <label htmlFor={countryId} className="block text-sm font-bold text-gray-700 mb-2">
+        <label htmlFor={countryId} className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
           Country {required ? "*" : ""}
         </label>
         <select
@@ -42,7 +42,7 @@ const CountryStateCityFieldset = ({
           className={`w-full px-4 py-3 rounded-xl border-2 outline-none transition-all mt-1 ${
             errors.country
               ? "border-red-500 bg-red-50"
-              : "border-gray-200 focus:border-zoop-moss"
+              : "border-gray-200 dark:border-white/10 focus:border-zoop-moss"
           }`}
         >
           <option value="">Select Country</option>
@@ -58,7 +58,7 @@ const CountryStateCityFieldset = ({
       </div>
 
       <div>
-        <label htmlFor={stateId} className="block text-sm font-bold text-gray-700 mb-2">
+        <label htmlFor={stateId} className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
           State {required ? "*" : ""}
         </label>
         {states.length > 0 ? (
@@ -71,7 +71,7 @@ const CountryStateCityFieldset = ({
             className={`w-full px-4 py-3 rounded-xl border-2 outline-none transition-all mt-1 disabled:bg-gray-100 disabled:cursor-not-allowed ${
               errors.state
                 ? "border-red-500 bg-red-50"
-                : "border-gray-200 focus:border-zoop-moss"
+                : "border-gray-200 dark:border-white/10 focus:border-zoop-moss"
             }`}
           >
             <option value="">Select State</option>
@@ -92,7 +92,7 @@ const CountryStateCityFieldset = ({
             className={`w-full px-4 py-3 rounded-xl border-2 outline-none transition-all mt-1 disabled:bg-gray-100 disabled:cursor-not-allowed ${
               errors.state
                 ? "border-red-500 bg-red-50"
-                : "border-gray-200 focus:border-zoop-moss"
+                : "border-gray-200 dark:border-white/10 focus:border-zoop-moss"
             }`}
           />
         )}
@@ -102,7 +102,7 @@ const CountryStateCityFieldset = ({
       </div>
 
       <div>
-        <label htmlFor={cityId} className="block text-sm font-bold text-gray-700 mb-2">
+        <label htmlFor={cityId} className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
           City {required ? "*" : ""}
         </label>
         {cities.length > 0 ? (
@@ -115,7 +115,7 @@ const CountryStateCityFieldset = ({
             className={`w-full px-4 py-3 rounded-xl border-2 outline-none transition-all mt-1 disabled:bg-gray-100 disabled:cursor-not-allowed ${
               errors.city
                 ? "border-red-500 bg-red-50"
-                : "border-gray-200 focus:border-zoop-moss"
+                : "border-gray-200 dark:border-white/10 focus:border-zoop-moss"
             }`}
           >
             <option value="">Select City</option>
@@ -136,7 +136,7 @@ const CountryStateCityFieldset = ({
             className={`w-full px-4 py-3 rounded-xl border-2 outline-none transition-all mt-1 disabled:bg-gray-100 disabled:cursor-not-allowed ${
               errors.city
                 ? "border-red-500 bg-red-50"
-                : "border-gray-200 focus:border-zoop-moss"
+                : "border-gray-200 dark:border-white/10 focus:border-zoop-moss"
             }`}
           />
         )}

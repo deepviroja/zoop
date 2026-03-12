@@ -60,7 +60,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
       <button
         onClick={() => onPageChange(Math.max(1, currentPage - 1))}
         disabled={currentPage === 1}
-        className="flex items-center gap-1 px-4 py-2 border border-gray-200 rounded-lg font-bold text-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent hover:bg-gray-100 transition-colors"
+        className="flex items-center gap-1 px-4 py-2 border border-gray-200 dark:border-white/10 rounded-lg font-bold text-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent hover:bg-gray-100 transition-colors"
       >
         <ChevronLeft width={16} height={16} />
         <span className="hidden sm:inline">Previous</span>
@@ -85,8 +85,8 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
               onClick={() => onPageChange(page)}
               className={`w-10 h-10 rounded-lg font-bold text-sm transition-all focus:outline-none focus:ring-2 focus:ring-zoop-moss/50 ${
                 currentPage === page
-                  ? "bg-zoop-moss text-zoop-obsidian shadow-md transform scale-105"
-                  : "border border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300"
+                  ? "bg-zoop-moss text-zoop-obsidian dark:text-white shadow-md dark:shadow-[0_8px_24px_rgba(0,0,0,0.5)] transform scale-105"
+                  : "border border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-400 hover:bg-gray-50 hover:border-gray-300"
               }`}
             >
               {page}
@@ -98,7 +98,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
       <button
         onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
         disabled={currentPage === totalPages}
-        className="flex items-center gap-1 px-4 py-2 border border-gray-200 rounded-lg font-bold text-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent hover:bg-gray-100 transition-colors"
+        className="flex items-center gap-1 px-4 py-2 border border-gray-200 dark:border-white/10 rounded-lg font-bold text-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent hover:bg-gray-100 transition-colors"
       >
         <span className="hidden sm:inline">Next</span>
         <ChevronRight width={16} height={16} />

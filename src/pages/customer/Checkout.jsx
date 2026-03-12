@@ -436,24 +436,24 @@ const Checkout = () => {
   if (orderPlaced) {
     return (
       <div className="min-h-screen bg-zoop-canvas flex items-center justify-center p-4">
-        <div className="bg-white rounded-3xl p-8 md:p-12 max-w-2xl w-full text-center shadow-2xl">
+        <div className="bg-white dark:glass-card rounded-3xl p-8 md:p-12 max-w-2xl w-full text-center shadow-2xl dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)]">
           <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <Check width={40} height={40} className="text-green-600" />
           </div>
-          <h1 className="text-3xl md:text-4xl font-900 text-zoop-obsidian mb-4">
+          <h1 className="text-3xl md:text-4xl font-900 text-zoop-obsidian dark:text-white mb-4">
             Order Placed Successfully!
           </h1>
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-600 dark:text-gray-400 mb-6">
             Thank you for your order. We'll send you a confirmation email
             shortly.
           </p>
-          <div className="bg-gray-50 rounded-xl p-6 mb-6">
+          <div className="bg-gray-50 dark:bg-white/5 rounded-xl p-6 mb-6">
             <div className="flex justify-between items-center mb-3">
-              <span className="text-sm text-gray-600">Order ID</span>
-              <span className="font-black text-zoop-obsidian">#{orderId}</span>
+              <span className="text-sm text-gray-600 dark:text-gray-400">Order ID</span>
+              <span className="font-black text-zoop-obsidian dark:text-white">#{orderId}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600">Total Amount</span>
+              <span className="text-sm text-gray-600 dark:text-gray-400">Total Amount</span>
               <span className="text-2xl font-900 text-zoop-moss">
                 {formatInrWithSymbol(finalTotal, {
                   maximumFractionDigits: 0,
@@ -479,7 +479,7 @@ const Checkout = () => {
     <div className="min-h-screen bg-zoop-canvas py-8">
       <div className="max-w-[1200px] mx-auto px-4">
         {/* Progress Steps */}
-        <div className="bg-white rounded-2xl p-6 mb-8 shadow-sm">
+        <div className="bg-white dark:glass-card rounded-2xl p-6 mb-8 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
           <div className="flex items-center justify-between max-w-2xl mx-auto">
             {[
               { num: 1, label: "Address" },
@@ -491,15 +491,15 @@ const Checkout = () => {
                   <div
                     className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center font-black text-sm transition-all ${
                       step >= s.num
-                        ? "bg-zoop-moss text-zoop-obsidian"
-                        : "bg-gray-200 text-gray-400"
+                        ? "bg-zoop-moss text-zoop-obsidian dark:text-white"
+                        : "bg-gray-200 dark:bg-white/20 text-gray-400"
                     }`}
                   >
                     {step > s.num ? <Check width={20} height={20} /> : s.num}
                   </div>
                   <span
                     className={`mt-2 text-xs md:text-sm font-bold ${
-                      step >= s.num ? "text-zoop-obsidian" : "text-gray-400"
+                      step >= s.num ? "text-zoop-obsidian dark:text-white" : "text-gray-400"
                     }`}
                   >
                     {s.label}
@@ -508,7 +508,7 @@ const Checkout = () => {
                 {index < 2 && (
                   <div
                     className={`flex-1 h-1 mx-2 md:mx-4 rounded transition-all ${
-                      step > s.num ? "bg-zoop-moss" : "bg-gray-200"
+                      step > s.num ? "bg-zoop-moss" : "bg-gray-200 dark:bg-white/20"
                     }`}
                   />
                 )}
@@ -520,17 +520,17 @@ const Checkout = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left: Form */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm">
+            <div className="bg-white dark:glass-card rounded-2xl p-6 md:p-8 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
               {/* Step 1: Delivery Address */}
               {step === 1 && (
                 <div>
-                  <h2 className="text-2xl font-900 text-zoop-obsidian mb-6">
+                  <h2 className="text-2xl font-900 text-zoop-obsidian dark:text-white mb-6">
                     Delivery Address
                   </h2>
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-bold text-gray-700 mb-2">
+                        <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                           Full Name *
                         </label>
                         <input
@@ -538,7 +538,7 @@ const Checkout = () => {
                           name="fullName"
                           value={formData.fullName}
                           onChange={handleInputChange}
-                          className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-zoop-moss"
+                          className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-zoop-moss"
                           placeholder="John Doe"
                         />
                       </div>
@@ -565,7 +565,7 @@ const Checkout = () => {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-bold text-gray-700 mb-2">
+                      <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                         Email
                       </label>
                         <input
@@ -574,7 +574,7 @@ const Checkout = () => {
                           value={formData.email}
                           onChange={handleInputChange}
                           className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-zoop-moss ${
-                            formErrors.email ? "border-red-500 bg-red-50" : "border-gray-200"
+                            formErrors.email ? "border-red-500 bg-red-50" : "border-gray-200 dark:border-white/10"
                           }`}
                           placeholder="john@example.com"
                         />
@@ -584,7 +584,7 @@ const Checkout = () => {
                       </div>
 
                     <div>
-                      <label className="block text-sm font-bold text-gray-700 mb-2">
+                      <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                         Address *
                       </label>
                       <textarea
@@ -593,7 +593,7 @@ const Checkout = () => {
                         onChange={handleInputChange}
                         rows="3"
                         className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-zoop-moss ${
-                          formErrors.address ? "border-red-500 bg-red-50" : "border-gray-200"
+                          formErrors.address ? "border-red-500 bg-red-50" : "border-gray-200 dark:border-white/10"
                         }`}
                         placeholder="House No, Building Name, Street, Area"
                       />
@@ -656,7 +656,7 @@ const Checkout = () => {
                     />
 
                     <div>
-                      <label className="block text-sm font-bold text-gray-700 mb-2">
+                      <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                         Pincode *
                       </label>
                       <input
@@ -666,7 +666,7 @@ const Checkout = () => {
                         onChange={handleInputChange}
                         maxLength="10"
                         className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-zoop-moss ${
-                          formErrors.pincode ? "border-red-500 bg-red-50" : "border-gray-200"
+                          formErrors.pincode ? "border-red-500 bg-red-50" : "border-gray-200 dark:border-white/10"
                         }`}
                         placeholder="395003"
                       />
@@ -676,7 +676,7 @@ const Checkout = () => {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-bold text-gray-700 mb-2">
+                      <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                         Landmark (Optional)
                       </label>
                       <input
@@ -684,7 +684,7 @@ const Checkout = () => {
                         name="landmark"
                         value={formData.landmark}
                         onChange={handleInputChange}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-zoop-moss"
+                        className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-zoop-moss"
                         placeholder="Near City Mall"
                       />
                     </div>
@@ -697,7 +697,7 @@ const Checkout = () => {
                         onChange={handleInputChange}
                         className="w-4 h-4"
                       />
-                      <label className="text-sm text-gray-600">
+                      <label className="text-sm text-gray-600 dark:text-gray-400">
                         Save this address for future orders
                       </label>
                     </div>
@@ -708,7 +708,7 @@ const Checkout = () => {
               {/* Step 2: Payment Method */}
               {step === 2 && (
                 <div>
-                  <h2 className="text-2xl font-900 text-zoop-obsidian mb-6">
+                  <h2 className="text-2xl font-900 text-zoop-obsidian dark:text-white mb-6">
                     Payment Method
                   </h2>
                   <div className="space-y-4">
@@ -739,7 +739,7 @@ const Checkout = () => {
                         className={`flex items-start gap-4 p-4 border-2 rounded-xl cursor-pointer transition-all ${
                           formData.paymentMethod === method.id
                             ? "border-zoop-moss bg-zoop-moss/10"
-                            : "border-gray-200 hover:border-zoop-moss/50"
+                            : "border-gray-200 dark:border-white/10 hover:border-zoop-moss/50"
                         }`}
                       >
                         <input
@@ -751,7 +751,7 @@ const Checkout = () => {
                           className="mt-1"
                         />
                         <div className="flex-1">
-                          <p className="font-bold text-zoop-obsidian">
+                          <p className="font-bold text-zoop-obsidian dark:text-white">
                             {method.label}
                           </p>
                           <p className="text-sm text-gray-500">{method.desc}</p>
@@ -765,13 +765,13 @@ const Checkout = () => {
               {/* Step 3: Review Order */}
               {step === 3 && (
                 <div>
-                  <h2 className="text-2xl font-900 text-zoop-obsidian mb-6">
+                  <h2 className="text-2xl font-900 text-zoop-obsidian dark:text-white mb-6">
                     Review Your Order
                   </h2>
                   {/* Delivery Address Summary */}
-                  <div className="bg-gray-50 rounded-xl p-4 mb-6">
+                  <div className="bg-gray-50 dark:bg-white/5 rounded-xl p-4 mb-6">
                     <div className="flex justify-between items-start mb-2">
-                      <h3 className="font-bold text-zoop-obsidian">
+                      <h3 className="font-bold text-zoop-obsidian dark:text-white">
                         Delivery Address
                       </h3>
                       <button
@@ -781,7 +781,7 @@ const Checkout = () => {
                         Edit
                       </button>
                     </div>
-                    <p className="text-sm text-gray-700">
+                    <p className="text-sm text-gray-700 dark:text-gray-300">
                       {formData.fullName}
                       <br />
                       {formData.address}
@@ -793,9 +793,9 @@ const Checkout = () => {
                   </div>
 
                   {/* Payment Method Summary */}
-                  <div className="bg-gray-50 rounded-xl p-4 mb-6">
+                  <div className="bg-gray-50 dark:bg-white/5 rounded-xl p-4 mb-6">
                     <div className="flex justify-between items-start mb-2">
-                      <h3 className="font-bold text-zoop-obsidian">
+                      <h3 className="font-bold text-zoop-obsidian dark:text-white">
                         Payment Method
                       </h3>
                       <button
@@ -805,7 +805,7 @@ const Checkout = () => {
                         Change
                       </button>
                     </div>
-                    <p className="text-sm text-gray-700">
+                    <p className="text-sm text-gray-700 dark:text-gray-300">
                       {!formData.paymentMethod && "Not selected yet"}
                       {formData.paymentMethod === "cod" && "Cash on Delivery"}
                       {formData.paymentMethod === "upi" && "UPI Payment"}
@@ -817,7 +817,7 @@ const Checkout = () => {
               )}
 
               {/* Navigation Buttons */}
-              <div className="flex gap-4 mt-8 pt-6 border-t border-gray-200">
+              <div className="flex gap-4 mt-8 pt-6 border-t border-gray-200 dark:border-white/10">
                 <button
                   onClick={handleCancelCheckout}
                   className="px-5 py-3 border border-red-200 text-red-600 rounded-xl font-bold hover:bg-red-50 transition-all"
@@ -827,7 +827,7 @@ const Checkout = () => {
                 {step > 1 && (
                   <button
                     onClick={handleBack}
-                    className="flex-1 py-3 border-2 border-gray-200 rounded-xl font-bold hover:border-zoop-obsidian transition-all"
+                    className="flex-1 py-3 border-2 border-gray-200 dark:border-white/10 rounded-xl font-bold hover:border-zoop-obsidian transition-all"
                   >
                     Back
                   </button>
@@ -835,7 +835,7 @@ const Checkout = () => {
                 {step < 3 ? (
                   <button
                     onClick={handleNext}
-                    className="flex-1 py-3 bg-zoop-moss text-zoop-obsidian rounded-xl font-black hover:shadow-xl transition-all flex items-center justify-center gap-2"
+                    className="flex-1 py-3 bg-zoop-moss text-zoop-obsidian dark:text-white rounded-xl font-black hover:shadow-xl transition-all flex items-center justify-center gap-2"
                   >
                     Continue
                     <ChevronRight width={20} height={20} />
@@ -855,14 +855,14 @@ const Checkout = () => {
 
           {/* Right: Order Summary */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl p-6 shadow-sm lg:sticky lg:top-24">
-              <h3 className="font-900 text-lg text-zoop-obsidian mb-4">
+            <div className="bg-white dark:glass-card rounded-2xl p-6 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] lg:sticky lg:top-24">
+              <h3 className="font-900 text-lg text-zoop-obsidian dark:text-white mb-4">
                 Order Summary
               </h3>
 
-              <div className="space-y-3 pb-4 border-b border-gray-200">
+              <div className="space-y-3 pb-4 border-b border-gray-200 dark:border-white/10">
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Subtotal</span>
+                  <span className="text-gray-600 dark:text-gray-400">Subtotal</span>
                   <span className="font-bold">
                     {formatInrWithSymbol(subtotal, {
                       maximumFractionDigits: 0,
@@ -870,7 +870,7 @@ const Checkout = () => {
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Shipping</span>
+                  <span className="text-gray-600 dark:text-gray-400">Shipping</span>
                   <span className="font-bold">
                     {shipping === 0 ? (
                       <span className="text-green-600">FREE</span>
@@ -882,7 +882,7 @@ const Checkout = () => {
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Tax (5%)</span>
+                  <span className="text-gray-600 dark:text-gray-400">Tax (5%)</span>
                   <span className="font-bold">
                     {formatInrWithSymbol(tax, {
                       maximumFractionDigits: 0,
@@ -901,10 +901,10 @@ const Checkout = () => {
                 )}
               </div>
 
-              <div className="mt-4 rounded-xl border border-gray-200 bg-gray-50 p-4">
+              <div className="mt-4 rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 p-4">
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <p className="text-sm font-black text-zoop-obsidian">Offers & Coupons</p>
+                    <p className="text-sm font-black text-zoop-obsidian dark:text-white">Offers & Coupons</p>
                     <p className="text-xs text-gray-500">Choose any active order or shipping discount.</p>
                   </div>
                   {selectedOfferId && (
@@ -929,7 +929,7 @@ const Checkout = () => {
                           className={`flex cursor-pointer items-start gap-3 rounded-xl border px-3 py-3 ${
                             selectedOfferId === offer.id
                               ? "border-zoop-moss bg-zoop-moss/10"
-                              : "border-gray-200 bg-white"
+                              : "border-gray-200 dark:border-white/10 bg-white dark:glass-card"
                           } ${disabled ? "opacity-50" : ""}`}
                         >
                           <input
@@ -941,7 +941,7 @@ const Checkout = () => {
                             className="mt-1"
                           />
                           <div className="flex-1">
-                            <p className="text-sm font-black text-zoop-obsidian">
+                            <p className="text-sm font-black text-zoop-obsidian dark:text-white">
                               {offer.title} {offer.code ? `(${offer.code})` : ""}
                             </p>
                             <p className="text-xs text-gray-500">{offer.description}</p>
@@ -966,8 +966,8 @@ const Checkout = () => {
               </div>
 
               <div className="flex justify-between items-center pt-4">
-                <span className="text-sm font-bold text-gray-600">Total</span>
-                <span className="text-2xl font-900 text-zoop-obsidian">
+                <span className="text-sm font-bold text-gray-600 dark:text-gray-400">Total</span>
+                <span className="text-2xl font-900 text-zoop-obsidian dark:text-white">
                   {formatInrWithSymbol(currentTotal, {
                     maximumFractionDigits: 0,
                   })}
@@ -975,8 +975,8 @@ const Checkout = () => {
               </div>
 
               {/* Added Order Items to Sidebar for re-verification */}
-              <div className="mt-8 pt-8 border-t border-gray-100">
-                <h3 className="text-sm font-black text-zoop-obsidian uppercase tracking-widest mb-4">
+              <div className="mt-8 pt-8 border-t border-gray-100 dark:border-white/10">
+                <h3 className="text-sm font-black text-zoop-obsidian dark:text-white uppercase tracking-widest mb-4">
                   Items Details ({cartItems.length})
                 </h3>
                 <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
@@ -985,7 +985,7 @@ const Checkout = () => {
                       key={`${item.id}-${item.selectedSize}-${item.selectedColor}`}
                       className="flex gap-4 group"
                     >
-                      <div className="w-16 h-16 shrink-0 bg-gray-100 rounded-lg overflow-hidden border border-gray-100">
+                      <div className="w-16 h-16 shrink-0 bg-gray-100 dark:bg-white/10 rounded-lg overflow-hidden border border-gray-100 dark:border-white/10">
                         <img
                           src={
                             item.thumbnailUrl ||
@@ -997,7 +997,7 @@ const Checkout = () => {
                         />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-bold text-xs text-zoop-obsidian truncate">
+                        <p className="font-bold text-xs text-zoop-obsidian dark:text-white truncate">
                           {item.title || item.name}
                         </p>
                         <p className="text-[10px] text-gray-500 mt-0.5">
@@ -1011,7 +1011,7 @@ const Checkout = () => {
                               `Color: ${item.selectedColor}`}
                           </p>
                         )}
-                        <p className="font-black text-xs text-zoop-obsidian mt-1">
+                        <p className="font-black text-xs text-zoop-obsidian dark:text-white mt-1">
                           {formatInrWithSymbol(
                             Number(item.price || 0) * Number(item.quantity || 0),
                             { maximumFractionDigits: 0 },
@@ -1024,7 +1024,7 @@ const Checkout = () => {
               </div>
 
               {step === 3 && (
-                <div className="mt-6 pt-6 border-t border-gray-200">
+                <div className="mt-6 pt-6 border-t border-gray-200 dark:border-white/10">
                   <p className="text-xs text-gray-500 text-center">
                     By placing this order, you agree to our Terms & Conditions
                   </p>
@@ -1037,9 +1037,9 @@ const Checkout = () => {
       {showBlockedPopup && (
         <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/50" onClick={() => setShowBlockedPopup(false)} />
-          <div className="relative bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl">
-            <h4 className="text-lg font-900 text-zoop-obsidian mb-3">Checkout Unavailable</h4>
-            <p className="text-sm text-gray-600">
+          <div className="relative bg-white dark:glass-card rounded-2xl p-6 max-w-md w-full shadow-2xl dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)]">
+            <h4 className="text-lg font-900 text-zoop-obsidian dark:text-white mb-3">Checkout Unavailable</h4>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
               Some items are currently being purchased by another user.
             </p>
             {blockedItems.length > 0 && (
@@ -1055,7 +1055,7 @@ const Checkout = () => {
               <button
                 type="button"
                 onClick={() => setShowBlockedPopup(false)}
-                className="flex-1 py-2.5 border border-gray-200 rounded-lg font-bold"
+                className="flex-1 py-2.5 border border-gray-200 dark:border-white/10 rounded-lg font-bold"
               >
                 Close
               </button>
@@ -1088,7 +1088,7 @@ const Checkout = () => {
                     setNotifySubmitting(false);
                   }
                 }}
-                className="flex-1 py-2.5 bg-zoop-moss text-zoop-obsidian rounded-lg font-bold disabled:opacity-60"
+                className="flex-1 py-2.5 bg-zoop-moss text-zoop-obsidian dark:text-white rounded-lg font-bold disabled:opacity-60"
               >
                 {notifySubmitting ? "Please wait..." : "Notify Me"}
               </button>

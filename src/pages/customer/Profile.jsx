@@ -363,20 +363,20 @@ const Profile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-white/5 py-8">
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-black text-zoop-obsidian mb-2">
+          <h1 className="text-3xl md:text-4xl font-black text-zoop-obsidian dark:text-white mb-2">
             My Profile
           </h1>
-          <p className="text-gray-600">Manage your account information</p>
+          <p className="text-gray-600 dark:text-gray-400">Manage your account information</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column - Profile Card */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center">
+            <div className="bg-white dark:glass-card rounded-2xl shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-white/10 p-8 text-center">
               {/* Avatar */}
               <div className="relative inline-block mb-6">
                 <div className="w-32 h-32 rounded-full bg-gradient-to-br from-zoop-moss to-green-600 overflow-hidden flex items-center justify-center text-white text-4xl font-black">
@@ -397,17 +397,17 @@ const Profile = () => {
                   type="button"
                   onClick={() => avatarInputRef.current?.click()}
                   disabled={avatarUploading}
-                  className="absolute bottom-0 right-0 w-10 h-10 bg-white border-2 border-gray-200 rounded-full flex items-center justify-center hover:bg-gray-50 transition-colors shadow-lg disabled:opacity-60"
+                  className="absolute bottom-0 right-0 w-10 h-10 bg-white dark:glass-card border-2 border-gray-200 dark:border-white/10 rounded-full flex items-center justify-center hover:bg-gray-50 transition-colors shadow-lg dark:shadow-[0_12px_32px_rgba(0,0,0,0.5)] disabled:opacity-60"
                 >
-                  <Edit width={16} height={16} className="text-gray-600" />
+                  <Edit width={16} height={16} className="text-gray-600 dark:text-gray-400" />
                 </button>
               </div>
               {avatarUploading && <p className="text-xs text-gray-500 -mt-3 mb-3">Updating avatar...</p>}
 
-              <h2 className="text-2xl font-black text-zoop-obsidian mb-1">
+              <h2 className="text-2xl font-black text-zoop-obsidian dark:text-white mb-1">
                 {formData.name}
               </h2>
-              <p className="text-gray-600 text-sm mb-6">{formData.email}</p>
+              <p className="text-gray-600 dark:text-gray-400 text-sm mb-6">{formData.email}</p>
 
               {/* Stats */}
               <div className="space-y-3">
@@ -455,14 +455,14 @@ const Profile = () => {
                         type="button"
                         key={item.id}
                         onClick={() => navigate(`/product/${item.id}`)}
-                        className="w-full flex items-center gap-2 p-2 bg-gray-50 hover:bg-gray-100 rounded-lg"
+                        className="w-full flex items-center gap-2 p-2 bg-gray-50 dark:bg-white/5 hover:bg-gray-100 rounded-lg"
                       >
                         <img
                           src={item.thumbnailUrl || item.image}
                           alt={item.title || item.name}
-                          className="w-8 h-8 rounded object-cover bg-gray-100"
+                          className="w-8 h-8 rounded object-cover bg-gray-100 dark:bg-white/10"
                         />
-                        <span className="text-xs font-bold text-gray-700 truncate">
+                        <span className="text-xs font-bold text-gray-700 dark:text-gray-300 truncate">
                           {item.title || item.name}
                         </span>
                       </button>
@@ -476,15 +476,15 @@ const Profile = () => {
           {/* Right Column - Profile Information */}
           <div className="lg:col-span-2 space-y-6">
             {/* Personal Information */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+            <div className="bg-white dark:glass-card rounded-2xl shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-white/10 p-8">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-black text-zoop-obsidian">
+                <h3 className="text-xl font-black text-zoop-obsidian dark:text-white">
                   Personal Information
                 </h3>
                 {!isEditing ? (
                   <button
                     onClick={() => setIsEditing(true)}
-                    className="flex items-center gap-2 px-4 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg font-bold text-sm transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 bg-gray-50 dark:bg-white/5 hover:bg-gray-100 rounded-lg font-bold text-sm transition-colors"
                   >
                     <Edit width={16} height={16} />
                     Edit
@@ -493,14 +493,14 @@ const Profile = () => {
                   <div className="flex gap-2">
                     <button
                       onClick={() => setIsEditing(false)}
-                      className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg font-bold text-sm transition-colors"
+                      className="px-4 py-2 bg-gray-100 dark:bg-white/10 hover:bg-gray-200 rounded-lg font-bold text-sm transition-colors"
                     >
                       Cancel
                     </button>
                     <button
                       onClick={handleSave}
                       disabled={saving}
-                      className="px-4 py-2 bg-zoop-moss hover:bg-zoop-moss/90 text-zoop-obsidian rounded-lg font-bold text-sm transition-colors"
+                      className="px-4 py-2 bg-zoop-moss hover:bg-zoop-moss/90 text-zoop-obsidian dark:text-white rounded-lg font-bold text-sm transition-colors"
                     >
                       {saving ? "Saving..." : "Save"}
                     </button>
@@ -510,7 +510,7 @@ const Profile = () => {
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                  <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                     Full Name
                   </label>
                   {isEditing ? (
@@ -519,17 +519,17 @@ const Profile = () => {
                       name="name"
                       value={formData.name}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-zoop-moss focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl focus:ring-2 focus:ring-zoop-moss focus:border-transparent"
                     />
                   ) : (
-                    <p className="text-gray-900 px-4 py-3 bg-gray-50 rounded-xl">
+                    <p className="text-gray-900 dark:text-white px-4 py-3 bg-gray-50 dark:bg-white/5 rounded-xl">
                       {formData.name}
                     </p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                  <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                     Email Address
                   </label>
                   {isEditing ? (
@@ -538,10 +538,10 @@ const Profile = () => {
                       name="email"
                       value={formData.email}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-zoop-moss focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl focus:ring-2 focus:ring-zoop-moss focus:border-transparent"
                     />
                   ) : (
-                    <p className="text-gray-900 px-4 py-3 bg-gray-50 rounded-xl">
+                    <p className="text-gray-900 dark:text-white px-4 py-3 bg-gray-50 dark:bg-white/5 rounded-xl">
                       {formData.email}
                     </p>
                   )}
@@ -568,10 +568,10 @@ const Profile = () => {
                     />
                   ) : (
                     <>
-                      <label className="block text-sm font-bold text-gray-700 mb-2">
+                      <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                         Phone Number
                       </label>
-                      <p className="text-gray-900 px-4 py-3 bg-gray-50 rounded-xl">
+                      <p className="text-gray-900 dark:text-white px-4 py-3 bg-gray-50 dark:bg-white/5 rounded-xl">
                         {formData.phone}
                       </p>
                     </>
@@ -599,10 +599,10 @@ const Profile = () => {
                     />
                   ) : (
                     <>
-                      <label className="block text-sm font-bold text-gray-700 mb-2">
+                      <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                         Alternate Phone
                       </label>
-                      <p className="text-gray-900 px-4 py-3 bg-gray-50 rounded-xl">
+                      <p className="text-gray-900 dark:text-white px-4 py-3 bg-gray-50 dark:bg-white/5 rounded-xl">
                         {formData.altPhone || "-"}
                       </p>
                     </>
@@ -648,18 +648,18 @@ const Profile = () => {
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-bold text-gray-700 mb-2">
+                      <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                         City
                       </label>
-                      <p className="text-gray-900 px-4 py-3 bg-gray-50 rounded-xl">
+                      <p className="text-gray-900 dark:text-white px-4 py-3 bg-gray-50 dark:bg-white/5 rounded-xl">
                         {formData.city || "-"}
                       </p>
                     </div>
                     <div>
-                      <label className="block text-sm font-bold text-gray-700 mb-2">
+                      <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                         State
                       </label>
-                      <p className="text-gray-900 px-4 py-3 bg-gray-50 rounded-xl">
+                      <p className="text-gray-900 dark:text-white px-4 py-3 bg-gray-50 dark:bg-white/5 rounded-xl">
                         {formData.state || "-"}
                       </p>
                     </div>
@@ -667,7 +667,7 @@ const Profile = () => {
                 )}
 
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                  <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                     Pincode
                   </label>
                   {isEditing ? (
@@ -679,7 +679,7 @@ const Profile = () => {
                         onChange={handleInputChange}
                         maxLength={10}
                         className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-zoop-moss focus:border-transparent ${
-                          errors.pincode ? "border-red-500 bg-red-50" : "border-gray-200"
+                          errors.pincode ? "border-red-500 bg-red-50" : "border-gray-200 dark:border-white/10"
                         }`}
                       />
                       {errors.pincode && (
@@ -687,7 +687,7 @@ const Profile = () => {
                       )}
                     </>
                   ) : (
-                    <p className="text-gray-900 px-4 py-3 bg-gray-50 rounded-xl">
+                    <p className="text-gray-900 dark:text-white px-4 py-3 bg-gray-50 dark:bg-white/5 rounded-xl">
                       {formData.pincode || "-"}
                     </p>
                   )}
@@ -695,7 +695,7 @@ const Profile = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">
+                    <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                       Landmark
                     </label>
                     {isEditing ? (
@@ -704,16 +704,16 @@ const Profile = () => {
                         name="landmark"
                         value={formData.landmark}
                         onChange={handleInputChange}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-zoop-moss focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl focus:ring-2 focus:ring-zoop-moss focus:border-transparent"
                       />
                     ) : (
-                      <p className="text-gray-900 px-4 py-3 bg-gray-50 rounded-xl">
+                      <p className="text-gray-900 dark:text-white px-4 py-3 bg-gray-50 dark:bg-white/5 rounded-xl">
                         {formData.landmark || "-"}
                       </p>
                     )}
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">
+                    <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                       Gender
                     </label>
                     {isEditing ? (
@@ -721,7 +721,7 @@ const Profile = () => {
                         name="gender"
                         value={formData.gender}
                         onChange={handleInputChange}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-zoop-moss focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl focus:ring-2 focus:ring-zoop-moss focus:border-transparent"
                       >
                         <option value="">Select Gender</option>
                         <option value="male">Male</option>
@@ -730,7 +730,7 @@ const Profile = () => {
                         <option value="prefer_not_to_say">Prefer not to say</option>
                       </select>
                     ) : (
-                      <p className="text-gray-900 px-4 py-3 bg-gray-50 rounded-xl">
+                      <p className="text-gray-900 dark:text-white px-4 py-3 bg-gray-50 dark:bg-white/5 rounded-xl">
                         {formData.gender || "-"}
                       </p>
                     )}
@@ -738,7 +738,7 @@ const Profile = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                  <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                     Date of Birth
                   </label>
                   {isEditing ? (
@@ -747,10 +747,10 @@ const Profile = () => {
                       name="dateOfBirth"
                       value={formData.dateOfBirth}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-zoop-moss focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl focus:ring-2 focus:ring-zoop-moss focus:border-transparent"
                     />
                   ) : (
-                    <p className="text-gray-900 px-4 py-3 bg-gray-50 rounded-xl">
+                    <p className="text-gray-900 dark:text-white px-4 py-3 bg-gray-50 dark:bg-white/5 rounded-xl">
                       {formData.dateOfBirth || "-"}
                     </p>
                   )}
@@ -759,10 +759,10 @@ const Profile = () => {
             </div>
 
             {/* Delivery Address */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+            <div className="bg-white dark:glass-card rounded-2xl shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-white/10 p-8">
               <div className="flex items-center gap-3 mb-6">
                 <MapPin width={24} height={24} className="text-zoop-moss" />
-                <h3 className="text-xl font-black text-zoop-obsidian">
+                <h3 className="text-xl font-black text-zoop-obsidian dark:text-white">
                   Delivery Address
                 </h3>
               </div>
@@ -774,34 +774,34 @@ const Profile = () => {
                     value={formData.address}
                     onChange={handleInputChange}
                     rows={3}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-zoop-moss focus:border-transparent resize-none"
+                    className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl focus:ring-2 focus:ring-zoop-moss focus:border-transparent resize-none"
                   />
                 ) : (
-                  <p className="text-gray-900 px-4 py-3 bg-gray-50 rounded-xl">
+                  <p className="text-gray-900 dark:text-white px-4 py-3 bg-gray-50 dark:bg-white/5 rounded-xl">
                     {formData.address}
                   </p>
                 )}
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+            <div className="bg-white dark:glass-card rounded-2xl shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-white/10 p-8">
               <div className="flex items-center gap-3 mb-6">
                 <MapPin width={24} height={24} className="text-zoop-moss" />
-                <h3 className="text-xl font-black text-zoop-obsidian">Saved Address Book</h3>
+                <h3 className="text-xl font-black text-zoop-obsidian dark:text-white">Saved Address Book</h3>
               </div>
               <div className="space-y-3">
                 {Array.isArray(formData.addresses) && formData.addresses.length > 0 ? (
                   formData.addresses.map((item) => (
-                    <div key={item.id} className="rounded-2xl border border-gray-100 bg-gray-50 p-4">
+                    <div key={item.id} className="rounded-2xl border border-gray-100 dark:border-white/10 bg-gray-50 dark:bg-white/5 p-4">
                       <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                         <div>
                           <p className="text-sm font-black uppercase tracking-wider text-[#8b5e3c]">
                             {item.label} {item.isDefault ? "• Default" : ""}
                           </p>
-                          <p className="mt-1 font-bold text-zoop-obsidian">
+                          <p className="mt-1 font-bold text-zoop-obsidian dark:text-white">
                             {item.fullName || formData.name}
                           </p>
-                          <p className="text-sm text-gray-600">
+                          <p className="text-sm text-gray-600 dark:text-gray-400">
                             {[item.addressLine1, item.addressLine2, item.city, item.state, item.postalCode]
                               .filter(Boolean)
                               .join(", ")}
@@ -810,7 +810,7 @@ const Profile = () => {
                         {isEditing && (
                           <div className="flex gap-2">
                             {!item.isDefault && (
-                              <button type="button" onClick={() => makeDefaultAddress(item.id)} className="rounded-xl bg-white px-3 py-2 text-xs font-black text-zoop-obsidian">
+                              <button type="button" onClick={() => makeDefaultAddress(item.id)} className="rounded-xl bg-white dark:glass-card px-3 py-2 text-xs font-black text-zoop-obsidian dark:text-white">
                                 Make Default
                               </button>
                             )}
@@ -828,23 +828,23 @@ const Profile = () => {
               </div>
 
               {isEditing && (
-                <div className="mt-6 rounded-2xl border border-dashed border-gray-200 p-4">
-                  <p className="text-sm font-black text-zoop-obsidian mb-3">Add another address</p>
+                <div className="mt-6 rounded-2xl border border-dashed border-gray-200 dark:border-white/10 p-4">
+                  <p className="text-sm font-black text-zoop-obsidian dark:text-white mb-3">Add another address</p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <select value={addressDraft.label} onChange={(e) => setAddressDraft((prev) => ({ ...prev, label: e.target.value }))} className="px-4 py-3 rounded-xl border border-gray-200">
+                    <select value={addressDraft.label} onChange={(e) => setAddressDraft((prev) => ({ ...prev, label: e.target.value }))} className="px-4 py-3 rounded-xl border border-gray-200 dark:border-white/10">
                       <option value="home">Home</option>
                       <option value="office">Office</option>
                       <option value="friend_family">Friend & Family</option>
                     </select>
-                    <input value={addressDraft.fullName} onChange={(e) => setAddressDraft((prev) => ({ ...prev, fullName: e.target.value }))} className="px-4 py-3 rounded-xl border border-gray-200" placeholder="Receiver name" />
-                    <input value={addressDraft.addressLine1} onChange={(e) => setAddressDraft((prev) => ({ ...prev, addressLine1: e.target.value }))} className="px-4 py-3 rounded-xl border border-gray-200 md:col-span-2" placeholder="Address line 1" />
-                    <input value={addressDraft.addressLine2} onChange={(e) => setAddressDraft((prev) => ({ ...prev, addressLine2: e.target.value }))} className="px-4 py-3 rounded-xl border border-gray-200 md:col-span-2" placeholder="Address line 2" />
-                    <input value={addressDraft.city} onChange={(e) => setAddressDraft((prev) => ({ ...prev, city: e.target.value }))} className="px-4 py-3 rounded-xl border border-gray-200" placeholder="City" />
-                    <input value={addressDraft.state} onChange={(e) => setAddressDraft((prev) => ({ ...prev, state: e.target.value }))} className="px-4 py-3 rounded-xl border border-gray-200" placeholder="State" />
-                    <input value={addressDraft.postalCode} onChange={(e) => setAddressDraft((prev) => ({ ...prev, postalCode: e.target.value }))} className="px-4 py-3 rounded-xl border border-gray-200" placeholder="Pincode" />
-                    <input value={addressDraft.phone} onChange={(e) => setAddressDraft((prev) => ({ ...prev, phone: e.target.value }))} className="px-4 py-3 rounded-xl border border-gray-200" placeholder="Phone number" />
+                    <input value={addressDraft.fullName} onChange={(e) => setAddressDraft((prev) => ({ ...prev, fullName: e.target.value }))} className="px-4 py-3 rounded-xl border border-gray-200 dark:border-white/10" placeholder="Receiver name" />
+                    <input value={addressDraft.addressLine1} onChange={(e) => setAddressDraft((prev) => ({ ...prev, addressLine1: e.target.value }))} className="px-4 py-3 rounded-xl border border-gray-200 dark:border-white/10 md:col-span-2" placeholder="Address line 1" />
+                    <input value={addressDraft.addressLine2} onChange={(e) => setAddressDraft((prev) => ({ ...prev, addressLine2: e.target.value }))} className="px-4 py-3 rounded-xl border border-gray-200 dark:border-white/10 md:col-span-2" placeholder="Address line 2" />
+                    <input value={addressDraft.city} onChange={(e) => setAddressDraft((prev) => ({ ...prev, city: e.target.value }))} className="px-4 py-3 rounded-xl border border-gray-200 dark:border-white/10" placeholder="City" />
+                    <input value={addressDraft.state} onChange={(e) => setAddressDraft((prev) => ({ ...prev, state: e.target.value }))} className="px-4 py-3 rounded-xl border border-gray-200 dark:border-white/10" placeholder="State" />
+                    <input value={addressDraft.postalCode} onChange={(e) => setAddressDraft((prev) => ({ ...prev, postalCode: e.target.value }))} className="px-4 py-3 rounded-xl border border-gray-200 dark:border-white/10" placeholder="Pincode" />
+                    <input value={addressDraft.phone} onChange={(e) => setAddressDraft((prev) => ({ ...prev, phone: e.target.value }))} className="px-4 py-3 rounded-xl border border-gray-200 dark:border-white/10" placeholder="Phone number" />
                   </div>
-                  <label className="mt-3 flex items-center gap-2 text-sm font-bold text-gray-700">
+                  <label className="mt-3 flex items-center gap-2 text-sm font-bold text-gray-700 dark:text-gray-300">
                     <input type="checkbox" checked={addressDraft.isDefault} onChange={(e) => setAddressDraft((prev) => ({ ...prev, isDefault: e.target.checked }))} />
                     Make this the default location
                   </label>
@@ -856,8 +856,8 @@ const Profile = () => {
             </div>
 
             {/* Account Settings */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-              <h3 className="text-xl font-black text-zoop-obsidian mb-6">
+            <div className="bg-white dark:glass-card rounded-2xl shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-white/10 p-8">
+              <h3 className="text-xl font-black text-zoop-obsidian dark:text-white mb-6">
                 Account Actions
               </h3>
 
@@ -871,9 +871,9 @@ const Profile = () => {
                       showToast(e?.message || "Could not send password reset email", "error");
                     }
                   }}
-                  className="w-full flex items-center justify-between px-6 py-4 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors group"
+                  className="w-full flex items-center justify-between px-6 py-4 bg-gray-50 dark:bg-white/5 hover:bg-gray-100 rounded-xl transition-colors group"
                 >
-                  <span className="font-bold text-gray-900">
+                  <span className="font-bold text-gray-900 dark:text-white">
                     Change Password
                   </span>
                   <span className="text-gray-400 group-hover:text-gray-600">
@@ -887,9 +887,9 @@ const Profile = () => {
                       .getElementById("notifications-section")
                       ?.scrollIntoView({ behavior: "smooth" })
                   }
-                  className="w-full flex items-center justify-between px-6 py-4 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors group"
+                  className="w-full flex items-center justify-between px-6 py-4 bg-gray-50 dark:bg-white/5 hover:bg-gray-100 rounded-xl transition-colors group"
                 >
-                  <span className="font-bold text-gray-900">
+                  <span className="font-bold text-gray-900 dark:text-white">
                     Notification Preferences
                   </span>
                   <span className="text-gray-400 group-hover:text-gray-600">
@@ -910,17 +910,17 @@ const Profile = () => {
             </div>
 
             {/* Support & Quick Links */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-              <h3 className="text-xl font-black text-zoop-obsidian mb-6">
+            <div className="bg-white dark:glass-card rounded-2xl shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-white/10 p-8">
+              <h3 className="text-xl font-black text-zoop-obsidian dark:text-white mb-6">
                 Quick Links
               </h3>
 
               <div className="space-y-4">
                 <Link
                   to="/track"
-                  className="w-full flex items-center justify-between px-6 py-4 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors group"
+                  className="w-full flex items-center justify-between px-6 py-4 bg-gray-50 dark:bg-white/5 hover:bg-gray-100 rounded-xl transition-colors group"
                 >
-                  <span className="font-bold text-gray-900">Track Order</span>
+                  <span className="font-bold text-gray-900 dark:text-white">Track Order</span>
                   <span className="text-gray-400 group-hover:text-gray-600">
                     →
                   </span>
@@ -928,9 +928,9 @@ const Profile = () => {
 
                 <Link
                   to="/contact"
-                  className="w-full flex items-center justify-between px-6 py-4 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors group"
+                  className="w-full flex items-center justify-between px-6 py-4 bg-gray-50 dark:bg-white/5 hover:bg-gray-100 rounded-xl transition-colors group"
                 >
-                  <span className="font-bold text-gray-900">
+                  <span className="font-bold text-gray-900 dark:text-white">
                     Customer Support
                   </span>
                   <span className="text-gray-400 group-hover:text-gray-600">
@@ -942,10 +942,10 @@ const Profile = () => {
                   to="/seller/signup"
                   className="w-full flex items-center justify-between px-6 py-4 bg-zoop-moss/10 hover:bg-zoop-moss/20 rounded-xl transition-colors group"
                 >
-                  <span className="font-bold text-zoop-obsidian">
+                  <span className="font-bold text-zoop-obsidian dark:text-white">
                     Become a Seller
                   </span>
-                  <span className="text-zoop-obsidian group-hover:scale-105 transition-transform">
+                  <span className="text-zoop-obsidian dark:text-white group-hover:scale-105 transition-transform">
                     ⚡
                   </span>
                 </Link>
@@ -960,15 +960,15 @@ const Profile = () => {
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-              <h3 className="text-xl font-black text-zoop-obsidian mb-4">Recent Orders</h3>
+            <div className="bg-white dark:glass-card rounded-2xl shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-white/10 p-8">
+              <h3 className="text-xl font-black text-zoop-obsidian dark:text-white mb-4">Recent Orders</h3>
               {recentOrders.length === 0 ? (
                 <p className="text-sm text-gray-500">No recent orders.</p>
               ) : (
                 <div className="space-y-3">
                   {recentOrders.map((order) => (
-                    <Link key={order.id} to={`/track?orderId=${order.id}`} className="block p-3 rounded-xl bg-gray-50 hover:bg-gray-100">
-                      <p className="text-sm font-bold text-zoop-obsidian">#{order.id}</p>
+                    <Link key={order.id} to={`/track?orderId=${order.id}`} className="block p-3 rounded-xl bg-gray-50 dark:bg-white/5 hover:bg-gray-100">
+                      <p className="text-sm font-bold text-zoop-obsidian dark:text-white">#{order.id}</p>
                       <p className="text-xs text-gray-500 mt-1 capitalize">{order.status}</p>
                     </Link>
                   ))}
@@ -976,15 +976,15 @@ const Profile = () => {
               )}
             </div>
 
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-              <h3 className="text-xl font-black text-zoop-obsidian mb-4">Support Updates</h3>
+            <div className="bg-white dark:glass-card rounded-2xl shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-white/10 p-8">
+              <h3 className="text-xl font-black text-zoop-obsidian dark:text-white mb-4">Support Updates</h3>
               {supportTickets.length === 0 ? (
                 <p className="text-sm text-gray-500">No support tickets yet.</p>
               ) : (
                 <div className="space-y-3">
                   {supportTickets.map((ticket) => (
-                    <div key={ticket.id} className="p-3 rounded-xl bg-gray-50">
-                      <p className="text-sm font-bold text-zoop-obsidian">{ticket.subject}</p>
+                    <div key={ticket.id} className="p-3 rounded-xl bg-gray-50 dark:bg-white/5">
+                      <p className="text-sm font-bold text-zoop-obsidian dark:text-white">{ticket.subject}</p>
                       <p className="text-xs text-gray-500 mt-1 capitalize">Status: {ticket.status}</p>
                       {Array.isArray(ticket.replies) && ticket.replies.length > 0 && (
                         <p className="text-xs text-green-700 mt-1">Reply: {ticket.replies[ticket.replies.length - 1].message}</p>
@@ -995,16 +995,16 @@ const Profile = () => {
               )}
             </div>
 
-            <div id="notifications-section" className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-              <h3 className="text-xl font-black text-zoop-obsidian mb-4">Notifications</h3>
+            <div id="notifications-section" className="bg-white dark:glass-card rounded-2xl shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-white/10 p-8">
+              <h3 className="text-xl font-black text-zoop-obsidian dark:text-white mb-4">Notifications</h3>
               {notifications.length === 0 ? (
                 <p className="text-sm text-gray-500">No notifications yet.</p>
               ) : (
                 <div className="space-y-3">
                   {notifications.map((n) => (
-                    <div key={n.id} className={`p-3 rounded-xl border ${n.read ? "bg-gray-50 border-gray-100" : "bg-zoop-moss/10 border-zoop-moss/30"}`}>
-                      <p className="text-sm font-bold text-zoop-obsidian">{n.title}</p>
-                      <p className="text-xs text-gray-600 mt-1">{n.message}</p>
+                    <div key={n.id} className={`p-3 rounded-xl border ${n.read ? "bg-gray-50 dark:bg-white/5 border-gray-100 dark:border-white/10" : "bg-zoop-moss/10 border-zoop-moss/30"}`}>
+                      <p className="text-sm font-bold text-zoop-obsidian dark:text-white">{n.title}</p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">{n.message}</p>
                     </div>
                   ))}
                 </div>
@@ -1019,8 +1019,8 @@ const Profile = () => {
                     setDeleteFlow({ open: false, otpSent: false, otp: "", reason: "", loading: false })
                   }
                 />
-                <div className="relative bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl border border-gray-100">
-                  <h3 className="text-lg font-black text-zoop-obsidian">Delete Account</h3>
+                <div className="relative bg-white dark:glass-card rounded-2xl p-6 w-full max-w-md shadow-2xl dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-white/10">
+                  <h3 className="text-lg font-black text-zoop-obsidian dark:text-white">Delete Account</h3>
                   <p className="text-sm text-gray-500 mt-1 mb-4">
                     We will send an OTP to your email for confirmation.
                   </p>
@@ -1028,14 +1028,14 @@ const Profile = () => {
                     value={deleteFlow.reason}
                     onChange={(e) => setDeleteFlow((p) => ({ ...p, reason: e.target.value }))}
                     rows={3}
-                    className="w-full border border-gray-200 rounded-xl p-3 text-sm mb-3"
+                    className="w-full border border-gray-200 dark:border-white/10 rounded-xl p-3 text-sm mb-3"
                     placeholder="Optional reason"
                   />
                   {deleteFlow.otpSent && (
                     <input
                       value={deleteFlow.otp}
                       onChange={(e) => setDeleteFlow((p) => ({ ...p, otp: e.target.value }))}
-                      className="w-full border border-gray-200 rounded-xl px-3 py-2 mb-3"
+                      className="w-full border border-gray-200 dark:border-white/10 rounded-xl px-3 py-2 mb-3"
                       placeholder="Enter OTP"
                     />
                   )}
@@ -1044,7 +1044,7 @@ const Profile = () => {
                       onClick={() =>
                         setDeleteFlow({ open: false, otpSent: false, otp: "", reason: "", loading: false })
                       }
-                      className="flex-1 py-2.5 border border-gray-200 rounded-xl font-bold"
+                      className="flex-1 py-2.5 border border-gray-200 dark:border-white/10 rounded-xl font-bold"
                     >
                       Cancel
                     </button>

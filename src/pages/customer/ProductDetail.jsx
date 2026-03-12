@@ -262,7 +262,7 @@ const ProductDetail = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-black text-zoop-obsidian mb-4">
+          <h2 className="text-2xl font-black text-zoop-obsidian dark:text-white mb-4">
             Product Not Found
           </h2>
           <Link to="/" className="text-zoop-moss font-bold hover:underline">
@@ -285,7 +285,7 @@ const ProductDetail = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:glass-card">
       <Seo
         title={`${product.name} | ${brandName}`}
         description={(product.aboutItem || product.description || "").slice(0, 160)}
@@ -322,9 +322,9 @@ const ProductDetail = () => {
         }}
       />
       {/* Breadcrumb */}
-      <div className="bg-gray-50 border-b border-gray-200">
+      <div className="bg-gray-50 dark:bg-white/5 border-b border-gray-200 dark:border-white/10">
         <div className="max-w-[1400px] mx-auto px-4 py-3">
-          <div className="flex items-center gap-2 text-sm text-gray-600">
+          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
             <Link to="/" className="hover:text-zoop-moss">
               Home
             </Link>
@@ -336,7 +336,7 @@ const ProductDetail = () => {
               {product.category || "Uncategorized"}
             </Link>
             <span>/</span>
-            <span className="text-zoop-obsidian font-bold line-clamp-1">
+            <span className="text-zoop-obsidian dark:text-white font-bold line-clamp-1">
               {product.name}
             </span>
           </div>
@@ -348,7 +348,7 @@ const ProductDetail = () => {
           {/* LEFT: Image Gallery */}
           <div className="space-y-4">
             {/* Main Image */}
-            <div className="relative aspect-square bg-zoop-canvas rounded-2xl overflow-hidden group">
+            <div className="relative aspect-4-5 bg-zoop-canvas rounded-2xl overflow-hidden group">
               {mediaItems[selectedImage]?.type === "video" ? (
                 <video
                   src={mediaItems[selectedImage]?.src}
@@ -394,13 +394,13 @@ const ProductDetail = () => {
               {/* Badges */}
               <div className="absolute top-4 left-4 flex flex-col gap-2">
                 {product.type === "Local" && (
-                  <div className="bg-zoop-moss text-zoop-obsidian text-sm font-black px-4 py-2 rounded-full shadow-lg flex items-center gap-2">
+                  <div className="bg-zoop-moss text-zoop-obsidian dark:text-white text-sm font-black px-4 py-2 rounded-full shadow-lg dark:shadow-[0_12px_32px_rgba(0,0,0,0.5)] flex items-center gap-2">
                     <Zap width={14} height={14} fill="black" /> SAME-DAY
                     DELIVERY
                   </div>
                 )}
                 {discount > 0 && (
-                  <div className="bg-red-500 text-white text-sm font-black px-4 py-2 rounded-full shadow-lg">
+                  <div className="bg-red-500 text-white text-sm font-black px-4 py-2 rounded-full shadow-lg dark:shadow-[0_12px_32px_rgba(0,0,0,0.5)]">
                     {discount}% OFF
                   </div>
                 )}
@@ -414,10 +414,10 @@ const ProductDetail = () => {
                   <button
                     key={index}
                     onClick={() => setSelectedImage(index)}
-                    className={`aspect-square rounded-lg overflow-hidden border-2 transition-all ${
+                    className={`aspect-4-5 rounded-lg overflow-hidden border-2 transition-all ${
                       selectedImage === index
                         ? "border-zoop-moss scale-95"
-                        : "border-gray-200 hover:border-zoop-moss/50"
+                        : "border-gray-200 dark:border-white/10 hover:border-zoop-moss/50"
                     }`}
                   >
                     {media.type === "video" ? (
@@ -446,10 +446,10 @@ const ProductDetail = () => {
               <p className="text-sm font-bold text-zoop-copper uppercase tracking-wider">
                 {product.brand}
               </p>
-              <h1 className="text-3xl md:text-4xl font-900 text-zoop-obsidian mt-2 leading-tight">
+              <h1 className="text-3xl md:text-4xl font-900 text-zoop-obsidian dark:text-white mt-2 leading-tight">
                 {product.name}
               </h1>
-              <p className="text-gray-600 mt-3 leading-relaxed">
+              <p className="text-gray-600 dark:text-gray-400 mt-3 leading-relaxed">
                 {product.aboutItem || product.description}
               </p>
               <p className="text-sm text-gray-500 mt-2">
@@ -458,7 +458,7 @@ const ProductDetail = () => {
             </div>
 
             {/* Rating & Reviews */}
-            <div className="flex items-center gap-4 pb-6 border-b border-gray-200">
+            <div className="flex items-center gap-4 pb-6 border-b border-gray-200 dark:border-white/10">
               <StarRating rating={product.rating} totalReviews={product.reviews || 0} size={18} />
               <span className="text-sm text-gray-500">
                 {(product.reviews || 0).toLocaleString()} reviews
@@ -471,9 +471,9 @@ const ProductDetail = () => {
             </div>
 
             {/* Price */}
-            <div className="pb-6 border-b border-gray-200">
+            <div className="pb-6 border-b border-gray-200 dark:border-white/10">
               <div className="flex items-baseline gap-3">
-                <span className="text-4xl font-900 text-zoop-obsidian">
+                <span className="text-4xl font-900 text-zoop-obsidian dark:text-white">
                   {formatInrWithSymbol(product.price || 0, {
                     maximumFractionDigits: 0,
                   })}
@@ -505,9 +505,9 @@ const ProductDetail = () => {
 
             {/* Size Selector */}
             {product.sizes && product.sizes.length > 0 && (
-              <div className="pb-6 border-b border-gray-200">
+              <div className="pb-6 border-b border-gray-200 dark:border-white/10">
                 <div className="flex items-center justify-between mb-3">
-                  <label className="text-sm font-bold text-zoop-obsidian uppercase tracking-wider">
+                  <label className="text-sm font-bold text-zoop-obsidian dark:text-white uppercase tracking-wider">
                     Select Size
                   </label>
                   <button className="text-xs text-zoop-moss font-bold hover:underline">
@@ -521,8 +521,8 @@ const ProductDetail = () => {
                       onClick={() => setSelectedSize(size)}
                       className={`py-3 px-2 rounded-lg border-2 font-bold text-sm transition-all ${
                         selectedSize === size
-                          ? "border-zoop-moss bg-zoop-moss/10 text-zoop-obsidian"
-                          : "border-gray-200 hover:border-zoop-moss/50"
+                          ? "border-zoop-moss bg-zoop-moss/10 text-zoop-obsidian dark:text-white"
+                          : "border-gray-200 dark:border-white/10 hover:border-zoop-moss/50"
                       }`}
                     >
                       {size}
@@ -534,8 +534,8 @@ const ProductDetail = () => {
 
             {/* Color Selector */}
             {product.colors && product.colors.length > 0 && (
-              <div className="pb-6 border-b border-gray-200">
-                <label className="text-sm font-bold text-zoop-obsidian uppercase tracking-wider block mb-3">
+              <div className="pb-6 border-b border-gray-200 dark:border-white/10">
+                <label className="text-sm font-bold text-zoop-obsidian dark:text-white uppercase tracking-wider block mb-3">
                   Select Color {selectedColor && `- ${selectedColor}`}
                 </label>
                 <div className="flex flex-wrap gap-3">
@@ -545,8 +545,8 @@ const ProductDetail = () => {
                       onClick={() => setSelectedColor(color)}
                       className={`px-4 py-2 rounded-lg border-2 font-medium text-sm transition-all ${
                         selectedColor === color
-                          ? "border-zoop-moss bg-zoop-moss/10 text-zoop-obsidian"
-                          : "border-gray-200 hover:border-zoop-moss/50"
+                          ? "border-zoop-moss bg-zoop-moss/10 text-zoop-obsidian dark:text-white"
+                          : "border-gray-200 dark:border-white/10 hover:border-zoop-moss/50"
                       }`}
                     >
                       {color}
@@ -557,12 +557,12 @@ const ProductDetail = () => {
             )}
 
             {/* Quantity */}
-            <div className="pb-6 border-b border-gray-200">
-              <label className="text-sm font-bold text-zoop-obsidian uppercase tracking-wider block mb-3">
+            <div className="pb-6 border-b border-gray-200 dark:border-white/10">
+              <label className="text-sm font-bold text-zoop-obsidian dark:text-white uppercase tracking-wider block mb-3">
                 Quantity
               </label>
               <div className="flex items-center gap-4">
-                <div className="flex items-center bg-gray-100 rounded-xl p-1">
+                <div className="flex items-center bg-gray-100 dark:bg-white/10 rounded-xl p-1">
                   <button
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
                     className="w-12 h-12 flex items-center justify-center font-black text-xl hover:bg-white rounded-lg transition-colors"
@@ -602,7 +602,7 @@ const ProductDetail = () => {
                 disabled={!product.inStock}
                 className={`w-full py-4 rounded-xl font-black text-sm uppercase tracking-wider transition-all ${
                   product.inStock
-                    ? "bg-zoop-moss text-zoop-obsidian hover:shadow-2xl hover:-translate-y-1"
+                    ? "bg-zoop-moss text-zoop-obsidian dark:text-white hover:shadow-2xl hover:-translate-y-1"
                     : "bg-gray-300 text-gray-500 cursor-not-allowed"
                 }`}
               >
@@ -618,7 +618,7 @@ const ProductDetail = () => {
                 disabled={!product.inStock}
                 className={`w-full py-4 rounded-xl font-black text-sm uppercase tracking-wider border-2 transition-all ${
                   product.inStock
-                    ? "border-zoop-obsidian text-zoop-obsidian hover:bg-zoop-obsidian hover:text-white"
+                    ? "border-zoop-obsidian text-zoop-obsidian dark:text-white hover:bg-zoop-obsidian hover:text-white"
                     : "border-gray-300 text-gray-400 cursor-not-allowed"
                 }`}
               >
@@ -631,7 +631,7 @@ const ProductDetail = () => {
                       <p className="text-xs font-black uppercase tracking-[0.28em] text-[#8b5e3c]">
                         Buy Together
                       </p>
-                      <p className="text-lg font-black text-zoop-obsidian">
+                      <p className="text-lg font-black text-zoop-obsidian dark:text-white">
                         Add the full set in one step
                       </p>
                     </div>
@@ -646,13 +646,13 @@ const ProductDetail = () => {
                   <div className="grid gap-3 md:grid-cols-[1fr_auto_1fr_auto_1fr] items-center">
                     {comboProducts.map((item, index) => (
                       <React.Fragment key={item.id}>
-                        <div className="rounded-2xl border border-white bg-white p-3 shadow-sm">
+                        <div className="rounded-2xl border border-white bg-white dark:glass-card p-3 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
                           <img
                             src={optimizeCloudinaryUrl(item.thumbnailUrl || item.image, { width: 500 })}
                             alt={item.title || item.name}
                             className="h-28 w-full rounded-xl object-cover"
                           />
-                          <p className="mt-3 line-clamp-2 text-sm font-black text-zoop-obsidian">
+                          <p className="mt-3 line-clamp-2 text-sm font-black text-zoop-obsidian dark:text-white">
                             {item.title || item.name}
                           </p>
                           <p className="mt-1 text-sm text-gray-500">
@@ -710,13 +710,13 @@ const ProductDetail = () => {
                     });
                   }
                 }}
-                className="w-full py-4 rounded-xl font-bold text-sm transition-all border-2 border-gray-200 hover:border-red-500 flex items-center justify-center gap-2"
+                className="w-full py-4 rounded-xl font-bold text-sm transition-all border-2 border-gray-200 dark:border-white/10 hover:border-red-500 flex items-center justify-center gap-2"
               >
                 <Heart
                   width={20}
                   height={20}
                   className={
-                    isLiked ? "fill-red-500 text-red-500" : "text-gray-600"
+                    isLiked ? "fill-red-500 text-red-500" : "text-gray-600 dark:text-gray-400"
                   }
                 />
                 {isLiked ? "Saved to Wishlist" : "Add to Wishlist"}
@@ -724,8 +724,8 @@ const ProductDetail = () => {
             </div>
 
             {/* Delivery Info */}
-            <div className="bg-gray-50 rounded-xl p-6 space-y-4">
-              <h3 className="font-black text-zoop-obsidian uppercase tracking-wider text-sm">
+            <div className="bg-gray-50 dark:bg-white/5 rounded-xl p-6 space-y-4">
+              <h3 className="font-black text-zoop-obsidian dark:text-white uppercase tracking-wider text-sm">
                 Delivery & Services
               </h3>
               <div className="space-y-3">
@@ -736,12 +736,12 @@ const ProductDetail = () => {
                     className="text-zoop-moss shrink-0 mt-0.5"
                   />
                   <div>
-                    <p className="font-bold text-sm text-zoop-obsidian">
+                    <p className="font-bold text-sm text-zoop-obsidian dark:text-white">
                       {product.type === "Local"
                         ? `Same-Day Delivery in ${location}`
                         : "Fast Delivery"}
                     </p>
-                    <p className="text-xs text-gray-600 mt-1">
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
                       {deliveryEstimate.label}
                     </p>
                   </div>
@@ -753,10 +753,10 @@ const ProductDetail = () => {
                     className="text-zoop-moss shrink-0 mt-0.5"
                   />
                   <div>
-                    <p className="font-bold text-sm text-zoop-obsidian">
+                    <p className="font-bold text-sm text-zoop-obsidian dark:text-white">
                       {product.returnPolicy || "7 Days"} Return Policy
                     </p>
-                    <p className="text-xs text-gray-600 mt-1">
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
                       Easy returns and refunds
                     </p>
                   </div>
@@ -767,15 +767,15 @@ const ProductDetail = () => {
         </div>
 
         {/* Tabs: Description, Specifications, Reviews */}
-        <div className="border-t border-gray-200 pt-12">
-          <div className="flex gap-6 overflow-x-auto border-b border-gray-200 mb-8 no-scrollbar scrollbar-gap">
+        <div className="border-t border-gray-200 dark:border-white/10 pt-12">
+          <div className="flex gap-6 overflow-x-auto border-b border-gray-200 dark:border-white/10 mb-8 no-scrollbar scrollbar-gap">
             {["description", "specifications", "reviews"].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`pb-4 font-black uppercase tracking-wider text-sm transition-all ${
                   activeTab === tab
-                    ? "text-zoop-obsidian border-b-2 border-zoop-moss"
+                    ? "text-zoop-obsidian dark:text-white border-b-2 border-zoop-moss"
                     : "text-gray-400 hover:text-zoop-obsidian"
                 }`}
               >
@@ -786,25 +786,25 @@ const ProductDetail = () => {
 
           {activeTab === "description" && (
             <div className="prose max-w-none">
-              <p className="text-gray-700 leading-relaxed">
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
                 {product.description}
               </p>
               {product.aboutItem && product.aboutItem !== product.description && (
-                <div className="mt-4 rounded-xl border border-gray-100 bg-gray-50 p-4">
-                  <p className="text-sm font-black text-zoop-obsidian mb-1">About This Item</p>
-                  <p className="text-gray-700">{product.aboutItem}</p>
+                <div className="mt-4 rounded-xl border border-gray-100 dark:border-white/10 bg-gray-50 dark:bg-white/5 p-4">
+                  <p className="text-sm font-black text-zoop-obsidian dark:text-white mb-1">About This Item</p>
+                  <p className="text-gray-700 dark:text-gray-300">{product.aboutItem}</p>
                 </div>
               )}
               {product.features && (
                 <div className="mt-6">
-                  <h3 className="font-black text-lg text-zoop-obsidian mb-4">
+                  <h3 className="font-black text-lg text-zoop-obsidian dark:text-white mb-4">
                     Key Features
                   </h3>
                   <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {product.features.map((feature, index) => (
                       <li
                         key={index}
-                        className="flex items-center gap-2 text-gray-700"
+                        className="flex items-center gap-2 text-gray-700 dark:text-gray-300"
                       >
                         <span className="text-zoop-moss">✓</span>
                         {feature}
@@ -815,17 +815,17 @@ const ProductDetail = () => {
               )}
               {Array.isArray(product.attributes) && product.attributes.length > 0 && (
                 <div className="mt-6">
-                  <h3 className="font-black text-lg text-zoop-obsidian mb-4">
+                  <h3 className="font-black text-lg text-zoop-obsidian dark:text-white mb-4">
                     Additional Details
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {product.attributes.map((attr, idx) => (
                       <div
                         key={`${attr.key}-${idx}`}
-                        className="rounded-lg border border-gray-100 bg-white p-3"
+                        className="rounded-lg border border-gray-100 dark:border-white/10 bg-white dark:glass-card p-3"
                       >
                         <p className="text-xs text-gray-500 uppercase font-bold">{attr.key}</p>
-                        <p className="text-sm text-zoop-obsidian font-bold mt-1">
+                        <p className="text-sm text-zoop-obsidian dark:text-white font-bold mt-1">
                           {(attr.values || []).join(", ")}
                         </p>
                       </div>
@@ -834,12 +834,12 @@ const ProductDetail = () => {
                 </div>
               )}
               {product.seller && (
-                <div className="mt-8 bg-gray-50 border border-gray-100 rounded-2xl p-6">
-                  <h3 className="font-black text-lg text-zoop-obsidian mb-4">
+                <div className="mt-8 bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-2xl p-6">
+                  <h3 className="font-black text-lg text-zoop-obsidian dark:text-white mb-4">
                     Seller Information
                   </h3>
                   <div className="flex flex-col md:flex-row md:items-center gap-4">
-                    <div className="w-14 h-14 rounded-full bg-white border border-gray-200 overflow-hidden flex items-center justify-center text-2xl font-black text-zoop-obsidian">
+                    <div className="w-14 h-14 rounded-full bg-white dark:glass-card border border-gray-200 dark:border-white/10 overflow-hidden flex items-center justify-center text-2xl font-black text-zoop-obsidian dark:text-white">
                       {product.seller.photoURL ? (
                         <img
                           src={optimizeCloudinaryUrl(product.seller.photoURL, {
@@ -855,16 +855,16 @@ const ProductDetail = () => {
                       )}
                     </div>
                     <div className="flex-1">
-                      <p className="font-bold text-zoop-obsidian">
+                      <p className="font-bold text-zoop-obsidian dark:text-white">
                         {product.seller.businessName || product.seller.name}
                       </p>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
                         {product.seller.city && product.seller.state
                           ? `${product.seller.city}, ${product.seller.state}`
                           : product.seller.city || product.seller.state || "India"}
                       </p>
                     </div>
-                    <div className="text-sm text-gray-600 space-y-1">
+                    <div className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
                       {product.seller.showPhoneOnProduct && product.seller.phone && (
                         <p>Phone: {product.seller.phone}</p>
                       )}
@@ -882,17 +882,17 @@ const ProductDetail = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {product.specs && Object.keys(product.specs).length > 0 ? (
                 Object.entries(product.specs).map(([key, value]) => (
-                  <div key={key} className="border-b border-gray-100 pb-4">
+                  <div key={key} className="border-b border-gray-100 dark:border-white/10 pb-4">
                     <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
                       {key.replace(/([A-Z])/g, " $1").trim()}
                     </p>
-                    <p className="font-bold text-zoop-obsidian">
+                    <p className="font-bold text-zoop-obsidian dark:text-white">
                       {Array.isArray(value) ? value.join(", ") : value}
                     </p>
                   </div>
                 ))
               ) : (
-                <div className="md:col-span-2 rounded-xl border border-gray-100 bg-gray-50 p-4 text-sm text-gray-500">
+                <div className="md:col-span-2 rounded-xl border border-gray-100 dark:border-white/10 bg-gray-50 dark:bg-white/5 p-4 text-sm text-gray-500">
                   Specifications will appear here once seller adds product details.
                 </div>
               )}
@@ -908,13 +908,13 @@ const ProductDetail = () => {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {reviews.map((review) => (
-                    <div key={review.id} className="border border-gray-100 rounded-xl p-4 bg-white shadow-sm">
+                    <div key={review.id} className="border border-gray-100 dark:border-white/10 rounded-xl p-4 bg-white dark:glass-card shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
                       <div className="flex items-center justify-between">
-                        <p className="font-bold text-zoop-obsidian">{review.userName || "Customer"}</p>
+                        <p className="font-bold text-zoop-obsidian dark:text-white">{review.userName || "Customer"}</p>
                         <StarRating rating={Number(review.rating || 0)} size={14} />
                       </div>
                       {review.comment && (
-                        <p className="text-sm text-gray-600 mt-2">{review.comment}</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">{review.comment}</p>
                       )}
                     </div>
                   ))}
@@ -927,7 +927,7 @@ const ProductDetail = () => {
         {/* Related Products */}
         {displaySimilar.length > 0 && (
           <div className="mt-16">
-            <h2 className="text-2xl font-900 text-zoop-obsidian mb-4">
+            <h2 className="text-2xl font-900 text-zoop-obsidian dark:text-white mb-4">
               Similar Products
             </h2>
             <div className="flex gap-4 overflow-x-auto pb-3 scrollbar-gap">
@@ -942,7 +942,7 @@ const ProductDetail = () => {
 
         {(otherProducts.length > 0 || secondarySuggestions.length > 0) && (
           <div className="mt-10">
-            <h2 className="text-2xl font-900 text-zoop-obsidian mb-4">
+            <h2 className="text-2xl font-900 text-zoop-obsidian dark:text-white mb-4">
               View Also
             </h2>
             <div className="flex gap-4 overflow-x-auto pb-3 scrollbar-gap">

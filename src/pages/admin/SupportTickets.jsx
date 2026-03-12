@@ -65,17 +65,17 @@ const SupportTickets = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-white/5 p-6">
       <div className="max-w-[1600px] mx-auto space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-900 text-zoop-obsidian">Support Tickets</h1>
+          <h1 className="text-3xl font-900 text-zoop-obsidian dark:text-white">Support Tickets</h1>
           <p className="text-gray-500 mt-1">Manage customer support requests</p>
         </div>
 
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
+          <div className="bg-white dark:glass-card rounded-2xl p-6 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-500 text-sm font-medium mb-1">Open Tickets</p>
@@ -87,7 +87,7 @@ const SupportTickets = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
+          <div className="bg-white dark:glass-card rounded-2xl p-6 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-500 text-sm font-medium mb-1">In Progress</p>
@@ -99,7 +99,7 @@ const SupportTickets = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
+          <div className="bg-white dark:glass-card rounded-2xl p-6 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-500 text-sm font-medium mb-1">Resolved</p>
@@ -111,13 +111,13 @@ const SupportTickets = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
+          <div className="bg-white dark:glass-card rounded-2xl p-6 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-500 text-sm font-medium mb-1">Total Tickets</p>
-                <p className="text-3xl font-black text-zoop-obsidian">{stats.total}</p>
+                <p className="text-3xl font-black text-zoop-obsidian dark:text-white">{stats.total}</p>
               </div>
-              <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center">
+              <div className="w-12 h-12 bg-gray-100 dark:bg-white/10 rounded-xl flex items-center justify-center">
                 <MessageCircle width={24} height={24} stroke="#1f2937" />
               </div>
             </div>
@@ -125,15 +125,15 @@ const SupportTickets = () => {
         </div>
 
         {/* Filter Tabs */}
-        <div className="bg-white rounded-2xl p-2 shadow-sm flex gap-2">
+        <div className="bg-white dark:glass-card rounded-2xl p-2 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] flex gap-2">
           {['open', 'in-progress', 'resolved', 'all'].map((tab) => (
             <button
               key={tab}
               onClick={() => setFilter(tab)}
               className={`flex-1 py-3 px-4 rounded-xl font-bold text-sm transition-all ${
                 filter === tab
-                  ? 'bg-zoop-moss text-zoop-obsidian'
-                  : 'text-gray-600 hover:bg-gray-100'
+                  ? 'bg-zoop-moss text-zoop-obsidian dark:text-white'
+                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100'
               }`}
             >
               {tab === 'in-progress' ? 'In Progress' : tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -146,16 +146,16 @@ const SupportTickets = () => {
           {filteredTickets.map((ticket) => (
             <div
               key={ticket.id}
-              className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all cursor-pointer"
+              className="bg-white dark:glass-card rounded-2xl p-6 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] hover:shadow-lg transition-all cursor-pointer"
               onClick={() => setSelectedTicket(ticket)}
             >
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-zoop-moss/20 rounded-full flex items-center justify-center">
-                    <User width={20} height={20} className="text-zoop-obsidian" />
+                    <User width={20} height={20} className="text-zoop-obsidian dark:text-white" />
                   </div>
                   <div>
-                    <p className="font-black text-zoop-obsidian">{ticket.customer || ticket.name || ticket.email || "User"}</p>
+                    <p className="font-black text-zoop-obsidian dark:text-white">{ticket.customer || ticket.name || ticket.email || "User"}</p>
                     <p className="text-xs text-gray-500">{ticket.email}</p>
                   </div>
                 </div>
@@ -174,11 +174,11 @@ const SupportTickets = () => {
                   <span className="text-gray-300">•</span>
                   <span className="text-xs text-gray-500">{ticket.category || 'General'}</span>
                 </div>
-                <h3 className="text-lg font-black text-zoop-obsidian mb-2">{ticket.subject || ticket.title}</h3>
-                <p className="text-sm text-gray-600 line-clamp-2">{ticket.message || ticket.description}</p>
+                <h3 className="text-lg font-black text-zoop-obsidian dark:text-white mb-2">{ticket.subject || ticket.title}</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{ticket.message || ticket.description}</p>
               </div>
 
-              <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+              <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-white/10">
                 <div className="flex items-center gap-2 text-xs text-gray-500">
                   <Clock width={14} height={14} />
                   <span>{ticket.updatedAt ? new Date(ticket.updatedAt).toLocaleString() : ticket.lastUpdate}</span>
@@ -225,9 +225,9 @@ const SupportTickets = () => {
         </div>
 
         {filteredTickets.length === 0 && (
-          <div className="bg-white rounded-2xl p-12 text-center">
+          <div className="bg-white dark:glass-card rounded-2xl p-12 text-center">
             <div className="text-6xl mb-4">🎫</div>
-            <h3 className="text-xl font-black text-zoop-obsidian mb-2">
+            <h3 className="text-xl font-black text-zoop-obsidian dark:text-white mb-2">
               No {filter} tickets
             </h3>
             <p className="text-gray-500">

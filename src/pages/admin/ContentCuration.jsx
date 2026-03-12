@@ -79,12 +79,12 @@ const ContentCuration = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-white/5 p-6">
       <div className="max-w-[1600px] mx-auto space-y-6">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-900 text-zoop-obsidian">Content Curation</h1>
+            <h1 className="text-3xl font-900 text-zoop-obsidian dark:text-white">Content Curation</h1>
             <p className="text-gray-500 mt-1">Review and approve product listings</p>
           </div>
           
@@ -95,45 +95,45 @@ const ContentCuration = () => {
               placeholder="Search products..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-zoop-moss"
+              className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-zoop-moss"
             />
           </div>
         </div>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
+          <div className="bg-white dark:glass-card rounded-2xl p-6 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
             <p className="text-gray-500 text-sm font-medium mb-1">Pending Review</p>
             <p className="text-3xl font-black text-orange-500">{stats.pending}</p>
           </div>
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
+          <div className="bg-white dark:glass-card rounded-2xl p-6 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
             <p className="text-gray-500 text-sm font-medium mb-1">Approved</p>
             <p className="text-3xl font-black text-green-500">{stats.approved}</p>
           </div>
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
+          <div className="bg-white dark:glass-card rounded-2xl p-6 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
             <p className="text-gray-500 text-sm font-medium mb-1">Rejected</p>
             <p className="text-3xl font-black text-red-500">{stats.rejected}</p>
           </div>
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
+          <div className="bg-white dark:glass-card rounded-2xl p-6 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
             <p className="text-gray-500 text-sm font-medium mb-1">Removed</p>
-            <p className="text-3xl font-black text-gray-700">{stats.removed}</p>
+            <p className="text-3xl font-black text-gray-700 dark:text-gray-300">{stats.removed}</p>
           </div>
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
+          <div className="bg-white dark:glass-card rounded-2xl p-6 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
             <p className="text-gray-500 text-sm font-medium mb-1">Total Products</p>
-            <p className="text-3xl font-black text-zoop-obsidian">{stats.total}</p>
+            <p className="text-3xl font-black text-zoop-obsidian dark:text-white">{stats.total}</p>
           </div>
         </div>
 
         {/* Filter Tabs */}
-        <div className="bg-white rounded-2xl p-2 shadow-sm flex gap-2">
+        <div className="bg-white dark:glass-card rounded-2xl p-2 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] flex gap-2">
           {['all', 'pending', 'approved', 'rejected', 'removed'].map((tab) => (
             <button
               key={tab}
               onClick={() => setFilter(tab)}
               className={`flex-1 py-3 px-4 rounded-xl font-bold text-sm transition-all ${
                 filter === tab
-                  ? 'bg-zoop-moss text-zoop-obsidian'
-                  : 'text-gray-600 hover:bg-gray-100'
+                  ? 'bg-zoop-moss text-zoop-obsidian dark:text-white'
+                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100'
               }`}
             >
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -144,9 +144,9 @@ const ContentCuration = () => {
         {/* Products Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProducts.map((product) => (
-            <div key={product.id} className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all">
+            <div key={product.id} className="bg-white dark:glass-card rounded-2xl overflow-hidden shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] hover:shadow-lg transition-all">
               {/* Product Image */}
-              <div className="relative aspect-square bg-gray-100">
+              <div className="relative aspect-4-5 bg-gray-100 dark:bg-white/10">
                 <img
                   src={product.image || product.thumbnailUrl || "/brand-mark.svg"}
                   alt={product.name || product.title}
@@ -165,7 +165,7 @@ const ContentCuration = () => {
                   </span>
                 </div>
                 {product.type === 'Local' && (
-                  <div className="absolute top-3 right-3 bg-zoop-moss text-zoop-obsidian px-3 py-1 rounded-full text-xs font-black">
+                  <div className="absolute top-3 right-3 bg-zoop-moss text-zoop-obsidian dark:text-white px-3 py-1 rounded-full text-xs font-black">
                     ⚡ LOCAL
                   </div>
                 )}
@@ -175,19 +175,19 @@ const ContentCuration = () => {
               <div className="p-4">
                 <div className="mb-3">
                   <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">{product.brand}</p>
-                  <h3 className="font-bold text-lg text-zoop-obsidian line-clamp-2">{product.name || product.title}</h3>
+                  <h3 className="font-bold text-lg text-zoop-obsidian dark:text-white line-clamp-2">{product.name || product.title}</h3>
                 </div>
 
                 <div className="flex items-center justify-between mb-3">
                   <StarRating rating={Number(product.rating) || 0} totalReviews={Number(product.ratingCount) || 0} size={12} />
-                  <p className="font-black text-zoop-obsidian">
+                  <p className="font-black text-zoop-obsidian dark:text-white">
                     {formatInrWithSymbol(product.price || 0, {
                       maximumFractionDigits: 0,
                     })}
                   </p>
                 </div>
 
-                <div className="space-y-2 mb-4 pb-4 border-b border-gray-100">
+                <div className="space-y-2 mb-4 pb-4 border-b border-gray-100 dark:border-white/10">
                   <div className="flex justify-between text-xs">
                     <span className="text-gray-500">Category:</span>
                     <span className="font-bold">{product.category || product.categoryId}</span>
@@ -257,9 +257,9 @@ const ContentCuration = () => {
                   )}
                   <button
                     onClick={() => setSelectedProduct(product)}
-                    className="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 rounded-lg transition-all flex items-center justify-center"
+                    className="px-4 py-2.5 bg-gray-100 dark:bg-white/10 hover:bg-gray-200 rounded-lg transition-all flex items-center justify-center"
                   >
-                    <Eye width={16} height={16} className="text-gray-600" />
+                    <Eye width={16} height={16} className="text-gray-600 dark:text-gray-400" />
                   </button>
                 </div>
               </div>
@@ -269,9 +269,9 @@ const ContentCuration = () => {
 
         {/* Empty State */}
         {filteredProducts.length === 0 && (
-          <div className="bg-white rounded-2xl p-12 text-center">
+          <div className="bg-white dark:glass-card rounded-2xl p-12 text-center">
             <div className="text-6xl mb-4">📦</div>
-            <h3 className="text-xl font-black text-zoop-obsidian mb-2">
+            <h3 className="text-xl font-black text-zoop-obsidian dark:text-white mb-2">
               No products found
             </h3>
             <p className="text-gray-500">
@@ -283,9 +283,9 @@ const ContentCuration = () => {
 
       {selectedProduct && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl p-8 max-w-4xl w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:glass-card rounded-3xl p-8 max-w-4xl w-full shadow-2xl dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)] max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-2xl font-black text-zoop-obsidian">Product Full Details</h3>
+              <h3 className="text-2xl font-black text-zoop-obsidian dark:text-white">Product Full Details</h3>
               <button
                 onClick={() => setSelectedProduct(null)}
                 className="p-2 hover:bg-gray-100 rounded-lg transition-all"
@@ -298,7 +298,7 @@ const ContentCuration = () => {
                 <img
                   src={selectedProduct.image || selectedProduct.thumbnailUrl || "/brand-mark.svg"}
                   alt={selectedProduct.name || selectedProduct.title}
-                  className="w-full aspect-square object-cover rounded-2xl border border-gray-200"
+                  className="w-full aspect-4-5 object-cover rounded-2xl border border-gray-200 dark:border-white/10"
                   onError={(event) => {
                     event.currentTarget.src = "/brand-mark.svg";
                   }}
@@ -309,7 +309,7 @@ const ContentCuration = () => {
                       key={idx}
                       src={img}
                       alt="media"
-                      className="h-20 w-full object-cover rounded-lg border border-gray-200"
+                      className="h-20 w-full object-cover rounded-lg border border-gray-200 dark:border-white/10"
                       onError={(event) => {
                         event.currentTarget.src = "/brand-mark.svg";
                       }}
@@ -319,15 +319,15 @@ const ContentCuration = () => {
               </div>
               <div className="space-y-3">
                 <p className="text-xs font-black uppercase tracking-widest text-gray-500">{selectedProduct.brand || "Brand"}</p>
-                <h4 className="text-2xl font-black text-zoop-obsidian">{selectedProduct.name || selectedProduct.title}</h4>
-                <p className="text-sm text-gray-700">{selectedProduct.description || "No description provided."}</p>
+                <h4 className="text-2xl font-black text-zoop-obsidian dark:text-white">{selectedProduct.name || selectedProduct.title}</h4>
+                <p className="text-sm text-gray-700 dark:text-gray-300">{selectedProduct.description || "No description provided."}</p>
                 <div className="grid grid-cols-2 gap-3 text-sm">
-                  <div className="p-3 bg-gray-50 rounded-xl"><b>Price:</b> Rs. {(selectedProduct.price || 0).toLocaleString("en-IN")}</div>
-                  <div className="p-3 bg-gray-50 rounded-xl"><b>Stock:</b> {selectedProduct.stockQty ?? selectedProduct.quantity ?? 0}</div>
-                  <div className="p-3 bg-gray-50 rounded-xl"><b>Category:</b> {selectedProduct.category || selectedProduct.categoryId || "-"}</div>
-                  <div className="p-3 bg-gray-50 rounded-xl"><b>Created:</b> {selectedProduct.createdAt ? new Date(selectedProduct.createdAt).toLocaleString() : "-"}</div>
+                  <div className="p-3 bg-gray-50 dark:bg-white/5 rounded-xl"><b>Price:</b> Rs. {(selectedProduct.price || 0).toLocaleString("en-IN")}</div>
+                  <div className="p-3 bg-gray-50 dark:bg-white/5 rounded-xl"><b>Stock:</b> {selectedProduct.stockQty ?? selectedProduct.quantity ?? 0}</div>
+                  <div className="p-3 bg-gray-50 dark:bg-white/5 rounded-xl"><b>Category:</b> {selectedProduct.category || selectedProduct.categoryId || "-"}</div>
+                  <div className="p-3 bg-gray-50 dark:bg-white/5 rounded-xl"><b>Created:</b> {selectedProduct.createdAt ? new Date(selectedProduct.createdAt).toLocaleString() : "-"}</div>
                 </div>
-                <div className="p-4 border border-gray-200 rounded-xl">
+                <div className="p-4 border border-gray-200 dark:border-white/10 rounded-xl">
                   <p className="text-xs font-black uppercase tracking-widest text-gray-500 mb-2">Seller Information</p>
                   <p className="text-sm"><b>Name:</b> {selectedProduct.seller?.businessName || selectedProduct.seller?.displayName || "-"}</p>
                   <p className="text-sm"><b>Email:</b> {selectedProduct.seller?.email || "-"}</p>

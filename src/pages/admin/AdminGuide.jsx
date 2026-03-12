@@ -48,21 +48,21 @@ const sections = [
 
 const AdminGuide = () => {
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-white/5 p-6">
       <div className="max-w-5xl mx-auto space-y-6">
         <div>
-          <h1 className="text-4xl font-900 tracking-tighter italic text-zoop-obsidian uppercase">
+          <h1 className="text-4xl font-900 tracking-tighter italic text-zoop-obsidian dark:text-white uppercase">
             Admin_Guide
           </h1>
           <p className="text-gray-500 mt-2">
             Operational instructions for admin panel workflows.
           </p>
         </div>
-        <div className="bg-white rounded-3xl border border-gray-100 p-6 md:p-8 shadow-sm space-y-5">
+        <div className="bg-white dark:glass-card rounded-3xl border border-gray-100 dark:border-white/10 p-6 md:p-8 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] space-y-5">
           {sections.map((section) => (
-            <div key={section.title} className="p-4 rounded-xl bg-gray-50 border border-gray-100">
-              <h3 className="text-lg font-black text-zoop-obsidian mb-2">{section.title}</h3>
-              <ul className="space-y-1 text-sm text-gray-700 list-disc pl-5">
+            <div key={section.title} className="p-4 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10">
+              <h3 className="text-lg font-black text-zoop-obsidian dark:text-white mb-2">{section.title}</h3>
+              <ul className="space-y-1 text-sm text-gray-700 dark:text-gray-300 list-disc pl-5">
                 {section.points.map((point) => (
                   <li key={point}>{point}</li>
                 ))}

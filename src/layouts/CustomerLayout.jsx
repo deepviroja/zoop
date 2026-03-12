@@ -315,7 +315,7 @@ const CustomerLayout = () => {
       />
 
       {/* --- TOP NOTIFICATION BAR (Not Sticky) --- */}
-      <div className="bg-gradient-to-r from-zoop-moss to-green-500 text-zoop-obsidian font-black text-center py-2.5 text-xs md:text-sm z-50 shadow-lg animate-pulse flex items-center justify-center gap-2">
+      <div className="bg-gradient-to-r from-zoop-moss to-green-500 text-zoop-obsidian dark:text-white font-black text-center py-2.5 text-xs md:text-sm z-50 shadow-lg dark:shadow-[0_12px_32px_rgba(0,0,0,0.5)] animate-pulse flex items-center justify-center gap-2">
         <Zap width={16} height={16} fill="black" />
         {announcementBanner}
         <Zap width={16} height={16} fill="black" />
@@ -323,39 +323,42 @@ const CustomerLayout = () => {
 
       {/* --- HEADER (Sticky Liquid) --- */}
       <header
-        className={`supports-[backdrop-filter]:backdrop-blur-2xl bg-zoop-moss/5 text-white sticky top-1 z-50 transition-all duration-500 shadow-[0_16px_60px_rgba(0,0,0,0.1)] m-1 rounded-2xl shadow-rounded-2xl border-b border-white/15 ${
-          isCompact ? "backdrop-saturate-150" : "backdrop-saturate-200"
+        className={`supports-[backdrop-filter]:backdrop-blur-2xl bg-zoop-moss/5 self-center text-white sticky top-1 z-50 transition-all duration-500 shadow-[0_16px_60px_rgba(0,0,0,0.1)] m-1 rounded-2xl border-b border-white/15 ${
+          scrollDir === "down" ? "backdrop-blur-3xl dark:bg-black/90 w-[98%]" : "backdrop-blur-2xl w-full"
         }`}
       >
-        <div className="max-w-[1400px] mx-auto px-4 relative">
+        <div className="max-w-[1400px] mx-auto px-4 relative ">
           <div
-            className={`flex items-center justify-between gap-4 transition-all duration-500 overflow-visible ${
-              scrollDir === "down"
-                ? "h-12 py-1"
-                : isCompact
-                  ? "h-14 py-1"
-                  : "h-18 py-2"
+            className={`flex items-center gap-4 transition-all duration-500 overflow-visible ${
+              scrollDir === "down" ? "h-14 py-1 justify-center" : "h-18 py-2 justify-between"
             }`}
           >
-            {/* LOGO */}
+            {/* LOGO - Hidden on mobile if scrollDir is down, or showing Z */}
             <Link
               to="/"
-              className="text-3xl pl-4 tracking-tighter whitespace-nowrap flex items-center gap-2"
+              className={`transition-all duration-500 flex items-center gap-2 ${
+                scrollDir === "down" 
+                  ? "scale-110 text-3xl !pl-0" 
+                  : "text-3xl pl-4 tracking-tighter scale-100"
+              }`}
             >
               <span style={brandStyle}>
-                {isCompact ? (brandName || "Z")[0] : brandName}
+                {scrollDir === "down" ? (brandName || "Z")[0] : isCompact ? (brandName || "Z")[0] : brandName}
               </span>
             </Link>
+
+            {/* SPACER for compact mode centering */}
+            {scrollDir === "down" && <div className="w-4" />}
 
             {/* DESKTOP SEARCH BAR - SMART CAPSULE */}
             <form
               ref={desktopSearchRef}
               onSubmit={handleSearch}
-              className={`hidden md:flex flex-1 items-center bg-white/90 backdrop-blur-xl rounded-full shadow-lg ${
-                isCompact ? "max-w-2xl" : "max-w-3xl"
-              } mx-8 relative transition-all duration-300 ring-2 ${
+              className={`hidden md:flex items-center bg-white/90 backdrop-blur-xl rounded-full shadow-lg dark:shadow-[0_12px_32px_rgba(0,0,0,0.5)] transition-all duration-500 ring-2 ${
+                scrollDir === "down" ? "max-w-md flex-none w-full" : "flex-1 mx-8 max-w-3xl"
+              } relative ${
                 searchQuery
-                  ? "ring-zoop-moss/50 shadow-zoop-moss/20 shadow-2xl"
+                  ? "ring-zoop-moss/50 shadow-zoop-moss/20 shadow-2xl dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)]"
                   : "ring-transparent"
               } focus-within:ring-zoop-moss focus-within:shadow-[0_0_20px_rgba(163,230,53,0.3)]`}
             >
@@ -368,7 +371,7 @@ const CustomerLayout = () => {
                   <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-zoop-moss opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-zoop-moss"></span>
                 </div>
-                <span className="mr-2 text-xs font-black uppercase text-zoop-obsidian whitespace-nowrap">
+                <span className="mr-2 text-xs font-black uppercase text-zoop-obsidian dark:text-white whitespace-nowrap">
                   {location}
                 </span>
                 <div
@@ -381,7 +384,7 @@ const CustomerLayout = () => {
               </div>
 
               {/* Vertical Divider */}
-              <div className="h-6 w-px bg-gray-200"></div>
+              <div className="h-6 w-px bg-gray-200 dark:bg-white/20"></div>
 
               {/* Search Input */}
               <div className="flex-1 relative flex items-center">
@@ -396,7 +399,7 @@ const CustomerLayout = () => {
                   placeholder="Search products, brands, categories"
                   className={`w-full pl-4 pr-12 ${
                     isCompact ? "py-2.5 text-xs" : "py-3 text-sm"
-                  } text-zoop-obsidian bg-transparent focus:outline-none font-medium placeholder:text-gray-400`}
+                  } text-zoop-obsidian dark:text-white bg-transparent focus:outline-none font-medium placeholder:text-gray-400`}
                 />
 
                 {/* Clear Button */}
@@ -413,14 +416,14 @@ const CustomerLayout = () => {
                 {/* Floating Search Button */}
                 <button
                   type="submit"
-                  className="absolute right-1.5 top-1/2 -translate-y-1/2 bg-zoop-moss text-zoop-obsidian p-2 rounded-full font-black hover:bg-zoop-moss/80 hover:scale-105 active:scale-95 transition-all shadow-md flex items-center justify-center"
+                  className="absolute right-1.5 top-1/2 -translate-y-1/2 bg-zoop-moss text-zoop-obsidian dark:text-white p-2 rounded-full font-black hover:bg-zoop-moss/80 hover:scale-105 active:scale-95 transition-all shadow-md dark:shadow-[0_8px_24px_rgba(0,0,0,0.5)] flex items-center justify-center"
                 >
                   <SearchIcon width={18} height={18} />
                 </button>
               </div>
 
               {showDesktopSuggestions && searchQuery.trim() !== "" && (
-                <div className="absolute left-0 right-0 top-[calc(100%+8px)] bg-white border border-gray-200 rounded-2xl shadow-2xl max-h-[70vh] overflow-y-auto p-3 z-[70]">
+                <div className="absolute left-0 right-0 top-[calc(100%+8px)] bg-white dark:glass-card border border-gray-200 dark:border-white/10 rounded-2xl shadow-2xl dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)] max-h-[70vh] overflow-y-auto p-3 z-[70]">
                   {desktopLiveResults.length > 0 ? (
                     <div className="space-y-2">
                       {desktopLiveResults.slice(0, 20).map((product) => (
@@ -437,10 +440,10 @@ const CustomerLayout = () => {
                           <img
                             src={product.thumbnailUrl || product.image}
                             alt={product.title || product.name}
-                            className="w-12 h-12 rounded-lg object-cover bg-gray-100"
+                            className="w-12 h-12 rounded-lg object-cover bg-gray-100 dark:bg-white/10"
                           />
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-bold text-zoop-obsidian truncate">
+                            <p className="text-sm font-bold text-zoop-obsidian dark:text-white truncate">
                               {product.title || product.name}
                             </p>
                             <p className="text-xs text-gray-500 truncate">
@@ -477,7 +480,7 @@ const CustomerLayout = () => {
             <div
               className={`flex items-center gap-3 md:gap-4 text-sm font-bold transition-all duration-500 ${
                 scrollDir === "down"
-                  ? "opacity-0 invisible w-0 translate-x-10 scale-90 md:translate-x-0 overflow-hidden"
+                  ? "opacity-0 invisible w-0 translate-x-10 scale-90 pointer-events-none"
                   : "opacity-100 visible translate-x-0 scale-100"
               }`}
             >
@@ -492,14 +495,14 @@ const CustomerLayout = () => {
                   >
                     <BellRing width={20} height={20} stroke="white" />
                     {unreadNotifications > 0 && (
-                      <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-zoop-moss text-zoop-obsidian text-[10px] font-black flex items-center justify-center">
+                      <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-zoop-moss text-zoop-obsidian dark:text-white text-[10px] font-black flex items-center justify-center">
                         {unreadNotifications > 9 ? "9+" : unreadNotifications}
                       </span>
                     )}
                   </button>
-                  <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-xl shadow-2xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
-                    <div className="p-3 border-b border-gray-100 flex items-center justify-between">
-                      <p className="text-sm font-black text-zoop-obsidian">
+                  <div className="absolute right-0 top-full mt-2 w-80 bg-white dark:glass-card rounded-xl shadow-2xl dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-white/10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                    <div className="p-3 border-b border-gray-100 dark:border-white/10 flex items-center justify-between">
+                      <p className="text-sm font-black text-zoop-obsidian dark:text-white">
                         Notifications
                       </p>
                       <button
@@ -527,10 +530,10 @@ const CustomerLayout = () => {
                                 : "bg-zoop-moss/10 hover:bg-zoop-moss/20"
                             }`}
                           >
-                            <p className="text-sm font-bold text-zoop-obsidian line-clamp-1">
+                            <p className="text-sm font-bold text-zoop-obsidian dark:text-white line-clamp-1">
                               {n.title}
                             </p>
-                            <p className="text-xs text-gray-600 line-clamp-2">
+                            <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2">
                               {n.message}
                             </p>
                           </button>
@@ -549,7 +552,7 @@ const CustomerLayout = () => {
                 >
                   <BellRing width={20} height={20} stroke="white" />
                   {unreadNotifications > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-zoop-moss text-zoop-obsidian text-[10px] font-black flex items-center justify-center">
+                    <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-zoop-moss text-zoop-obsidian dark:text-white text-[10px] font-black flex items-center justify-center">
                       {unreadNotifications > 9 ? "9+" : unreadNotifications}
                     </span>
                   )}
@@ -580,7 +583,7 @@ const CustomerLayout = () => {
                         ? "/seller/waiting"
                         : "/seller/onboarding"
                   }
-                  className="hidden md:flex items-center gap-2 px-3 py-2 bg-zoop-moss text-zoop-obsidian rounded-lg text-xs font-black hover:bg-zoop-moss/80 transition-all"
+                  className="hidden md:flex items-center gap-2 px-3 py-2 bg-zoop-moss text-zoop-obsidian dark:text-white rounded-lg text-xs font-black hover:bg-zoop-moss/80 transition-all"
                 >
                   <Box width={14} height={14} />
                   {user.verificationStatus === "approved"
@@ -613,14 +616,14 @@ const CustomerLayout = () => {
                     </button>
 
                     {/* Dropdown Menu */}
-                    <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-2xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
-                      <div className="p-4 border-b border-gray-100">
-                        <p className="text-sm font-black text-zoop-obsidian">
+                    <div className="absolute right-0 top-full mt-2 w-56 bg-white dark:glass-card rounded-xl shadow-2xl dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-white/10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                      <div className="p-4 border-b border-gray-100 dark:border-white/10">
+                        <p className="text-sm font-black text-zoop-obsidian dark:text-white">
                           {user.displayName || user.email?.split("@")[0]}
                         </p>
                         <p className="text-xs text-gray-500">{user.email}</p>
                         {user.role && user.role !== "customer" && (
-                          <span className="inline-block mt-1 text-[10px] font-black uppercase tracking-widest bg-zoop-moss/20 text-zoop-obsidian px-2 py-0.5 rounded-full">
+                          <span className="inline-block mt-1 text-[10px] font-black uppercase tracking-widest bg-zoop-moss/20 text-zoop-obsidian dark:text-white px-2 py-0.5 rounded-full">
                             {user.role}
                           </span>
                         )}
@@ -655,21 +658,21 @@ const CustomerLayout = () => {
                         )}
                         <Link
                           to="/profile"
-                          className="flex items-center h-8 gap-2 py-1 px-2 rounded-md hover:bg-gray-100 transition-colors text-sm font-bold text-gray-700"
+                          className="flex items-center h-8 gap-2 py-1 px-2 rounded-md hover:bg-gray-100 transition-colors text-sm font-bold text-gray-700 dark:text-gray-300"
                         >
                           <User width={18} height={18} />
                           My Profile
                         </Link>
                         <Link
                           to="/history"
-                          className="flex items-center h-8 gap-2 py-1 px-0 rounded-md hover:bg-gray-100 transition-colors text-sm font-bold text-gray-700"
+                          className="flex items-center h-8 gap-2 py-1 px-0 rounded-md hover:bg-gray-100 transition-colors text-sm font-bold text-gray-700 dark:text-gray-300"
                         >
                           <Box width={18} height={18} />
                           My Orders
                         </Link>
                         <Link
                           to="/wishlist"
-                          className="flex items-center h-8 gap-2 py-1 px-0 rounded-md hover:bg-gray-100 transition-colors text-sm font-bold text-gray-700"
+                          className="flex items-center h-8 gap-2 py-1 px-0 rounded-md hover:bg-gray-100 transition-colors text-sm font-bold text-gray-700 dark:text-gray-300"
                         >
                           <Heart width={18} height={18} />
                           My Wishlist
@@ -683,13 +686,13 @@ const CustomerLayout = () => {
                 <>
                   <Link
                     to="/seller/signup"
-                    className="hidden lg:block hover:text-zoop-moss text-zoop-obsidian transition-colors"
+                    className="hidden lg:block hover:text-zoop-moss text-zoop-obsidian dark:text-white transition-colors"
                   >
                     Become a Seller
                   </Link>
                   <Link
                     to="/login"
-                    className="hidden sm:block bg-zoop-moss text-zoop-obsidian px-4 py-2 rounded-sm font-black hover:bg-white hover:scale-105 transition-all shadow-lg text-xs md:text-sm"
+                    className="hidden sm:block bg-zoop-moss text-zoop-obsidian dark:text-white px-4 py-2 rounded-sm font-black hover:bg-white hover:scale-105 transition-all shadow-lg dark:shadow-[0_12px_32px_rgba(0,0,0,0.5)] text-xs md:text-sm"
                   >
                     Sign In
                   </Link>
@@ -723,7 +726,7 @@ const CustomerLayout = () => {
               </div>
               <button onClick={() => setSidebarOpen(true)} className="block">
                 <div className="relative group">
-                  <div className="h-10 w-10 bg-zoop-moss hover:bg-zoop-canvas rounded-xl flex items-center justify-center cursor-pointer transition-all group shadow-lg">
+                  <div className="h-10 w-10 bg-zoop-moss hover:bg-zoop-canvas rounded-xl flex items-center justify-center cursor-pointer transition-all group shadow-lg dark:shadow-[0_12px_32px_rgba(0,0,0,0.5)]">
                     <Menu width={24} height={24} stroke="#000" />
                   </div>
                   <span className="absolute -top-1 right-0 flex h-3 w-3">
@@ -734,10 +737,11 @@ const CustomerLayout = () => {
               </button>
             </div>
           </div>
-          <div className="md:hidden flex items-center gap-2 overflow-x-auto no-scrollbar pb-3">
+          {/* Redesigned Mobile Header Action Row - Hidden on scroll down for better focus */}
+          <div className={`md:hidden flex items-center gap-2 overflow-x-auto no-scrollbar pb-3 transition-all duration-300 ${scrollDir === 'down' ? 'h-0 opacity-0 invisible overflow-hidden' : 'h-12 opacity-100 visible'}`}>
             <Link
               to={mobileAccountLink.path}
-              className="shrink-0 rounded-full bg-zoop-moss px-4 py-2 text-[11px] font-black uppercase tracking-[0.18em] text-zoop-obsidian"
+              className="shrink-0 rounded-full bg-zoop-moss px-4 py-2 text-[11px] font-black uppercase tracking-[0.18em] text-zoop-obsidian dark:text-white shadow-lg shadow-zoop-moss/20"
             >
               {mobileAccountLink.label}
             </Link>
@@ -746,10 +750,10 @@ const CustomerLayout = () => {
 
         {/* MOBILE FULL SCREEN SEARCH */}
         {isMobileSearchOpen && (
-          <div className="fixed inset-0 bg-white z-[9999] flex flex-col animate-in slide-in-from-right duration-300">
+          <div className="fixed inset-0 bg-white dark:glass-card z-[9999] flex flex-col animate-in slide-in-from-right duration-300">
             <form
               onSubmit={handleSearch}
-              className="p-4 flex items-center gap-3 bg-white border-b border-gray-100 shadow-sm"
+              className="p-4 flex items-center gap-3 bg-white dark:glass-card border-b border-gray-100 dark:border-white/10 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]"
             >
               <button
                 type="button"
@@ -758,7 +762,7 @@ const CustomerLayout = () => {
               >
                 <ChevronLeft width={24} height={24} />
               </button>
-              <div className="flex-1 flex bg-gray-100 rounded-xl overflow-hidden items-center group focus-within:ring-2 ring-zoop-moss/20 transition-all">
+              <div className="flex-1 flex bg-gray-100 dark:bg-white/10 rounded-xl overflow-hidden items-center group focus-within:ring-2 ring-zoop-moss/20 transition-all">
                 <div className="pl-3 text-gray-400">
                   <SearchIcon width={18} height={18} />
                 </div>
@@ -767,7 +771,7 @@ const CustomerLayout = () => {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search products, brands..."
-                  className="w-full px-3 py-3 bg-transparent text-zoop-obsidian text-base font-medium focus:outline-none placeholder:text-gray-400"
+                  className="w-full px-3 py-3 bg-transparent text-zoop-obsidian dark:text-white text-base font-medium focus:outline-none placeholder:text-gray-400"
                   autoFocus
                 />
                 {searchQuery && (
@@ -782,7 +786,7 @@ const CustomerLayout = () => {
               </div>
             </form>
 
-            <div className="flex-1 overflow-y-auto bg-gray-50 p-4">
+            <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-white/5 p-4">
               {/* Live Results */}
               {searchQuery.trim() !== "" ? (
                 <div className="space-y-3">
@@ -809,9 +813,9 @@ const CustomerLayout = () => {
                           setIsMobileSearchOpen(false);
                           setSearchQuery("");
                         }}
-                        className="flex items-center gap-4 bg-white p-3 rounded-xl border border-gray-100 shadow-sm active:scale-[0.98] transition-transform"
+                        className="flex items-center gap-4 bg-white dark:glass-card p-3 rounded-xl border border-gray-100 dark:border-white/10 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] active:scale-[0.98] transition-transform"
                       >
-                        <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                        <div className="w-16 h-16 bg-gray-100 dark:bg-white/10 rounded-lg overflow-hidden flex-shrink-0">
                           <img
                             src={product.thumbnailUrl || product.image}
                             alt={product.title || product.name}
@@ -819,14 +823,14 @@ const CustomerLayout = () => {
                           />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-bold text-zoop-obsidian text-sm line-clamp-1">
+                          <p className="font-bold text-zoop-obsidian dark:text-white text-sm line-clamp-1">
                             {product.title || product.name}
                           </p>
                           <p className="text-gray-500 text-xs mb-1">
                             {product.brand}
                           </p>
                           <div className="flex items-center gap-2">
-                            <span className="text-zoop-obsidian font-black text-sm">
+                            <span className="text-zoop-obsidian dark:text-white font-black text-sm">
                               {formatInrWithSymbol(product.price || 0, {
                                 maximumFractionDigits: 0,
                               })}
@@ -851,7 +855,7 @@ const CustomerLayout = () => {
                         .includes(searchQuery.toLowerCase()),
                   ).length === 0 && (
                     <div className="text-center py-12">
-                      <div className="bg-white inline-block p-4 rounded-full mb-3 shadow-sm">
+                      <div className="bg-white dark:glass-card inline-block p-4 rounded-full mb-3 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
                         <SearchIcon
                           width={32}
                           height={32}
@@ -877,7 +881,7 @@ const CustomerLayout = () => {
                     ).length > 0 && (
                       <button
                         onClick={handleSearch}
-                        className="w-full py-3 bg-white border border-gray-200 text-zoop-moss font-bold rounded-xl mt-4"
+                        className="w-full py-3 bg-white dark:glass-card border border-gray-200 dark:border-white/10 text-zoop-moss font-bold rounded-xl mt-4"
                       >
                         View All Results
                       </button>
@@ -890,19 +894,19 @@ const CustomerLayout = () => {
                   <div className="flex flex-wrap justify-center gap-2">
                     <button
                       onClick={() => setSearchQuery("Shoes")}
-                      className="px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-bold text-gray-600"
+                      className="px-4 py-2 bg-white dark:glass-card border border-gray-200 dark:border-white/10 rounded-full text-sm font-bold text-gray-600 dark:text-gray-400"
                     >
                       Shoes
                     </button>
                     <button
                       onClick={() => setSearchQuery("Watch")}
-                      className="px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-bold text-gray-600"
+                      className="px-4 py-2 bg-white dark:glass-card border border-gray-200 dark:border-white/10 rounded-full text-sm font-bold text-gray-600 dark:text-gray-400"
                     >
                       Watch
                     </button>
                     <button
                       onClick={() => setSearchQuery("Local")}
-                      className="px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-bold text-gray-600"
+                      className="px-4 py-2 bg-white dark:glass-card border border-gray-200 dark:border-white/10 rounded-full text-sm font-bold text-gray-600 dark:text-gray-400"
                     >
                       Local
                     </button>
@@ -923,16 +927,16 @@ const CustomerLayout = () => {
       />
 
       {/* --- SUB NAV --- */}
-      <nav className="bg-white border-b border-gray-200 shadow-sm z-30">
+      <nav className="bg-white dark:glass-card border-b border-gray-200 dark:border-white/10 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] z-30">
         <div className="max-w-[1400px] mx-auto px-4 py-3">
           <div className="flex gap-4 md:gap-8 items-center overflow-x-auto whitespace-nowrap no-scrollbar text-sm">
             <NavLink
               to="/products?type=Local"
               className={({ isActive }) =>
-                `flex items-center gap-2 px-4 py-2  md:text-sm shadow-md rounded-full font-black text-xs transition-all flex-shrink-0 ${
+                `flex items-center gap-2 px-4 py-2  md:text-sm shadow-md dark:shadow-[0_8px_24px_rgba(0,0,0,0.5)] rounded-full font-black text-xs transition-all flex-shrink-0 ${
                   isActive
                     ? "bg-zoop-obsidian text-white"
-                    : "bg-zoop-moss text-zoop-obsidian hover:bg-zoop-moss/60"
+                    : "bg-zoop-moss text-zoop-obsidian dark:text-white hover:bg-zoop-moss/60"
                 }`
               }
             >
@@ -1037,7 +1041,7 @@ const CustomerLayout = () => {
                   <img
                     src={brandLogoUrl}
                     alt={brandName}
-                    className="h-7 w-7 rounded object-cover bg-white"
+                    className="h-7 w-7 rounded object-cover bg-white dark:glass-card"
                   />
                 ) : null}
                 <span style={brandStyle}>{brandName}</span>

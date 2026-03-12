@@ -109,10 +109,10 @@ const IconShowcase = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-16">
-          <h1 className="text-5xl md:text-6xl font-black text-zoop-obsidian mb-4">
+          <h1 className="text-5xl md:text-6xl font-black text-zoop-obsidian dark:text-white mb-4">
             🎨 Animated Icon Library
           </h1>
-          <p className="text-xl text-gray-600 mb-2">
+          <p className="text-xl text-gray-600 dark:text-gray-400 mb-2">
             50+ Premium Animated Icons for Zoop Marketplace
           </p>
           <p className="text-lg text-gray-500">
@@ -122,28 +122,28 @@ const IconShowcase = () => {
 
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16">
-          <div className="bg-white rounded-2xl p-6 text-center shadow-sm">
+          <div className="bg-white dark:glass-card rounded-2xl p-6 text-center shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
             <div className="text-3xl font-black text-zoop-moss mb-2">50+</div>
-            <div className="text-sm text-gray-600">Total Icons</div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">Total Icons</div>
           </div>
-          <div className="bg-white rounded-2xl p-6 text-center shadow-sm">
+          <div className="bg-white dark:glass-card rounded-2xl p-6 text-center shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
             <div className="text-3xl font-black text-zoop-copper mb-2">100%</div>
-            <div className="text-sm text-gray-600">Animated</div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">Animated</div>
           </div>
-          <div className="bg-white rounded-2xl p-6 text-center shadow-sm">
+          <div className="bg-white dark:glass-card rounded-2xl p-6 text-center shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
             <div className="text-3xl font-black text-blue-600 mb-2">TypeScript</div>
-            <div className="text-sm text-gray-600">Type Safe</div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">Type Safe</div>
           </div>
-          <div className="bg-white rounded-2xl p-6 text-center shadow-sm">
+          <div className="bg-white dark:glass-card rounded-2xl p-6 text-center shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
             <div className="text-3xl font-black text-purple-600 mb-2">60fps</div>
-            <div className="text-sm text-gray-600">Performance</div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">Performance</div>
           </div>
         </div>
 
         {/* Icon Sections */}
         {iconSections.map((section, idx) => (
           <div key={idx} className="mb-12">
-            <h2 className="text-2xl font-black text-zoop-obsidian mb-6 flex items-center gap-3">
+            <h2 className="text-2xl font-black text-zoop-obsidian dark:text-white mb-6 flex items-center gap-3">
               <span className="w-2 h-8 bg-zoop-moss rounded-full"></span>
               {section.title}
             </h2>
@@ -153,13 +153,13 @@ const IconShowcase = () => {
                 return (
                   <div
                     key={iconIdx}
-                    className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 group"
+                    className="bg-white dark:glass-card rounded-2xl p-6 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] hover:shadow-xl transition-all duration-300 group"
                   >
                     <div className="flex flex-col items-center text-center">
-                      <div className="w-20 h-20 flex items-center justify-center mb-4 rounded-xl bg-gray-50 group-hover:bg-zoop-moss/10 transition-colors">
-                        <IconComponent width={40} height={40} stroke="currentColor" className="text-zoop-obsidian" />
+                      <div className="w-20 h-20 flex items-center justify-center mb-4 rounded-xl bg-gray-50 dark:bg-white/5 group-hover:bg-zoop-moss/10 transition-colors">
+                        <IconComponent width={40} height={40} stroke="currentColor" className="text-zoop-obsidian dark:text-white" />
                       </div>
-                      <h3 className="font-bold text-zoop-obsidian mb-2">{icon.name}</h3>
+                      <h3 className="font-bold text-zoop-obsidian dark:text-white mb-2">{icon.name}</h3>
                       <p className="text-xs text-gray-500">{icon.description}</p>
                     </div>
                   </div>
@@ -171,28 +171,28 @@ const IconShowcase = () => {
 
         {/* Features */}
         <div className="mt-16 bg-gradient-to-r from-zoop-moss/20 to-zoop-copper/20 rounded-2xl p-8">
-          <h2 className="text-2xl font-black text-zoop-obsidian mb-6 text-center">
+          <h2 className="text-2xl font-black text-zoop-obsidian dark:text-white mb-6 text-center">
             ✨ Key Features
           </h2>
           <div className="grid md:grid-cols-3 gap-6">
             <div className="bg-white/80 backdrop-blur rounded-xl p-6">
               <div className="text-3xl mb-3">🎯</div>
-              <h3 className="font-bold text-zoop-obsidian mb-2">Hover Activated</h3>
-              <p className="text-sm text-gray-600">
+              <h3 className="font-bold text-zoop-obsidian dark:text-white mb-2">Hover Activated</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
                 All animations trigger on hover for interactive feedback
               </p>
             </div>
             <div className="bg-white/80 backdrop-blur rounded-xl p-6">
               <div className="text-3xl mb-3">⚡</div>
-              <h3 className="font-bold text-zoop-obsidian mb-2">Lightweight</h3>
-              <p className="text-sm text-gray-600">
+              <h3 className="font-bold text-zoop-obsidian dark:text-white mb-2">Lightweight</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
                 CSS-based animations for optimal performance
               </p>
             </div>
             <div className="bg-white/80 backdrop-blur rounded-xl p-6">
               <div className="text-3xl mb-3">🎨</div>
-              <h3 className="font-bold text-zoop-obsidian mb-2">Creative</h3>
-              <p className="text-sm text-gray-600">
+              <h3 className="font-bold text-zoop-obsidian dark:text-white mb-2">Creative</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
                 Unique animations that communicate function
               </p>
             </div>
@@ -200,8 +200,8 @@ const IconShowcase = () => {
         </div>
 
         {/* Usage Example */}
-        <div className="mt-12 bg-white rounded-2xl p-8 shadow-sm">
-          <h2 className="text-2xl font-black text-zoop-obsidian mb-4">
+        <div className="mt-12 bg-white dark:glass-card rounded-2xl p-8 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
+          <h2 className="text-2xl font-black text-zoop-obsidian dark:text-white mb-4">
             💻 Usage Example
           </h2>
           <pre className="bg-gray-900 text-gray-100 rounded-xl p-6 overflow-x-auto">

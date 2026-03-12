@@ -145,17 +145,17 @@ const StoreSettings = () => {
 
   if (loading) {
     return (
-      <div className="min-h-[50vh] bg-gray-50 rounded-2xl border border-gray-100 flex items-center justify-center">
+      <div className="min-h-[50vh] bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/10 flex items-center justify-center">
         <p className="text-sm font-bold text-gray-500">Loading store settings...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-white/5 p-6">
       <div className="max-w-5xl mx-auto space-y-6">
         <div>
-          <h1 className="text-4xl font-900 tracking-tighter italic text-zoop-obsidian uppercase">
+          <h1 className="text-4xl font-900 tracking-tighter italic text-zoop-obsidian dark:text-white uppercase">
             Store_Settings
           </h1>
           <p className="text-gray-400 font-bold text-xs uppercase tracking-widest mt-1">
@@ -163,17 +163,17 @@ const StoreSettings = () => {
           </p>
         </div>
 
-        <div className="bg-white rounded-3xl p-6 md:p-8 border border-gray-100 shadow-sm space-y-6">
-          <h2 className="text-xl font-black text-zoop-obsidian">Notifications</h2>
+        <div className="bg-white dark:glass-card rounded-3xl p-6 md:p-8 border border-gray-100 dark:border-white/10 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] space-y-6">
+          <h2 className="text-xl font-black text-zoop-obsidian dark:text-white">Notifications</h2>
           {[
             { key: "orderNotifications", label: "Order Notifications", desc: "Get alerts for new and updated orders" },
             { key: "lowStockAlerts", label: "Low Stock Alerts", desc: "Get notified when inventory is running low" },
             { key: "customerMessages", label: "Customer Messages", desc: "Receive buyer message notifications" },
             { key: "weeklyReports", label: "Weekly Reports", desc: "Receive weekly business reports via email" },
           ].map((item) => (
-            <div key={item.key} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+            <div key={item.key} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 rounded-xl">
               <div>
-                <p className="font-bold text-zoop-obsidian">{item.label}</p>
+                <p className="font-bold text-zoop-obsidian dark:text-white">{item.label}</p>
                 <p className="text-sm text-gray-500">{item.desc}</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
@@ -183,17 +183,17 @@ const StoreSettings = () => {
                   onChange={() => handleToggle(item.key)}
                   className="sr-only peer"
                 />
-                <div className="w-14 h-7 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-zoop-moss" />
+                <div className="w-14 h-7 bg-gray-200 dark:bg-white/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-zoop-moss" />
               </label>
             </div>
           ))}
         </div>
 
-        <div className="bg-white rounded-3xl p-6 md:p-8 border border-gray-100 shadow-sm space-y-6">
-          <h2 className="text-xl font-black text-zoop-obsidian">Operations</h2>
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+        <div className="bg-white dark:glass-card rounded-3xl p-6 md:p-8 border border-gray-100 dark:border-white/10 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] space-y-6">
+          <h2 className="text-xl font-black text-zoop-obsidian dark:text-white">Operations</h2>
+          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 rounded-xl">
             <div>
-              <p className="font-bold text-zoop-obsidian">Vacation Mode</p>
+              <p className="font-bold text-zoop-obsidian dark:text-white">Vacation Mode</p>
               <p className="text-sm text-gray-500">
                 Temporarily pause store operations for new orders
               </p>
@@ -205,12 +205,12 @@ const StoreSettings = () => {
                 onChange={() => handleToggle("vacationMode")}
                 className="sr-only peer"
               />
-              <div className="w-14 h-7 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-zoop-moss" />
+              <div className="w-14 h-7 bg-gray-200 dark:bg-white/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-zoop-moss" />
             </label>
           </div>
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 rounded-xl">
             <div>
-              <p className="font-bold text-zoop-obsidian">Auto Restock Suggestions</p>
+              <p className="font-bold text-zoop-obsidian dark:text-white">Auto Restock Suggestions</p>
               <p className="text-sm text-gray-500">
                 Suggest restock actions based on order trends
               </p>
@@ -222,13 +222,13 @@ const StoreSettings = () => {
                 onChange={() => handleToggle("autoRestock")}
                 className="sr-only peer"
               />
-              <div className="w-14 h-7 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-zoop-moss" />
+              <div className="w-14 h-7 bg-gray-200 dark:bg-white/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-zoop-moss" />
             </label>
           </div>
         </div>
 
-        <div className="bg-white rounded-3xl p-6 md:p-8 border border-gray-100 shadow-sm space-y-6">
-          <h2 className="text-xl font-black text-zoop-obsidian">Payout Preference</h2>
+        <div className="bg-white dark:glass-card rounded-3xl p-6 md:p-8 border border-gray-100 dark:border-white/10 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] space-y-6">
+          <h2 className="text-xl font-black text-zoop-obsidian dark:text-white">Payout Preference</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <button
               type="button"
@@ -236,10 +236,10 @@ const StoreSettings = () => {
               className={`p-4 border rounded-xl text-left ${
                 form.payoutPreference === "bank_transfer"
                   ? "border-zoop-moss bg-zoop-moss/10"
-                  : "border-gray-200 bg-white"
+                  : "border-gray-200 dark:border-white/10 bg-white dark:glass-card"
               }`}
             >
-              <p className="font-black text-zoop-obsidian">Bank Transfer</p>
+              <p className="font-black text-zoop-obsidian dark:text-white">Bank Transfer</p>
               <p className="text-sm text-gray-500 mt-1">
                 Default method, uses bank details from seller profile
               </p>
@@ -250,10 +250,10 @@ const StoreSettings = () => {
               className={`p-4 border rounded-xl text-left ${
                 form.payoutPreference === "upi"
                   ? "border-zoop-moss bg-zoop-moss/10"
-                  : "border-gray-200 bg-white"
+                  : "border-gray-200 dark:border-white/10 bg-white dark:glass-card"
               }`}
             >
-              <p className="font-black text-zoop-obsidian">UPI</p>
+              <p className="font-black text-zoop-obsidian dark:text-white">UPI</p>
               <p className="text-sm text-gray-500 mt-1">Use UPI ID for payout reference records</p>
             </button>
           </div>
@@ -266,22 +266,22 @@ const StoreSettings = () => {
                 type="text"
                 value={form.upiId}
                 onChange={(e) => setForm((prev) => ({ ...prev, upiId: e.target.value }))}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-zoop-moss"
+                className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl outline-none focus:ring-2 focus:ring-zoop-moss"
                 placeholder="example@upi"
               />
             </div>
           )}
         </div>
 
-        <div className="bg-white rounded-3xl p-6 md:p-8 border border-gray-100 shadow-sm space-y-6">
-          <h2 className="text-xl font-black text-zoop-obsidian">Customer Contact Visibility</h2>
+        <div className="bg-white dark:glass-card rounded-3xl p-6 md:p-8 border border-gray-100 dark:border-white/10 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] space-y-6">
+          <h2 className="text-xl font-black text-zoop-obsidian dark:text-white">Customer Contact Visibility</h2>
           {[
             { key: "showPhoneOnProduct", label: "Show Phone on Product Page", desc: "Buyers can see your phone number in seller information when enabled" },
             { key: "showEmailOnProduct", label: "Show Email on Product Page", desc: "Buyers can see your support email in seller information when enabled" },
           ].map((item) => (
-            <div key={item.key} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+            <div key={item.key} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 rounded-xl">
               <div>
-                <p className="font-bold text-zoop-obsidian">{item.label}</p>
+                <p className="font-bold text-zoop-obsidian dark:text-white">{item.label}</p>
                 <p className="text-sm text-gray-500">{item.desc}</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
@@ -291,14 +291,14 @@ const StoreSettings = () => {
                   onChange={() => handleToggle(item.key)}
                   className="sr-only peer"
                 />
-                <div className="w-14 h-7 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-zoop-moss" />
+                <div className="w-14 h-7 bg-gray-200 dark:bg-white/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-zoop-moss" />
               </label>
             </div>
           ))}
         </div>
 
-        <div className="bg-white rounded-3xl p-6 md:p-8 border border-gray-100 shadow-sm space-y-6">
-          <h2 className="text-xl font-black text-zoop-obsidian">Same-Day Delivery Timing</h2>
+        <div className="bg-white dark:glass-card rounded-3xl p-6 md:p-8 border border-gray-100 dark:border-white/10 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] space-y-6">
+          <h2 className="text-xl font-black text-zoop-obsidian dark:text-white">Same-Day Delivery Timing</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">
@@ -315,7 +315,7 @@ const StoreSettings = () => {
                     sameDayCutoffHour: Number(e.target.value || 18),
                   }))
                 }
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-zoop-moss"
+                className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl outline-none focus:ring-2 focus:ring-zoop-moss"
               />
             </div>
             <div>
@@ -333,7 +333,7 @@ const StoreSettings = () => {
                     sameDayDeliveryWindowHours: Number(e.target.value || 4),
                   }))
                 }
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-zoop-moss"
+                className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl outline-none focus:ring-2 focus:ring-zoop-moss"
               />
             </div>
           </div>

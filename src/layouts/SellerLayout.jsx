@@ -18,7 +18,11 @@ import { LogOut } from "../assets/icons/LogOut";
 import { BellRing } from "../assets/icons/BellRing";
 import { Shield } from "../assets/icons/Shield";
 import { FileText } from "../assets/icons/FileText";
+import { apiClient } from "../api/client";
 import { useSiteConfig } from "../context/SiteConfigContext";
+import { useTheme } from "../context/ThemeContext";
+import { Moon } from "../assets/icons/Moon";
+import { Sun } from "../assets/icons/Sun";
 
 const SellerLayout = () => {
   const { user } = useUser();
@@ -26,6 +30,7 @@ const SellerLayout = () => {
   const [unreadNotifications, setUnreadNotifications] = useState(0);
   const navigate = useNavigate();
   const { siteConfig, replaceBrandText } = useSiteConfig();
+  const { isDarkMode, toggleTheme } = useTheme();
 
   useEffect(() => {
     let cancelled = false;
@@ -114,7 +119,7 @@ const SellerLayout = () => {
       <div className="md:hidden fixed top-0 left-0 right-0 p-4 z-50 pointer-events-none">
         <button
           onClick={() => setSidebarOpen(true)}
-          className="bg-zoop-obsidian text-white p-2 rounded-xl pointer-events-auto shadow-xl"
+          className="bg-zoop-obsidian text-white p-2 rounded-xl pointer-events-auto shadow-xl dark:shadow-[0_16px_48px_rgba(0,0,0,0.5)]"
         >
           <Menu width={24} height={24} stroke="white" />
         </button>
@@ -130,7 +135,7 @@ const SellerLayout = () => {
 
       {/* --- SIDEBAR --- */}
       <aside
-        className={`fixed top-0 left-0 h-screen w-72 bg-zoop-obsidian text-white p-8 z-50 transition-transform duration-300 md:translate-x-0 md:sticky md:top-0 shadow-2xl md:shadow-none flex flex-col ${
+        className={`fixed top-0 left-0 h-screen w-72 bg-zoop-obsidian text-white p-8 z-50 transition-transform duration-300 md:translate-x-0 md:sticky md:top-0 shadow-2xl dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)] md:shadow-none flex flex-col ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
         style={
@@ -145,7 +150,7 @@ const SellerLayout = () => {
               <img
                 src={siteConfig.brandLogoUrl}
                 alt="brand"
-                className="h-8 w-8 rounded object-cover bg-white"
+                className="h-8 w-8 rounded object-cover bg-white dark:glass-card"
               />
             ) : null}
             <h2 className="text-zoop-moss font-900 text-2xl tracking-tighter uppercase italic">
@@ -163,7 +168,7 @@ const SellerLayout = () => {
         {/* Seller info chip */}
         {user && (
           <div className="mb-6 px-4 py-3 bg-white/5 rounded-2xl flex items-center gap-3 shrink-0">
-            <div className="w-9 h-9 bg-zoop-moss rounded-full flex items-center justify-center text-zoop-obsidian font-black text-sm shrink-0">
+            <div className="w-9 h-9 bg-zoop-moss rounded-full flex items-center justify-center text-zoop-obsidian dark:text-white font-black text-sm shrink-0">
               {(user.displayName ||
                 user.name ||
                 user.email ||
@@ -196,7 +201,7 @@ const SellerLayout = () => {
               className={({ isActive }) =>
                 `px-5 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-3 shrink-0 ${
                   isActive
-                    ? "bg-zoop-moss text-zoop-obsidian shadow-[0_0_20px_rgba(183,232,75,0.3)] scale-105"
+                    ? "bg-zoop-moss text-zoop-obsidian dark:text-white shadow-[0_0_20px_rgba(183,232,75,0.3)] scale-105"
                     : "text-white/75 hover:text-white hover:bg-white/5"
                 }`
               }
@@ -214,6 +219,26 @@ const SellerLayout = () => {
             </NavLink>
           ))}
         </nav>
+        
+        {/* THEME TOGGLE */}
+        <div className="mt-4 px-2">
+          <button
+            onClick={toggleTheme}
+            className="w-full flex items-center justify-between px-5 py-4 rounded-2xl bg-white/5 hover:bg-white/10 transition-all text-[10px] font-black uppercase tracking-widest text-white/75 group"
+          >
+            <div className="flex items-center gap-3">
+              <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-zoop-moss text-zoop-obsidian' : 'bg-zoop-obsidian text-white'}`}>
+                {isDarkMode ? <Moon width={16} height={16} /> : <Sun width={16} height={16} />}
+              </div>
+              <span className="group-hover:translate-x-1 transition-transform">
+                {isDarkMode ? "Dark Theme" : "Light Theme"}
+              </span>
+            </div>
+            <div className={`w-10 h-5 rounded-full p-1 transition-colors ${isDarkMode ? 'bg-zoop-moss' : 'bg-white/20'}`}>
+              <div className={`w-3 h-3 rounded-full transition-transform duration-300 ${isDarkMode ? 'translate-x-5 bg-zoop-obsidian' : 'translate-x-0 bg-white'}`} />
+            </div>
+          </button>
+        </div>
 
         {/* Logout button at bottom */}
         <div className="mt-6 pt-6 border-t border-white/10 shrink-0">
@@ -229,19 +254,19 @@ const SellerLayout = () => {
 
       {/* --- MAIN CONTENT --- */}
       <main className="flex-1 w-full overflow-y-auto overscroll-contain p-4 pt-20 md:p-10 md:pt-10">
-        <div className="mb-4 flex items-center justify-between bg-white border border-gray-100 rounded-xl px-4 py-3 shadow-sm">
+        <div className="mb-4 flex items-center justify-between bg-white dark:glass-card border border-gray-100 dark:border-white/10 rounded-xl px-4 py-3 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
           <p className="text-xs font-black uppercase tracking-widest text-gray-500">
             Seller Workspace
           </p>
           <Link
             to="/seller/notifications"
-            className="relative inline-flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-gray-100 text-sm font-bold text-zoop-obsidian"
+            className="relative inline-flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-gray-100 text-sm font-bold text-zoop-obsidian dark:text-white"
             aria-label="Seller notifications"
           >
             <BellRing width={18} height={18} />
             <span className="hidden sm:inline">Notifications</span>
             {unreadNotifications > 0 && (
-              <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-zoop-moss text-zoop-obsidian text-[10px] font-black flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-zoop-moss text-zoop-obsidian dark:text-white text-[10px] font-black flex items-center justify-center">
                 {unreadNotifications > 9 ? "9+" : unreadNotifications}
               </span>
             )}

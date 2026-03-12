@@ -135,7 +135,7 @@ const Toast = ({ toast, onClose }) => {
     <div
       className={`
         pointer-events-auto
-        flex items-center gap-4 min-w-[320px] max-w-sm p-4 rounded-xl shadow-2xl border-l-[6px]
+        flex items-center gap-4 min-w-[320px] max-w-sm p-4 rounded-xl shadow-2xl dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)] border-l-[6px]
         backdrop-blur-md transition-all duration-400 ease-in-out transform
         ${style.bg} ${style.border}
         ${isExiting ? "translate-x-[120%] opacity-0" : "translate-x-0 opacity-100"}
@@ -153,7 +153,7 @@ const Toast = ({ toast, onClose }) => {
               toast.action.onClick?.();
               handleClose();
             }}
-            className="mt-2 text-xs bg-white text-zoop-obsidian px-3 py-1.5 rounded-md font-bold hover:bg-gray-100 transition-colors uppercase tracking-wider"
+            className="mt-2 text-xs bg-white dark:glass-card text-zoop-obsidian dark:text-white px-3 py-1.5 rounded-md font-bold hover:bg-gray-100 transition-colors uppercase tracking-wider"
           >
             {toast.action.label}
           </button>

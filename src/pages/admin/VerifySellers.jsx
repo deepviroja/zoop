@@ -147,7 +147,7 @@ const VerifySellers = () => {
 
   if (loading && sellers.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 p-6 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-white/5 p-6 flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-zoop-moss border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-500 font-bold">
@@ -159,12 +159,12 @@ const VerifySellers = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-white/5 p-6">
       <div className="max-w-[1400px] mx-auto space-y-6">
         {/* Header */}
         <div className="flex justify-between items-start">
           <div>
-            <h1 className="text-4xl font-black text-zoop-obsidian tracking-tight">
+            <h1 className="text-4xl font-black text-zoop-obsidian dark:text-white tracking-tight">
               Verify Sellers
             </h1>
             <p className="text-gray-500 mt-1 font-medium">
@@ -173,7 +173,7 @@ const VerifySellers = () => {
           </div>
           <button
             onClick={fetchSellers}
-            className="px-4 py-2 bg-white border border-gray-200 rounded-xl font-bold text-sm hover:bg-gray-50 transition-all flex items-center gap-2"
+            className="px-4 py-2 bg-white dark:glass-card border border-gray-200 dark:border-white/10 rounded-xl font-bold text-sm hover:bg-gray-50 transition-all flex items-center gap-2"
           >
             Refresh Data
           </button>
@@ -199,7 +199,7 @@ const VerifySellers = () => {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white rounded-[2rem] p-8 shadow-sm border border-gray-100 group hover:border-orange-200 transition-all">
+          <div className="bg-white dark:glass-card rounded-[2rem] p-8 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-white/10 group hover:border-orange-200 transition-all">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-400 text-xs font-black uppercase tracking-widest mb-2">
@@ -215,7 +215,7 @@ const VerifySellers = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-[2rem] p-8 shadow-sm border border-gray-100 group hover:border-green-200 transition-all">
+          <div className="bg-white dark:glass-card rounded-[2rem] p-8 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-white/10 group hover:border-green-200 transition-all">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-400 text-xs font-black uppercase tracking-widest mb-2">
@@ -231,7 +231,7 @@ const VerifySellers = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-[2rem] p-8 shadow-sm border border-gray-100 group hover:border-red-200 transition-all">
+          <div className="bg-white dark:glass-card rounded-[2rem] p-8 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-white/10 group hover:border-red-200 transition-all">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-400 text-xs font-black uppercase tracking-widest mb-2">
@@ -249,14 +249,14 @@ const VerifySellers = () => {
         </div>
 
         {/* Filter Tabs */}
-        <div className="bg-white rounded-2xl p-2 shadow-sm flex gap-2">
+        <div className="bg-white dark:glass-card rounded-2xl p-2 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] flex gap-2">
           {["pending", "approved", "rejected"].map((tab) => (
             <button
               key={tab}
               onClick={() => setFilter(tab)}
               className={`flex-1 py-4 px-6 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${
                 filter === tab
-                  ? "bg-zoop-obsidian text-white shadow-lg"
+                  ? "bg-zoop-obsidian text-white shadow-lg dark:shadow-[0_12px_32px_rgba(0,0,0,0.5)]"
                   : "text-gray-400 hover:bg-gray-50 hover:text-gray-600"
               }`}
             >
@@ -271,14 +271,14 @@ const VerifySellers = () => {
             filteredSellers.map((seller) => (
               <div
                 key={seller.id}
-                className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 hover:border-zoop-moss/30 transition-all"
+                className="bg-white dark:glass-card rounded-3xl p-8 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-white/10 hover:border-zoop-moss/30 transition-all"
               >
                 <div className="flex flex-col lg:flex-row gap-6">
                   {/* Left: Seller Info */}
                   <div className="flex-1">
                     <div className="flex items-start justify-between mb-4">
                       <div>
-                        <h3 className="text-xl font-black text-zoop-obsidian">
+                        <h3 className="text-xl font-black text-zoop-obsidian dark:text-white">
                           {seller.name}
                         </h3>
                         <p className="text-gray-500 text-sm mt-1">
@@ -340,7 +340,7 @@ const VerifySellers = () => {
                     </div>
 
                     {seller.status === "approved" && (
-                      <div className="flex items-center gap-4 pt-4 border-t border-gray-100">
+                      <div className="flex items-center gap-4 pt-4 border-t border-gray-100 dark:border-white/10">
                         <div className="flex items-center gap-1">
                           <Star
                             width={16}
@@ -353,7 +353,7 @@ const VerifySellers = () => {
                           </span>
                         </div>
                         <span className="text-gray-300">•</span>
-                        <span className="text-sm text-gray-600">
+                        <span className="text-sm text-gray-600 dark:text-gray-400">
                           {seller.productsCount} products
                         </span>
                       </div>
@@ -382,7 +382,7 @@ const VerifySellers = () => {
                           seller.documents.map((doc, i) => (
                             <div
                               key={i}
-                              className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                              className="flex items-center justify-between p-3 bg-gray-50 dark:bg-white/5 rounded-lg"
                             >
                               <div className="flex items-center gap-2">
                                 <FileText
@@ -412,7 +412,7 @@ const VerifySellers = () => {
                             </div>
                           ))
                         ) : (
-                          <p className="text-xs text-gray-400 italic p-3 bg-gray-50 rounded-lg">
+                          <p className="text-xs text-gray-400 italic p-3 bg-gray-50 dark:bg-white/5 rounded-lg">
                             No documents uploaded during signup
                           </p>
                         )}
@@ -463,9 +463,9 @@ const VerifySellers = () => {
               </div>
             ))
           ) : (
-            <div className="bg-white rounded-2xl p-12 text-center">
+            <div className="bg-white dark:glass-card rounded-2xl p-12 text-center">
               <div className="text-6xl mb-4">📋</div>
-              <h3 className="text-xl font-black text-zoop-obsidian mb-2">
+              <h3 className="text-xl font-black text-zoop-obsidian dark:text-white mb-2">
                 No {filter} sellers
               </h3>
               <p className="text-gray-500">
@@ -479,8 +479,8 @@ const VerifySellers = () => {
       {/* Reject reason modal */}
       {rejectModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full">
-            <h3 className="text-xl font-black text-zoop-obsidian mb-2">
+          <div className="bg-white dark:glass-card rounded-3xl shadow-2xl dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)] p-8 max-w-md w-full">
+            <h3 className="text-xl font-black text-zoop-obsidian dark:text-white mb-2">
               Reject Seller Application
             </h3>
             <p className="text-gray-500 text-sm mb-6">
@@ -491,14 +491,14 @@ const VerifySellers = () => {
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
               rows={4}
-              className="w-full border-2 border-gray-200 focus:border-red-400 rounded-xl px-4 py-3 font-medium outline-none transition-colors mb-6"
+              className="w-full border-2 border-gray-200 dark:border-white/10 focus:border-red-400 rounded-xl px-4 py-3 font-medium outline-none transition-colors mb-6"
               placeholder="e.g. Incomplete business documents, invalid GST number..."
               autoFocus
             />
             <div className="flex gap-3">
               <button
                 onClick={() => setRejectModal(null)}
-                className="flex-1 py-3 bg-gray-100 text-gray-600 rounded-xl font-black text-sm hover:bg-gray-200 transition-all"
+                className="flex-1 py-3 bg-gray-100 dark:bg-white/10 text-gray-600 dark:text-gray-400 rounded-xl font-black text-sm hover:bg-gray-200 transition-all"
               >
                 Cancel
               </button>

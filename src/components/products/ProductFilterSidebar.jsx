@@ -40,7 +40,7 @@ const ProductFilterSidebar = ({
   return (
     <aside
       className={`
-      lg:block lg:w-[19rem] xl:w-[20.5rem] flex-shrink-0 lg:sticky lg:z-30 transition-[top] duration-300 ${headerVisible ? "lg:top-46" : "lg:top-6"} h-fit
+      lg:block lg:w-[19rem] xl:w-[20.5rem] flex-shrink-0 lg:sticky lg:z-30 transition-[top] duration-300 ${headerVisible ? "lg:top-46" : "lg:top-46"} h-fit
       ${
         showFilters
           ? "fixed inset-0 bg-black/45 backdrop-blur-[2px] lg:relative lg:z-30 lg:bg-transparent lg:backdrop-blur-none"
@@ -51,12 +51,12 @@ const ProductFilterSidebar = ({
       <div className="space-y-5">
         <div
           ref={sidebarRef}
-          className="ml-auto flex h-full w-full max-w-[24rem] flex-col overflow-hidden bg-white px-4 pb-0 pt-4 shadow-xl lg:max-w-none lg:rounded-[1.75rem] lg:border lg:border-[#e7dfd4] lg:bg-white/95 lg:px-5 lg:pb-5 lg:pt-5 lg:shadow-[0_18px_42px_rgba(41,32,18,0.08)] lg:backdrop-blur-xl lg:max-h-[calc(100vh-7rem)] custom-scrollbar overflow-y-auto"
+          className="ml-auto flex h-full w-full max-w-[24rem] flex-col overflow-hidden bg-white dark:glass-card px-4 pb-0 pt-4 shadow-xl dark:shadow-[0_16px_48px_rgba(0,0,0,0.5)] lg:max-w-none lg:rounded-[1.75rem] lg:border lg:border-[#e7dfd4] lg:bg-white/95 lg:px-5 lg:pb-5 lg:pt-5 lg:shadow-[0_18px_42px_rgba(41,32,18,0.08)] lg:backdrop-blur-xl lg:max-h-[calc(100vh-7rem)] custom-scrollbar overflow-y-auto"
         >
           {/* Mobile Header */}
-          <div className="lg:hidden flex justify-between items-center border-b border-gray-100 pb-4 mb-4">
+          <div className="lg:hidden flex justify-between items-center border-b border-gray-100 dark:border-white/10 pb-4 mb-4">
             <div>
-              <h2 className="text-xl font-black text-zoop-obsidian">Filters</h2>
+              <h2 className="text-xl font-black text-zoop-obsidian dark:text-white">Filters</h2>
               <p className="text-xs font-medium text-gray-500">
                 Refine products without leaving the page
               </p>
@@ -64,7 +64,7 @@ const ProductFilterSidebar = ({
             <button
               onClick={() => setShowFilters(false)}
               aria-label="Close filters"
-              className="rounded-full border border-gray-200 p-2"
+              className="rounded-full border border-gray-200 dark:border-white/10 p-2"
             >
               <X width={24} height={24} />
             </button>
@@ -72,7 +72,7 @@ const ProductFilterSidebar = ({
 
           {/* Desktop Header */}
           <div className="hidden lg:flex justify-between items-center mb-6">
-            <h2 className="text-lg font-black text-zoop-obsidian uppercase tracking-wider">
+            <h2 className="text-lg font-black text-zoop-obsidian dark:text-white uppercase tracking-wider">
               Filters
             </h2>
             {activeFiltersCount > 0 && (
@@ -86,13 +86,13 @@ const ProductFilterSidebar = ({
             )}
           </div>
 
-          <div className="space-y-6 overflow-y-auto pb-6 pr-1 lg:flex-1 lg:pb-0">
+          <div className="space-y-6 overflow-y-auto custom-scrollbar pb-6 pr-1 lg:flex-1 lg:pb-0">
             {/* Category Filter - Collapsible */}
             <div>
               <button
                 onClick={() => toggleSection("category")}
                 aria-label={`${expandedSections.category ? "Collapse" : "Expand"} category filters`}
-                className="w-full flex justify-between items-center text-sm font-bold text-gray-700 uppercase tracking-wider mb-3 hover:text-zoop-obsidian transition-colors"
+                className="w-full flex justify-between items-center text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-3 hover:text-zoop-obsidian transition-colors"
               >
                 <span>Category</span>
                 <ChevronDown
@@ -155,11 +155,11 @@ const ProductFilterSidebar = ({
               )}
             </div>
 
-            <div className="border-t border-gray-200 pt-6">
+            <div className="border-t border-gray-200 dark:border-white/10 pt-6">
               <button
                 onClick={() => toggleSection("price")}
                 aria-label={`${expandedSections.price ? "Collapse" : "Expand"} price filters`}
-                className="w-full flex justify-between items-center text-sm font-bold text-gray-700 uppercase tracking-wider mb-3 hover:text-zoop-obsidian transition-colors"
+                className="w-full flex justify-between items-center text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-3 hover:text-zoop-obsidian transition-colors"
               >
                 <span>Price Range</span>
                 <ChevronDown
@@ -185,7 +185,7 @@ const ProductFilterSidebar = ({
                           ],
                         })
                       }
-                      className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-zoop-moss"
+                      className="w-full px-3 py-2 border border-gray-200 dark:border-white/10 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-zoop-moss"
                     />
                     <input
                       type="number"
@@ -200,7 +200,7 @@ const ProductFilterSidebar = ({
                           ],
                         })
                       }
-                      className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-zoop-moss"
+                      className="w-full px-3 py-2 border border-gray-200 dark:border-white/10 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-zoop-moss"
                     />
                   </div>
                   <input
@@ -235,11 +235,11 @@ const ProductFilterSidebar = ({
             </div>
 
             {/* Brand Filter */}
-            <div className="border-t border-gray-200 pt-6">
+            <div className="border-t border-gray-200 dark:border-white/10 pt-6">
               <button
                 onClick={() => toggleSection("brand")}
                 aria-label={`${expandedSections.brand ? "Collapse" : "Expand"} brand filters`}
-                className="w-full flex justify-between items-center text-sm font-bold text-gray-700 uppercase tracking-wider mb-3 hover:text-zoop-obsidian transition-colors"
+                className="w-full flex justify-between items-center text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-3 hover:text-zoop-obsidian transition-colors"
               >
                 <span>Brand</span>
                 <ChevronDown
@@ -272,11 +272,11 @@ const ProductFilterSidebar = ({
             </div>
 
             {/* Type Filter */}
-            <div className="border-t border-gray-200 pt-6">
+            <div className="border-t border-gray-200 dark:border-white/10 pt-6">
               <button
                 onClick={() => toggleSection("type")}
                 aria-label={`${expandedSections.type ? "Collapse" : "Expand"} delivery type filters`}
-                className="w-full flex justify-between items-center text-sm font-bold text-gray-700 uppercase tracking-wider mb-3 hover:text-zoop-obsidian transition-colors"
+                className="w-full flex justify-between items-center text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-3 hover:text-zoop-obsidian transition-colors"
               >
                 <span>Delivery Type</span>
                 <ChevronDown
@@ -335,11 +335,11 @@ const ProductFilterSidebar = ({
             </div>
 
             {/* Rating Filter */}
-            <div className="border-t border-gray-200 pt-6">
+            <div className="border-t border-gray-200 dark:border-white/10 pt-6">
               <button
                 onClick={() => toggleSection("rating")}
                 aria-label={`${expandedSections.rating ? "Collapse" : "Expand"} rating filters`}
-                className="w-full flex justify-between items-center text-sm font-bold text-gray-700 uppercase tracking-wider mb-3 hover:text-zoop-obsidian transition-colors"
+                className="w-full flex justify-between items-center text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-3 hover:text-zoop-obsidian transition-colors"
               >
                 <span>Customer Rating</span>
                 <ChevronDown
@@ -375,7 +375,7 @@ const ProductFilterSidebar = ({
             </div>
 
             {/* In Stock Filter */}
-            <div className="border-t border-gray-200 pt-6">
+            <div className="border-t border-gray-200 dark:border-white/10 pt-6">
               <label className="flex items-center gap-2 cursor-pointer group">
                 <input
                   type="checkbox"
@@ -396,7 +396,7 @@ const ProductFilterSidebar = ({
           </div>
 
           {/* Mobile Apply Button */}
-          <div className="lg:hidden sticky bottom-0 left-0 right-0 -mx-4 mt-auto border-t border-gray-100 bg-white px-4 py-4">
+          <div className="lg:hidden sticky bottom-0 left-0 right-0 -mx-4 mt-auto border-t border-gray-100 dark:border-white/10 bg-white dark:glass-card px-4 py-4">
             <div className="mb-3 flex items-center justify-between text-xs font-bold uppercase tracking-[0.18em] text-gray-500">
               <span>{activeFiltersCount} active filters</span>
               {activeFiltersCount > 0 && (
@@ -412,7 +412,7 @@ const ProductFilterSidebar = ({
             <button
               onClick={() => setShowFilters(false)}
               aria-label="Show filtered results"
-              className="w-full rounded-xl bg-zoop-moss py-3 font-black text-zoop-obsidian"
+              className="w-full rounded-xl bg-zoop-moss py-3 font-black text-zoop-obsidian dark:text-white"
             >
               Show Results
             </button>

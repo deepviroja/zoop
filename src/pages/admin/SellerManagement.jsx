@@ -96,11 +96,11 @@ const SellerManagement = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-white/5 p-6">
       <div className="max-w-[1600px] mx-auto space-y-6">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <h1 className="text-4xl font-900 tracking-tighter italic text-zoop-obsidian uppercase">
+            <h1 className="text-4xl font-900 tracking-tighter italic text-zoop-obsidian dark:text-white uppercase">
               Seller_Management
             </h1>
             <p className="text-gray-400 font-bold text-xs uppercase tracking-widest mt-1">
@@ -113,16 +113,16 @@ const SellerManagement = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search seller by name or email"
-              className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-zoop-moss outline-none"
+              className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:glass-card focus:ring-2 focus:ring-zoop-moss outline-none"
             />
           </div>
         </div>
 
-        <div className="bg-white rounded-3xl shadow-sm overflow-hidden">
+        <div className="bg-white dark:glass-card rounded-3xl shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] overflow-hidden">
           <div className="overflow-x-auto scrollbar-gap">
             <table className="w-full">
               <thead>
-                <tr className="bg-gray-50">
+                <tr className="bg-gray-50 dark:bg-white/5">
                   <th className="px-6 py-4 text-left text-[10px] font-black uppercase tracking-widest text-gray-400">Seller</th>
                   <th className="px-6 py-4 text-left text-[10px] font-black uppercase tracking-widest text-gray-400">Verification</th>
                   <th className="px-6 py-4 text-left text-[10px] font-black uppercase tracking-widest text-gray-400">Products</th>
@@ -154,7 +154,7 @@ const SellerManagement = () => {
                             <Store width={18} height={18} />
                           </div>
                           <div>
-                            <p className="font-bold text-zoop-obsidian">
+                            <p className="font-bold text-zoop-obsidian dark:text-white">
                               {seller.businessName || seller.displayName || seller.name || "Seller"}
                             </p>
                             <p className="text-xs text-gray-500">{seller.email || "-"}</p>
@@ -163,13 +163,13 @@ const SellerManagement = () => {
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex flex-wrap gap-2">
-                          <span className="px-3 py-1 rounded-full text-xs font-black uppercase bg-gray-100 text-gray-700">
+                          <span className="px-3 py-1 rounded-full text-xs font-black uppercase bg-gray-100 dark:bg-white/10 text-gray-700 dark:text-gray-300">
                             {seller.verificationStatus || "pending"}
                           </span>
                           <span
                             className={`px-3 py-1 rounded-full text-xs font-black uppercase ${
                               sellerStateLabel(seller) === "deleted"
-                                ? "bg-gray-200 text-gray-700"
+                                ? "bg-gray-200 dark:bg-white/20 text-gray-700 dark:text-gray-300"
                                 : sellerStateLabel(seller) === "pending"
                                   ? "bg-sky-100 text-sky-700"
                                 : sellerStateLabel(seller) === "banned"
@@ -182,13 +182,13 @@ const SellerManagement = () => {
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="inline-flex items-center gap-2 text-sm font-bold text-zoop-obsidian">
+                        <div className="inline-flex items-center gap-2 text-sm font-bold text-zoop-obsidian dark:text-white">
                           <Package width={14} height={14} />
                           {Number(seller.productsCount || 0)}
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="inline-flex items-center gap-2 text-sm font-bold text-zoop-obsidian">
+                        <div className="inline-flex items-center gap-2 text-sm font-bold text-zoop-obsidian dark:text-white">
                           <ShoppingCart width={14} height={14} />
                           {Number(seller.totalOrders || 0)}
                         </div>
@@ -196,7 +196,7 @@ const SellerManagement = () => {
                       <td className="px-6 py-4 font-black text-zoop-moss">
                         Rs. {fmtInr(seller.totalRevenue)}
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">
+                      <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
                         {fmtDateTime(seller.lastOrderAt)}
                       </td>
                       <td className="px-6 py-4">
@@ -237,9 +237,9 @@ const SellerManagement = () => {
 
         {selectedSeller && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-3xl p-8 max-w-3xl w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="bg-white dark:glass-card rounded-3xl p-8 max-w-3xl w-full shadow-2xl dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)] max-h-[90vh] overflow-y-auto">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-2xl font-black text-zoop-obsidian">Seller Details</h3>
+                <h3 className="text-2xl font-black text-zoop-obsidian dark:text-white">Seller Details</h3>
                 <button
                   onClick={() => setSelectedSeller(null)}
                   className="p-2 hover:bg-gray-100 rounded-lg transition-all"
@@ -249,59 +249,59 @@ const SellerManagement = () => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-4 bg-gray-50 rounded-xl">
+                <div className="p-4 bg-gray-50 dark:bg-white/5 rounded-xl">
                   <p className="text-xs text-gray-500 font-bold uppercase">Business Name</p>
-                  <p className="font-black text-zoop-obsidian mt-1">
+                  <p className="font-black text-zoop-obsidian dark:text-white mt-1">
                     {selectedSeller.businessName || selectedSeller.displayName || "-"}
                   </p>
                 </div>
-                <div className="p-4 bg-gray-50 rounded-xl">
+                <div className="p-4 bg-gray-50 dark:bg-white/5 rounded-xl">
                   <p className="text-xs text-gray-500 font-bold uppercase">Owner</p>
-                  <p className="font-black text-zoop-obsidian mt-1">{selectedSeller.ownerName || "-"}</p>
+                  <p className="font-black text-zoop-obsidian dark:text-white mt-1">{selectedSeller.ownerName || "-"}</p>
                 </div>
-                <div className="p-4 bg-gray-50 rounded-xl">
+                <div className="p-4 bg-gray-50 dark:bg-white/5 rounded-xl">
                   <p className="text-xs text-gray-500 font-bold uppercase">Email</p>
-                  <p className="font-black text-zoop-obsidian mt-1">{selectedSeller.email || "-"}</p>
+                  <p className="font-black text-zoop-obsidian dark:text-white mt-1">{selectedSeller.email || "-"}</p>
                 </div>
-                <div className="p-4 bg-gray-50 rounded-xl">
+                <div className="p-4 bg-gray-50 dark:bg-white/5 rounded-xl">
                   <p className="text-xs text-gray-500 font-bold uppercase">Phone</p>
-                  <p className="font-black text-zoop-obsidian mt-1">{selectedSeller.phone || "-"}</p>
+                  <p className="font-black text-zoop-obsidian dark:text-white mt-1">{selectedSeller.phone || "-"}</p>
                 </div>
-                <div className="p-4 bg-gray-50 rounded-xl">
+                <div className="p-4 bg-gray-50 dark:bg-white/5 rounded-xl">
                   <p className="text-xs text-gray-500 font-bold uppercase">Joined At</p>
-                  <p className="font-black text-zoop-obsidian mt-1">{fmtDateTime(selectedSeller.joinedAt)}</p>
+                  <p className="font-black text-zoop-obsidian dark:text-white mt-1">{fmtDateTime(selectedSeller.joinedAt)}</p>
                 </div>
-                <div className="p-4 bg-gray-50 rounded-xl">
+                <div className="p-4 bg-gray-50 dark:bg-white/5 rounded-xl">
                   <p className="text-xs text-gray-500 font-bold uppercase">Last Login</p>
-                  <p className="font-black text-zoop-obsidian mt-1">{fmtDateTime(selectedSeller.lastLoginAt)}</p>
+                  <p className="font-black text-zoop-obsidian dark:text-white mt-1">{fmtDateTime(selectedSeller.lastLoginAt)}</p>
                 </div>
-                <div className="p-4 bg-gray-50 rounded-xl">
+                <div className="p-4 bg-gray-50 dark:bg-white/5 rounded-xl">
                   <p className="text-xs text-gray-500 font-bold uppercase">Account Status</p>
-                  <p className="font-black text-zoop-obsidian mt-1">{sellerStateLabel(selectedSeller)}</p>
+                  <p className="font-black text-zoop-obsidian dark:text-white mt-1">{sellerStateLabel(selectedSeller)}</p>
                 </div>
-                <div className="p-4 bg-gray-50 rounded-xl">
+                <div className="p-4 bg-gray-50 dark:bg-white/5 rounded-xl">
                   <p className="text-xs text-gray-500 font-bold uppercase">Last Product Added</p>
-                  <p className="font-black text-zoop-obsidian mt-1">{fmtDateTime(selectedSeller.lastProductAt)}</p>
+                  <p className="font-black text-zoop-obsidian dark:text-white mt-1">{fmtDateTime(selectedSeller.lastProductAt)}</p>
                 </div>
-                <div className="p-4 bg-gray-50 rounded-xl">
+                <div className="p-4 bg-gray-50 dark:bg-white/5 rounded-xl">
                   <p className="text-xs text-gray-500 font-bold uppercase">Last Order</p>
-                  <p className="font-black text-zoop-obsidian mt-1">{fmtDateTime(selectedSeller.lastOrderAt)}</p>
+                  <p className="font-black text-zoop-obsidian dark:text-white mt-1">{fmtDateTime(selectedSeller.lastOrderAt)}</p>
                 </div>
-                <div className="p-4 bg-gray-50 rounded-xl">
+                <div className="p-4 bg-gray-50 dark:bg-white/5 rounded-xl">
                   <p className="text-xs text-gray-500 font-bold uppercase">Total Products</p>
-                  <p className="font-black text-zoop-obsidian mt-1">{selectedSeller.productsCount || 0}</p>
+                  <p className="font-black text-zoop-obsidian dark:text-white mt-1">{selectedSeller.productsCount || 0}</p>
                 </div>
-                <div className="p-4 bg-gray-50 rounded-xl">
+                <div className="p-4 bg-gray-50 dark:bg-white/5 rounded-xl">
                   <p className="text-xs text-gray-500 font-bold uppercase">Total Orders</p>
-                  <p className="font-black text-zoop-obsidian mt-1">{selectedSeller.totalOrders || 0}</p>
+                  <p className="font-black text-zoop-obsidian dark:text-white mt-1">{selectedSeller.totalOrders || 0}</p>
                 </div>
-                <div className="p-4 bg-gray-50 rounded-xl md:col-span-2">
+                <div className="p-4 bg-gray-50 dark:bg-white/5 rounded-xl md:col-span-2">
                   <p className="text-xs text-gray-500 font-bold uppercase">Total Revenue</p>
                   <p className="font-black text-zoop-moss text-xl mt-1">
                     Rs. {fmtInr(selectedSeller.totalRevenue)}
                   </p>
                 </div>
-                <div className="p-4 bg-gray-50 rounded-xl md:col-span-2">
+                <div className="p-4 bg-gray-50 dark:bg-white/5 rounded-xl md:col-span-2">
                   <p className="text-xs text-gray-500 font-bold uppercase mb-2">Uploaded Documents</p>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm">
                     {[
@@ -319,8 +319,8 @@ const SellerManagement = () => {
                         }}
                         className={`px-3 py-2 rounded-lg border font-bold ${
                           doc.url
-                            ? "bg-white border-gray-200 text-zoop-obsidian hover:border-zoop-moss"
-                            : "bg-gray-100 border-gray-100 text-gray-400 cursor-not-allowed"
+                            ? "bg-white dark:glass-card border-gray-200 dark:border-white/10 text-zoop-obsidian dark:text-white hover:border-zoop-moss"
+                            : "bg-gray-100 dark:bg-white/10 border-gray-100 dark:border-white/10 text-gray-400 cursor-not-allowed"
                         }`}
                       >
                         {doc.label}

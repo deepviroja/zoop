@@ -47,8 +47,8 @@ const NetworkStatusToast = () => {
       }`}
     >
       {status === "offline" && (
-        <div className="flex items-center gap-3 px-6 py-4 bg-red-600 text-white rounded-2xl shadow-2xl border border-red-500 max-w-sm">
-          <div className="w-2.5 h-2.5 rounded-full bg-white animate-pulse flex-shrink-0" />
+        <div className="flex items-center gap-3 px-6 py-4 bg-red-600 text-white rounded-2xl shadow-2xl dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)] border border-red-500 max-w-sm">
+          <div className="w-2.5 h-2.5 rounded-full bg-white dark:glass-card animate-pulse flex-shrink-0" />
           <div>
             <p className="font-black text-sm">No Internet Connection</p>
             <p className="text-xs text-red-200 mt-0.5">
@@ -65,8 +65,8 @@ const NetworkStatusToast = () => {
       )}
 
       {status === "back-online" && (
-        <div className="flex items-center gap-3 px-6 py-4 bg-green-600 text-white rounded-2xl shadow-2xl border border-green-500 max-w-sm">
-          <div className="w-2.5 h-2.5 rounded-full bg-white flex-shrink-0" />
+        <div className="flex items-center gap-3 px-6 py-4 bg-green-600 text-white rounded-2xl shadow-2xl dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)] border border-green-500 max-w-sm">
+          <div className="w-2.5 h-2.5 rounded-full bg-white dark:glass-card flex-shrink-0" />
           <div>
             <p className="font-black text-sm">Back Online!</p>
             <p className="text-xs text-green-200 mt-0.5">

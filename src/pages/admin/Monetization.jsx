@@ -115,9 +115,9 @@ const Monetization = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6 space-y-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-white/5 p-6 space-y-6">
       <div>
-        <h1 className="text-4xl font-900 tracking-tighter italic text-zoop-obsidian uppercase">
+        <h1 className="text-4xl font-900 tracking-tighter italic text-zoop-obsidian dark:text-white uppercase">
           Monetization Hub
         </h1>
         <p className="text-gray-500 mt-1">
@@ -149,15 +149,15 @@ const Monetization = () => {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-6 gap-4">
-        <div className="bg-white rounded-2xl p-5 border border-gray-100">
+        <div className="bg-white dark:glass-card rounded-2xl p-5 border border-gray-100 dark:border-white/10">
           <p className="text-xs font-black uppercase tracking-widest text-gray-400">
             Total Revenue
           </p>
-          <p className={`${amountCardClass} text-zoop-obsidian`}>
+          <p className={`${amountCardClass} text-zoop-obsidian dark:text-white`}>
             {fmtInr(overview?.totals?.totalRevenue, { compact: true })}
           </p>
         </div>
-        <div className="bg-white rounded-2xl p-5 border border-gray-100">
+        <div className="bg-white dark:glass-card rounded-2xl p-5 border border-gray-100 dark:border-white/10">
           <p className="text-xs font-black uppercase tracking-widest text-gray-400">
             Total Commission
           </p>
@@ -165,7 +165,7 @@ const Monetization = () => {
             {fmtInr(overview?.totals?.totalCommission, { compact: true })}
           </p>
         </div>
-        <div className="bg-white rounded-2xl p-5 border border-gray-100">
+        <div className="bg-white dark:glass-card rounded-2xl p-5 border border-gray-100 dark:border-white/10">
           <p className="text-xs font-black uppercase tracking-widest text-gray-400">
             Pending Transfer
           </p>
@@ -173,7 +173,7 @@ const Monetization = () => {
             {fmtInr(overview?.totals?.pendingTransfer, { compact: true })}
           </p>
         </div>
-        <div className="bg-white rounded-2xl p-5 border border-gray-100">
+        <div className="bg-white dark:glass-card rounded-2xl p-5 border border-gray-100 dark:border-white/10">
           <p className="text-xs font-black uppercase tracking-widest text-gray-400">
             Awaiting Settlement
           </p>
@@ -181,7 +181,7 @@ const Monetization = () => {
             {fmtInr(overview?.totals?.awaitingSettlement, { compact: true })}
           </p>
         </div>
-        <div className="bg-white rounded-2xl p-5 border border-gray-100">
+        <div className="bg-white dark:glass-card rounded-2xl p-5 border border-gray-100 dark:border-white/10">
           <p className="text-xs font-black uppercase tracking-widest text-gray-400">
             On Hold
           </p>
@@ -189,7 +189,7 @@ const Monetization = () => {
             {fmtInr(overview?.totals?.onHold, { compact: true })}
           </p>
         </div>
-        <div className="bg-white rounded-2xl p-5 border border-gray-100">
+        <div className="bg-white dark:glass-card rounded-2xl p-5 border border-gray-100 dark:border-white/10">
           <p className="text-xs font-black uppercase tracking-widest text-gray-400">
             Transferred
           </p>
@@ -199,9 +199,9 @@ const Monetization = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-3xl border border-gray-100 p-6">
+      <div className="bg-white dark:glass-card rounded-3xl border border-gray-100 dark:border-white/10 p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-black text-zoop-obsidian">
+          <h2 className="text-2xl font-black text-zoop-obsidian dark:text-white">
             Commission Structure
           </h2>
           <button
@@ -211,7 +211,7 @@ const Monetization = () => {
                 { categoryId: "", categoryName: "", commissionPercent: 0 },
               ])
             }
-            className="px-4 py-2 bg-gray-100 rounded-lg font-black text-xs uppercase"
+            className="px-4 py-2 bg-gray-100 dark:bg-white/10 rounded-lg font-black text-xs uppercase"
           >
             Add Row
           </button>
@@ -231,7 +231,7 @@ const Monetization = () => {
                     ),
                   )
                 }
-                className="px-3 py-2 border border-gray-200 rounded-xl"
+                className="px-3 py-2 border border-gray-200 dark:border-white/10 rounded-xl"
                 placeholder="category id (e.g. electronics)"
               />
               <input
@@ -243,7 +243,7 @@ const Monetization = () => {
                     ),
                   )
                 }
-                className="px-3 py-2 border border-gray-200 rounded-xl"
+                className="px-3 py-2 border border-gray-200 dark:border-white/10 rounded-xl"
                 placeholder="category name"
               />
               <input
@@ -261,7 +261,7 @@ const Monetization = () => {
                     ),
                   )
                 }
-                className="px-3 py-2 border border-gray-200 rounded-xl"
+                className="px-3 py-2 border border-gray-200 dark:border-white/10 rounded-xl"
                 placeholder="commission %"
               />
               <button
@@ -284,10 +284,10 @@ const Monetization = () => {
         </button>
       </div>
 
-      <div className="bg-white rounded-3xl border border-gray-100 p-6">
+      <div className="bg-white dark:glass-card rounded-3xl border border-gray-100 dark:border-white/10 p-6">
         <div className="flex items-center justify-between gap-3 mb-4">
           <div>
-            <h2 className="text-2xl font-black text-zoop-obsidian">
+            <h2 className="text-2xl font-black text-zoop-obsidian dark:text-white">
               Offers & Coupons
             </h2>
             <p className="text-sm text-gray-500">
@@ -301,7 +301,7 @@ const Monetization = () => {
             onChange={(e) =>
               setOfferDraft((p) => ({ ...p, title: e.target.value }))
             }
-            className="px-3 py-2 border border-gray-200 rounded-xl"
+            className="px-3 py-2 border border-gray-200 dark:border-white/10 rounded-xl"
             placeholder="Offer title"
           />
           <input
@@ -312,7 +312,7 @@ const Monetization = () => {
                 code: e.target.value.toUpperCase(),
               }))
             }
-            className="px-3 py-2 border border-gray-200 rounded-xl"
+            className="px-3 py-2 border border-gray-200 dark:border-white/10 rounded-xl"
             placeholder="Coupon code"
           />
           <input
@@ -320,7 +320,7 @@ const Monetization = () => {
             onChange={(e) =>
               setOfferDraft((p) => ({ ...p, description: e.target.value }))
             }
-            className="px-3 py-2 border border-gray-200 rounded-xl md:col-span-2"
+            className="px-3 py-2 border border-gray-200 dark:border-white/10 rounded-xl md:col-span-2"
             placeholder="Short description"
           />
           <select
@@ -328,7 +328,7 @@ const Monetization = () => {
             onChange={(e) =>
               setOfferDraft((p) => ({ ...p, type: e.target.value }))
             }
-            className="px-3 py-2 border border-gray-200 rounded-xl"
+            className="px-3 py-2 border border-gray-200 dark:border-white/10 rounded-xl"
           >
             <option value="coupon">Coupon</option>
             <option value="offer">Offer</option>
@@ -338,7 +338,7 @@ const Monetization = () => {
             onChange={(e) =>
               setOfferDraft((p) => ({ ...p, discountType: e.target.value }))
             }
-            className="px-3 py-2 border border-gray-200 rounded-xl"
+            className="px-3 py-2 border border-gray-200 dark:border-white/10 rounded-xl"
           >
             <option value="percent">Percent</option>
             <option value="flat">Flat</option>
@@ -352,7 +352,7 @@ const Monetization = () => {
                 discountValue: Number(e.target.value || 0),
               }))
             }
-            className="px-3 py-2 border border-gray-200 rounded-xl"
+            className="px-3 py-2 border border-gray-200 dark:border-white/10 rounded-xl"
             placeholder="Discount value"
           />
           <input
@@ -364,7 +364,7 @@ const Monetization = () => {
                 minOrderAmount: Number(e.target.value || 0),
               }))
             }
-            className="px-3 py-2 border border-gray-200 rounded-xl"
+            className="px-3 py-2 border border-gray-200 dark:border-white/10 rounded-xl"
             placeholder="Minimum order amount"
           />
           <input
@@ -376,7 +376,7 @@ const Monetization = () => {
                 maxDiscountAmount: Number(e.target.value || 0),
               }))
             }
-            className="px-3 py-2 border border-gray-200 rounded-xl"
+            className="px-3 py-2 border border-gray-200 dark:border-white/10 rounded-xl"
             placeholder="Max discount amount"
           />
           <select
@@ -384,7 +384,7 @@ const Monetization = () => {
             onChange={(e) =>
               setOfferDraft((p) => ({ ...p, scope: e.target.value }))
             }
-            className="px-3 py-2 border border-gray-200 rounded-xl"
+            className="px-3 py-2 border border-gray-200 dark:border-white/10 rounded-xl"
           >
             <option value="order">Order</option>
             <option value="shipping">Shipping</option>
@@ -424,11 +424,11 @@ const Monetization = () => {
           {offers.map((offer) => (
             <div
               key={offer.id}
-              className="rounded-2xl border border-gray-100 bg-gray-50 p-4"
+              className="rounded-2xl border border-gray-100 dark:border-white/10 bg-gray-50 dark:bg-white/5 p-4"
             >
               <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                 <div>
-                  <p className="font-black text-zoop-obsidian">
+                  <p className="font-black text-zoop-obsidian dark:text-white">
                     {offer.title} {offer.code ? `(${offer.code})` : ""}
                   </p>
                   <p className="text-sm text-gray-500">{offer.description}</p>
@@ -457,7 +457,7 @@ const Monetization = () => {
                         setError(e?.message || "Could not update offer");
                       }
                     }}
-                    className={`px-4 py-2 rounded-xl text-xs font-black uppercase ${offer.active ? "bg-green-50 text-green-700" : "bg-gray-200 text-gray-700"}`}
+                    className={`px-4 py-2 rounded-xl text-xs font-black uppercase ${offer.active ? "bg-green-50 text-green-700" : "bg-gray-200 dark:bg-white/20 text-gray-700 dark:text-gray-300"}`}
                   >
                     {offer.active ? "Active" : "Inactive"}
                   </button>
@@ -468,11 +468,11 @@ const Monetization = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-3xl border border-gray-100 overflow-hidden">
-        <div className="p-6 border-b border-gray-100">
+      <div className="bg-white dark:glass-card rounded-3xl border border-gray-100 dark:border-white/10 overflow-hidden">
+        <div className="p-6 border-b border-gray-100 dark:border-white/10">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <h2 className="text-2xl font-black text-zoop-obsidian">
+              <h2 className="text-2xl font-black text-zoop-obsidian dark:text-white">
                 Seller Payouts
               </h2>
               <p className="mt-1 text-sm text-gray-500">
@@ -493,7 +493,7 @@ const Monetization = () => {
                   className={`rounded-full px-4 py-2 text-xs font-black uppercase tracking-wider ${
                     payoutStatusFilter === tab.id
                       ? "bg-zoop-obsidian text-white"
-                      : "bg-gray-100 text-gray-600"
+                      : "bg-gray-100 dark:bg-white/10 text-gray-600 dark:text-gray-400"
                   }`}
                 >
                   {tab.label}
@@ -509,7 +509,7 @@ const Monetization = () => {
         ) : (
           <div className="overflow-x-auto scrollbar-gap">
             <table className="w-full">
-              <thead className="bg-gray-50">
+              <thead className="bg-gray-50 dark:bg-white/5">
                 <tr>
                   {[
                     "Payout ID",
@@ -535,33 +535,33 @@ const Monetization = () => {
                 {visiblePayouts.map((p) => (
                   <tr key={p.id}>
                     <td className="px-6 py-4">
-                      <p className="font-bold text-zoop-obsidian">{p.id}</p>
+                      <p className="font-bold text-zoop-obsidian dark:text-white">{p.id}</p>
                       {p.transferRef && (
                         <p className="text-xs text-gray-500">{p.transferRef}</p>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
-                      <p className="font-bold text-zoop-obsidian">
+                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
+                      <p className="font-bold text-zoop-obsidian dark:text-white">
                         {p.sellerName || p.sellerId}
                       </p>
                       <p className="text-xs text-gray-500">{p.sellerId}</p>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
-                      <p className="font-bold text-zoop-obsidian">
+                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
+                      <p className="font-bold text-zoop-obsidian dark:text-white">
                         {p.customer?.name || "-"}
                       </p>
                       <p className="text-xs text-gray-500">
                         {p.customer?.email || "-"}
                       </p>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
-                      <p className="font-bold text-zoop-obsidian">
+                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
+                      <p className="font-bold text-zoop-obsidian dark:text-white">
                         {p.displayOrderId || p.orderId}
                       </p>
                       <p className="text-xs text-gray-500">{p.orderId}</p>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
-                      <p className="font-bold text-zoop-obsidian">
+                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
+                      <p className="font-bold text-zoop-obsidian dark:text-white">
                         {p.productTitle || p.productId}
                       </p>
                       <p className="text-xs text-gray-500">{p.productId}</p>

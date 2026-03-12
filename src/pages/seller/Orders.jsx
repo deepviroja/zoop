@@ -54,7 +54,7 @@ const Orders = () => {
       {/* --- HEADER & FILTERS --- */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
         <div>
-          <h2 className="text-4xl font-900 tracking-tighter italic text-zoop-obsidian uppercase">
+          <h2 className="text-4xl font-900 tracking-tighter italic text-zoop-obsidian dark:text-white uppercase">
             Orders
           </h2>
           <p className="text-gray-400 font-bold text-xs uppercase tracking-widest mt-1">
@@ -62,7 +62,7 @@ const Orders = () => {
           </p>
         </div>
 
-        <div className="flex bg-zoop-canvas p-1 rounded-2xl border border-gray-100">
+        <div className="flex bg-zoop-canvas p-1 rounded-2xl border border-gray-100 dark:border-white/10">
           {[
             { key: "active", label: `Active (${activeOrders.length})` },
             {
@@ -76,7 +76,7 @@ const Orders = () => {
               onClick={() => setFilter(tab.key)}
               className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
                 filter === tab.key
-                  ? "bg-white shadow-sm text-zoop-obsidian"
+                  ? "bg-white dark:glass-card shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] text-zoop-obsidian dark:text-white"
                   : "text-gray-400"
               }`}
             >
@@ -107,18 +107,18 @@ const Orders = () => {
             displayed.map((order) => {
               const statusLower = (order.status || "pending").toLowerCase();
               const badgeClass =
-                statusColors[statusLower] || "bg-gray-100 text-gray-600";
+                statusColors[statusLower] || "bg-gray-100 dark:bg-white/10 text-gray-600 dark:text-gray-400";
 
               return (
                 <div
                   key={order.id || order._id}
-                  className="group p-8 rounded-[2rem] border-2 bg-white border-gray-100 shadow-sm hover:border-zoop-moss/30 hover:shadow-xl transition-all"
+                  className="group p-8 rounded-[2rem] border-2 bg-white dark:glass-card border-gray-100 dark:border-white/10 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] hover:border-zoop-moss/30 hover:shadow-xl transition-all"
                 >
                   <div className="flex flex-col lg:flex-row justify-between gap-6">
                     {/* Left: Order Info */}
                     <div className="flex-1 space-y-4">
                       <div className="flex items-center gap-3 flex-wrap">
-                        <h3 className="font-900 text-xl text-zoop-obsidian tracking-tighter italic">
+                        <h3 className="font-900 text-xl text-zoop-obsidian dark:text-white tracking-tighter italic">
                           Order #{order.id || order._id}
                         </h3>
                         <span
@@ -133,7 +133,7 @@ const Orders = () => {
                         {(order.items || []).map((item, i) => (
                           <p
                             key={i}
-                            className="text-sm font-bold text-zoop-obsidian"
+                            className="text-sm font-bold text-zoop-obsidian dark:text-white"
                           >
                             {item.name || item.productName} × {item.quantity}
                           </p>
@@ -148,7 +148,7 @@ const Orders = () => {
                       {order.customer && (
                         <p className="text-xs font-medium text-gray-400">
                           Customer:{" "}
-                          <span className="text-zoop-obsidian font-bold">
+                          <span className="text-zoop-obsidian dark:text-white font-bold">
                             {order.customer?.name || order.customerName || "—"}
                           </span>
                           {order.createdAt && (
@@ -181,7 +181,7 @@ const Orders = () => {
                     {/* Right: Amount */}
                     <div className="flex flex-col justify-between items-end gap-4 min-w-[160px]">
                       <div className="text-right">
-                        <p className="text-2xl font-900 text-zoop-obsidian">
+                        <p className="text-2xl font-900 text-zoop-obsidian dark:text-white">
                           Rs. {(order.totalAmount || 0).toLocaleString()}
                         </p>
                         <p className="text-[10px] font-bold text-gray-400 uppercase">
@@ -200,9 +200,9 @@ const Orders = () => {
               );
             })
           ) : (
-            <div className="py-20 text-center bg-zoop-canvas rounded-[3rem] border-2 border-dashed border-gray-200">
+            <div className="py-20 text-center bg-zoop-canvas rounded-[3rem] border-2 border-dashed border-gray-200 dark:border-white/10">
               <span className="text-5xl">📦</span>
-              <h3 className="mt-4 font-black text-zoop-obsidian uppercase tracking-widest">
+              <h3 className="mt-4 font-black text-zoop-obsidian dark:text-white uppercase tracking-widest">
                 No {filter} orders
               </h3>
               <p className="text-gray-400 text-sm mt-1">

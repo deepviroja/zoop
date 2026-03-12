@@ -30,7 +30,7 @@ const CAT_IMAGES = {
 };
 
 const Skeleton = ({ className = "" }) => (
-  <div className={`bg-gray-200 animate-pulse rounded-xl ${className}`} />
+  <div className={`bg-gray-200 dark:bg-white/20 animate-pulse rounded-xl ${className}`} />
 );
 
 const Home = () => {
@@ -257,7 +257,7 @@ const Home = () => {
         <h2 className="text-2xl font-black text-red-500 mb-4">
           Error Loading Marketplace
         </h2>
-        <p className="text-gray-600 mb-6">{error}</p>
+        <p className="text-gray-600 dark:text-gray-400 mb-6">{error}</p>
         <button
           onClick={() => window.location.reload()}
           className="bg-zoop-obsidian text-white px-6 py-3 rounded-xl font-bold hover:opacity-80 transition-all"
@@ -288,7 +288,7 @@ const Home = () => {
         }}
       />
       {/* HERO SLIDER */}
-      <section className="relative group min-h-[460px] sm:min-h-[560px] md:h-[700px] w-full rounded-[1.75rem] md:rounded-3xl overflow-hidden shadow-2xl">
+      <section className="relative group min-h-[460px] sm:min-h-[560px] md:h-[700px] w-full rounded-[1.75rem] md:rounded-3xl overflow-hidden shadow-2xl dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)]">
         {/* Background */}
         <div className="absolute inset-0 bg-gradient-to-br from-zoop-obsidian via-zoop-ink to-black">
           <div
@@ -377,7 +377,7 @@ const Home = () => {
                     onClick={() =>
                       navigate(`/search?q=${activeSlide.city || localCity}`)
                     }
-                    className="group bg-zoop-moss text-zoop-obsidian px-6 py-3 md:px-8 md:py-4 rounded-xl font-black text-xs uppercase tracking-wider hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2"
+                    className="group bg-zoop-moss text-zoop-obsidian dark:text-white px-6 py-3 md:px-8 md:py-4 rounded-xl font-black text-xs uppercase tracking-wider hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2"
                   >
                     Shop Now
                     <ChevronRight
@@ -426,10 +426,10 @@ const Home = () => {
               {/* Right side card */}
               {!contentLoading && activeSlide.img && (
                 <div className="hidden md:block relative">
-                  <div className="relative w-full aspect-square max-w-md ml-auto">
+                  <div className="relative w-full aspect-4-5 max-w-md ml-auto">
                     <div className="absolute inset-0 bg-gradient-to-br from-zoop-moss/30 to-zoop-copper/30 rounded-3xl blur-2xl animate-pulse" />
                     <div className="relative bg-white/10 backdrop-blur-2xl border border-white/20 rounded-3xl p-8 hover:scale-105 transition-all duration-500 hover:rotate-2">
-                      <div className="aspect-square bg-gradient-to-br from-white/5 to-white/10 rounded-2xl overflow-hidden mb-6">
+                      <div className="aspect-4-5 bg-gradient-to-br from-white/5 to-white/10 rounded-2xl overflow-hidden mb-6">
                         <img
                           src={optimizeCloudinaryUrl(activeSlide.img, { width: 900 })}
                           alt={activeSlide.title}
@@ -499,7 +499,7 @@ const Home = () => {
       {/* SAME-DAY LOCAL SECTION */}
       {productsLoading ? (
         <section className="bg-zoop-moss/10 p-6 rounded-2xl border border-zoop-moss/20">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[0, 1, 2, 3].map((i) => (
               <Skeleton key={i} className="h-64" />
             ))}
@@ -512,7 +512,7 @@ const Home = () => {
               <Zap width={24} height={24} fill="black" />
             </div>
             <div>
-                <h3 className="text-2xl font-black text-zoop-obsidian italic uppercase tracking-tighter">
+                <h3 className="text-2xl font-black text-zoop-obsidian dark:text-white italic uppercase tracking-tighter">
                 Same-Day in {localCity}
               </h3>
               <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">
@@ -520,14 +520,14 @@ const Home = () => {
               </p>
             </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {displayLocalProducts.map((product) => (
               <Link
                 to={`/product/${product.id}`}
                 key={product.id}
-                className="bg-white p-4 rounded-xl border border-white hover:border-zoop-moss shadow-sm hover:shadow-xl transition-all group"
+                className="bg-white dark:glass-card p-4 rounded-xl border border-white hover:border-zoop-moss shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] hover:shadow-xl transition-all group"
               >
-                <div className="aspect-square bg-gray-100 rounded-lg mb-4 overflow-hidden relative">
+                <div className="aspect-4-5 bg-gray-100 dark:bg-white/10 rounded-lg mb-4 overflow-hidden relative">
                   <img
                     src={
                       optimizeCloudinaryUrl(product.thumbnailUrl, { width: 700 }) ||
@@ -540,16 +540,16 @@ const Home = () => {
                     alt={product.title || product.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   />
-                  <div className="absolute top-2 left-2 bg-zoop-moss text-[8px] font-black px-2 py-1 rounded shadow-sm flex items-center gap-1">
+                  <div className="absolute top-2 left-2 bg-zoop-moss text-[8px] font-black px-2 py-1 rounded shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] flex items-center gap-1">
                     <Zap width={8} height={8} fill="black" /> FAST
                   </div>
                   {product.discountPercent > 0 && (
-                    <div className="absolute top-2 right-2 bg-red-500 text-white text-[8px] font-black px-2 py-1 rounded shadow-sm">
+                    <div className="absolute top-2 right-2 bg-red-500 text-white text-[8px] font-black px-2 py-1 rounded shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
                       {product.discountPercent}% OFF
                     </div>
                   )}
                 </div>
-                <h4 className="font-bold text-zoop-obsidian text-sm line-clamp-1">
+                <h4 className="font-bold text-zoop-obsidian dark:text-white text-sm line-clamp-1">
                   {product.title || product.name}
                 </h4>
                 <p className="text-xs text-gray-500 font-medium">
@@ -582,7 +582,7 @@ const Home = () => {
       {/* TRENDING FOR YOU */}
       <section className="space-y-8">
         <div className="text-center">
-          <h3 className="text-4xl font-black text-zoop-obsidian italic">
+          <h3 className="text-4xl font-black text-zoop-obsidian dark:text-white italic">
             Trending For You
           </h3>
           <p className="text-gray-500 font-medium">
@@ -590,13 +590,13 @@ const Home = () => {
           </p>
         </div>
         {productsLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
               <Skeleton key={i} className="h-80" />
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-8">
             {trendingProducts.length > 0 ? (
               trendingProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />
@@ -615,14 +615,14 @@ const Home = () => {
 
       {/* NEW ARRIVALS horizontal scroll */}
       {!productsLoading && newArrivalProducts.length > 0 && (
-        <section className="bg-white p-5 shadow-sm border border-gray-200 rounded-xl">
+        <section className="bg-white dark:glass-card p-5 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] border border-gray-200 dark:border-white/10 rounded-xl">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-xl font-bold text-zoop-obsidian">
+            <h3 className="text-xl font-bold text-zoop-obsidian dark:text-white">
               New Arrivals
             </h3>
             <Link
               to="/products"
-              className="text-zoop-obsidian text-sm font-bold hover:underline"
+              className="text-zoop-obsidian dark:text-white text-sm font-bold hover:underline"
             >
               View All
             </Link>
@@ -657,11 +657,11 @@ const Home = () => {
                     <p className="text-[10px] font-black text-zoop-copper uppercase tracking-widest mb-1">
                       {product.brand || "Generic"}
                     </p>
-                    <h4 className="text-sm font-bold text-gray-800 line-clamp-1 group-hover:text-zoop-copper">
+                    <h4 className="text-sm font-bold text-gray-800 dark:text-gray-100 line-clamp-1 group-hover:text-zoop-copper">
                       {product.name || product.title}
                     </h4>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className="text-lg font-black text-zoop-obsidian">
+                      <span className="text-lg font-black text-zoop-obsidian dark:text-white">
                         {formatInrWithSymbol(product.price || 0, {
                           maximumFractionDigits: 0,
                         })}
@@ -701,7 +701,7 @@ const Home = () => {
           Brands You Can Shop Now.
           <span className="text-zoop-moss"> Ready to deliver.</span>
         </h2>
-        <p className="relative z-10 mt-3 text-sm md:text-base text-gray-600">
+        <p className="relative z-10 mt-3 text-sm md:text-base text-gray-600 dark:text-gray-400">
           Brands that are actually available.
         </p>
         {productsLoading ? (
@@ -716,9 +716,9 @@ const Home = () => {
                   <Link
                 to={`/search?q=${encodeURIComponent(brand.name)}`}
                 key={brand.id || idx}
-                className="bg-white border border-black/10 rounded-2xl p-5 md:p-6 flex flex-col items-center justify-center text-center hover:-translate-y-1 transition-all cursor-pointer group shadow-sm hover:shadow-lg"
+                className="bg-white dark:glass-card border border-black/10 rounded-2xl p-5 md:p-6 flex flex-col items-center justify-center text-center hover:-translate-y-1 transition-all cursor-pointer group shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] hover:shadow-lg"
               >
-                <div className="h-20 w-full rounded-2xl overflow-hidden bg-[#f4efe6] flex items-center justify-center">
+                <div className="h-20 w-full rounded-2xl overflow-hidden bg-[#f4efe6] dark:bg-white/5 flex items-center justify-center">
                   {brand.image ? (
                     <img
                       src={optimizeCloudinaryUrl(brand.image, { width: 500 })}
@@ -726,10 +726,10 @@ const Home = () => {
                       alt={brand.name}
                     />
                   ) : (
-                    <span className="font-black text-lg text-zoop-obsidian">{brand.name}</span>
+                    <span className="font-black text-lg text-zoop-obsidian dark:text-white">{brand.name}</span>
                   )}
                 </div>
-                <p className="mt-4 font-black text-zoop-obsidian">{brand.name}</p>
+                <p className="mt-4 font-black text-zoop-obsidian dark:text-white">{brand.name}</p>
                 <p className="mt-1 text-[11px] font-bold uppercase tracking-[0.18em] text-gray-500">
                   {brand.tier}
                 </p>
@@ -742,7 +742,7 @@ const Home = () => {
 
       {/* CATEGORY GRID */}
       {collectionCategories.length > 0 && (
-      <section className="relative rounded-3xl border border-[#e7dfd4] bg-gradient-to-br from-[#fcfaf7] via-[#fffefc] to-[#f7f4ee] p-6 md:p-10 shadow-[0_16px_40px_rgba(36,32,24,0.08)] overflow-hidden">
+      <section className="relative rounded-3xl border border-[#e7dfd4] dark:border-white/10 bg-gradient-to-br from-[#fcfaf7] via-[#fffefc] to-[#f7f4ee] p-6 md:p-10 shadow-[0_16px_40px_rgba(36,32,24,0.08)] overflow-hidden">
         <div
           className="absolute inset-0 opacity-[0.05]"
           style={{
@@ -754,16 +754,16 @@ const Home = () => {
         <div className="relative z-10">
           <div className="flex items-end justify-between gap-4 mb-8">
             <div>
-              <h3 className="text-3xl md:text-5xl font-black tracking-tight text-zoop-obsidian">
+              <h3 className="text-3xl md:text-5xl font-black tracking-tight text-zoop-obsidian dark:text-white">
                 Explore Our Collections
               </h3>
-              <p className="text-base text-gray-700 mt-2 max-w-3xl">
+              <p className="text-base text-gray-700 dark:text-gray-300 mt-2 max-w-3xl">
                 Discover curated products across all categories — from local artisans to global brands
               </p>
             </div>
             <Link
               to="/products"
-              className="hidden md:inline-flex text-sm font-bold text-gray-600 hover:text-zoop-obsidian underline underline-offset-4"
+              className="hidden md:inline-flex text-sm font-bold text-gray-600 dark:text-gray-400 hover:text-zoop-obsidian underline underline-offset-4"
             >
               View all products
             </Link>
@@ -782,7 +782,7 @@ const Home = () => {
                   <Link
                     key={cat.id || idx}
                     to={cat.path || `/category/${cat.id}`}
-                    className="snap-start min-w-[84%] h-72 rounded-2xl overflow-hidden border border-gray-200 bg-white shadow-sm active:scale-[0.98] transition-transform"
+                    className="snap-start min-w-[84%] h-72 rounded-2xl overflow-hidden border border-gray-200 dark:border-white/10 bg-white dark:glass-card shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] active:scale-[0.98] transition-transform"
                   >
                     <div className="relative h-full">
                       <img
@@ -803,12 +803,19 @@ const Home = () => {
                 ))}
               </div>
 
-              <div className="hidden md:grid grid-cols-2 lg:grid-cols-3 gap-5">
-                {collectionCategories.map((cat, idx) => (
+              <div className="hidden md:grid bento-grid mt-4">
+                {collectionCategories.map((cat, idx) => {
+                  let spanClass = "col-span-12 md:col-span-3 bento-item";
+                  if (idx === 0) spanClass = "col-span-12 md:col-span-6 md:row-span-2 bento-item min-h-[38rem]";
+                  else if (idx === 1 || idx === 2) spanClass = "col-span-12 md:col-span-3 md:row-span-1 bento-item min-h-[18rem]";
+                  else if (idx === 3) spanClass = "col-span-12 md:col-span-6 md:row-span-1 bento-item min-h-[18rem]";
+                  else spanClass = "col-span-12 md:col-span-3 bento-item min-h-[18rem]";
+
+                  return (
                   <Link
                     key={cat.id || idx}
                     to={cat.path || `/category/${cat.id}`}
-                    className="group h-72 rounded-2xl overflow-hidden border border-gray-200 bg-white shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-zoop-moss"
+                    className={`group rounded-2xl overflow-hidden border border-gray-200 dark:border-white/10 bg-white dark:glass-card shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] hover:shadow-xl hover:-translate-y-1 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-zoop-moss ${spanClass}`}
                   >
                     <div className="relative h-full">
                       <img
@@ -822,11 +829,11 @@ const Home = () => {
                         <p className="text-base opacity-90 mt-1 line-clamp-1">
                           {cat.desc || "Curated for local-first shoppers"}
                         </p>
-                        <p className="mt-3 text-sm font-bold">Explore {cat.name}</p>
+                        <p className="mt-3 text-sm font-bold">Explore {cat.name} →</p>
                       </div>
                     </div>
                   </Link>
-                ))}
+                )})}
               </div>
             </>
           )}
@@ -834,7 +841,7 @@ const Home = () => {
           <div className="md:hidden mt-5 text-center">
             <Link
               to="/products"
-              className="text-sm font-bold text-gray-600 hover:text-zoop-obsidian underline underline-offset-4"
+              className="text-sm font-bold text-gray-600 dark:text-gray-400 hover:text-zoop-obsidian underline underline-offset-4"
             >
               View all products
             </Link>
@@ -850,7 +857,7 @@ const Home = () => {
           <Skeleton className="h-96" />
         </section>
       ) : collections.length > 0 ? (
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-8">
           {collections.map((col, idx) => (
             <Link
               key={col.id || idx}
@@ -859,7 +866,7 @@ const Home = () => {
                 idx === 0
                   ? "bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"
                   : "bg-gradient-to-br from-rose-100 via-pink-50 to-orange-50"
-              } rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500`}
+              } rounded-3xl overflow-hidden shadow-xl dark:shadow-[0_16px_48px_rgba(0,0,0,0.5)] hover:shadow-2xl transition-all duration-500`}
             >
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent z-10" />
               <div className="relative z-20 h-full flex flex-col justify-end p-8 md:p-10">
@@ -900,7 +907,7 @@ const Home = () => {
                 <div
                   className={`inline-flex items-center gap-2 px-6 py-3 rounded-full font-black text-sm uppercase tracking-wider hover:scale-105 transition-all duration-300 w-fit ${
                     idx === 0
-                      ? "bg-white text-slate-900 hover:bg-blue-400"
+                      ? "bg-white dark:glass-card text-slate-900 hover:bg-blue-400"
                       : "bg-rose-950 text-white hover:bg-rose-600"
                   }`}
                 >
@@ -913,10 +920,10 @@ const Home = () => {
         </section>
       ) : (
         // Fallback static collections
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-8">
           <Link
             to="/category/men"
-            className="group relative h-80 md:h-96 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500"
+            className="group relative h-80 md:h-96 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-3xl overflow-hidden shadow-xl dark:shadow-[0_16px_48px_rgba(0,0,0,0.5)] hover:shadow-2xl transition-all duration-500"
           >
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent z-10" />
             <div className="absolute right-0 bottom-0 opacity-5 group-hover:opacity-10 transition-opacity duration-500">
@@ -929,14 +936,14 @@ const Home = () => {
               <p className="text-white/80 text-base md:text-lg font-medium mb-6">
                 Local leathercraft meets modern formal wear.
               </p>
-              <div className="inline-flex items-center gap-2 bg-white text-slate-900 px-6 py-3 rounded-full font-black text-sm uppercase tracking-wider w-fit">
+              <div className="inline-flex items-center gap-2 bg-white dark:glass-card text-slate-900 px-6 py-3 rounded-full font-black text-sm uppercase tracking-wider w-fit">
                 Shop Collection
               </div>
             </div>
           </Link>
           <Link
             to="/category/women"
-            className="group relative h-80 md:h-96 bg-gradient-to-br from-rose-100 via-pink-50 to-orange-50 rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500"
+            className="group relative h-80 md:h-96 bg-gradient-to-br from-rose-100 via-pink-50 to-orange-50 rounded-3xl overflow-hidden shadow-xl dark:shadow-[0_16px_48px_rgba(0,0,0,0.5)] hover:shadow-2xl transition-all duration-500"
           >
             <div className="absolute inset-0 bg-gradient-to-t from-rose-900/80 via-rose-900/30 to-transparent z-10" />
             <div className="absolute right-0 bottom-0 opacity-10 group-hover:opacity-20 transition-opacity duration-500">

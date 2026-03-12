@@ -3,10 +3,14 @@ import { Link } from "react-router-dom";
 import { User } from "../assets/icons/User";
 import { X } from "../assets/icons/X";
 import { ChevronRight } from "../assets/icons/ChevronRight";
+import { Moon } from "../assets/icons/Moon";
+import { Sun } from "../assets/icons/Sun";
 import { useUser } from "../context/UserContext";
+import { useTheme } from "../context/ThemeContext";
 
 const MobileSidebar = ({ isOpen, onClose, categories = [], quickLinks = [] }) => {
   const { user, logout } = useUser();
+  const { isDarkMode, toggleTheme } = useTheme();
   const displayCategories = categories.length > 0
     ? categories
     : ["Fashion", "Electronics", "Home", "Local", "Brands"];
@@ -29,13 +33,13 @@ const MobileSidebar = ({ isOpen, onClose, categories = [], quickLinks = [] }) =>
 
       {/* --- SIDEBAR PANEL --- */}
       <aside
-        className={`fixed top-0 left-0 h-screen w-[320px] max-w-[88vw] bg-white z-[201] shadow-2xl transform transition-transform duration-500 ease-in-out flex flex-col overflow-hidden ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
+        className={`fixed top-0 left-0 h-screen w-[320px] max-w-[88vw] bg-white dark:glass-card z-[201] shadow-2xl dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)] transform transition-transform duration-500 ease-in-out flex flex-col overflow-hidden ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
         {/* 1. USER HEADER SECTION */}
         <div className="bg-zoop-obsidian p-8 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="h-12 w-12 bg-zoop-obsidian rounded-2xl flex items-center justify-center text-xl shadow-md shadow-zoop-moss/40">
-              <User stroke="#b7e84b" />
+            <div className="h-12 w-12 bg-zoop-obsidian dark:bg-zoop-obsidian/40 rounded-2xl flex items-center justify-center text-xl shadow-md dark:shadow-[0_8px_24px_rgba(0,0,0,0.5)] shadow-zoop-copper/40 dark:shadow-zoop-moss/40 text-zoop-copper dark:text-zoop-moss">
+              <User stroke="currentColor" />
             </div>
             <div>
               <p className="text-[10px] font-black text-zoop-moss uppercase tracking-widest">
@@ -55,7 +59,7 @@ const MobileSidebar = ({ isOpen, onClose, categories = [], quickLinks = [] }) =>
         </div>
 
         {/* 2. SCROLLABLE CONTENT */}
-        <div className="flex-1 overflow-y-auto no-scrollbar py-6">
+        <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 py-6">
           {/* CATEGORIES SECTION */}
           <section className="px-8 mb-10">
             <h4 className="text-[10px] font-black text-zoop-copper uppercase tracking-[0.3em] mb-6">
@@ -69,7 +73,7 @@ const MobileSidebar = ({ isOpen, onClose, categories = [], quickLinks = [] }) =>
                     className="flex justify-between items-center group"
                     onClick={onClose}
                   >
-                    <span className="text-sm font-bold text-zoop-obsidian group-hover:translate-x-2 transition-transform">
+                    <span className="text-sm font-bold text-zoop-obsidian dark:text-white group-hover:translate-x-2 transition-transform">
                       {cat}
                     </span>
                     <ChevronRight
@@ -83,7 +87,7 @@ const MobileSidebar = ({ isOpen, onClose, categories = [], quickLinks = [] }) =>
             </ul>
           </section>
 
-          <div className="h-px bg-gray-50 mx-8 mb-10" />
+          <div className="h-px bg-gray-50 dark:bg-white/5 mx-8 mb-10" />
 
           {/* MY ACCOUNT SECTION (Only show if logged in) */}
           {user && (
@@ -99,13 +103,13 @@ const MobileSidebar = ({ isOpen, onClose, categories = [], quickLinks = [] }) =>
                       className="flex justify-between items-center group"
                       onClick={onClose}
                     >
-                      <span className="text-sm font-bold text-zoop-obsidian group-hover:translate-x-2 transition-transform">
+                      <span className="text-sm font-bold text-zoop-obsidian dark:text-white group-hover:translate-x-2 transition-transform">
                         My Profile
                       </span>
                       <ChevronRight
                         width={16}
                         height={16}
-                        className="text-gray-200 group-hover:text-zoop-moss transition-colors"
+                        className="text-gray-300 dark:text-gray-600 group-hover:text-zoop-moss transition-colors"
                       />
                     </Link>
                   </li>
@@ -115,13 +119,13 @@ const MobileSidebar = ({ isOpen, onClose, categories = [], quickLinks = [] }) =>
                       className="flex justify-between items-center group"
                       onClick={onClose}
                     >
-                      <span className="text-sm font-bold text-zoop-obsidian group-hover:translate-x-2 transition-transform">
+                      <span className="text-sm font-bold text-zoop-obsidian dark:text-white group-hover:translate-x-2 transition-transform">
                         Edit Profile
                       </span>
                       <ChevronRight
                         width={16}
                         height={16}
-                        className="text-gray-200 group-hover:text-zoop-moss transition-colors"
+                        className="text-gray-300 dark:text-gray-600 group-hover:text-zoop-moss transition-colors"
                       />
                     </Link>
                   </li>
@@ -131,13 +135,13 @@ const MobileSidebar = ({ isOpen, onClose, categories = [], quickLinks = [] }) =>
                       className="flex justify-between items-center group"
                       onClick={onClose}
                     >
-                      <span className="text-sm font-bold text-zoop-obsidian group-hover:translate-x-2 transition-transform">
+                      <span className="text-sm font-bold text-zoop-obsidian dark:text-white group-hover:translate-x-2 transition-transform">
                         My Orders
                       </span>
                       <ChevronRight
                         width={16}
                         height={16}
-                        className="text-gray-200 group-hover:text-zoop-moss transition-colors"
+                        className="text-gray-300 dark:text-gray-600 group-hover:text-zoop-moss transition-colors"
                       />
                     </Link>
                   </li>
@@ -147,22 +151,45 @@ const MobileSidebar = ({ isOpen, onClose, categories = [], quickLinks = [] }) =>
                       className="flex justify-between items-center group"
                       onClick={onClose}
                     >
-                      <span className="text-sm font-bold text-zoop-obsidian group-hover:translate-x-2 transition-transform">
+                      <span className="text-sm font-bold text-zoop-obsidian dark:text-white group-hover:translate-x-2 transition-transform">
                         My Wishlist
                       </span>
                       <ChevronRight
                         width={16}
                         height={16}
-                        className="text-gray-200 group-hover:text-zoop-moss transition-colors"
+                        className="text-gray-300 dark:text-gray-600 group-hover:text-zoop-moss transition-colors"
                       />
                     </Link>
                   </li>
                 </ul>
               </section>
 
-              <div className="h-px bg-gray-50 mx-8 mb-10" />
+              <div className="h-px bg-gray-50 dark:bg-white/5 mx-8 mb-10" />
             </>
           )}
+
+          {/* THEME TOGGLE */}
+          <section className="px-8 mb-10">
+            <h4 className="text-[10px] font-black text-gray-800 dark:text-gray-300 uppercase tracking-[0.3em] mb-4">
+              Appearance
+            </h4>
+            <button
+              onClick={toggleTheme}
+              className="w-full flex justify-between items-center group bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 p-4 rounded-[16px] hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-zoop-moss text-zoop-obsidian' : 'bg-zoop-obsidian text-white'}`}>
+                  {isDarkMode ? <Moon width={18} height={18} /> : <Sun width={18} height={18} />}
+                </div>
+                <span className="text-sm font-bold text-zoop-obsidian dark:text-white group-hover:translate-x-1 transition-transform">
+                  {isDarkMode ? "Dark Mode" : "Light Mode"}
+                </span>
+              </div>
+              <div className={`w-12 h-6 rounded-full p-1 transition-colors ${isDarkMode ? 'bg-zoop-moss' : 'bg-gray-300'}`}>
+                <div className={`w-4 h-4 rounded-full transition-transform duration-300 ${isDarkMode ? 'translate-x-6 bg-zoop-obsidian' : 'translate-x-0 bg-white'}`} />
+              </div>
+            </button>
+          </section>
 
           {/* HELP & SETTINGS */}
           <section className="px-8 mb-10">
@@ -185,18 +212,18 @@ const MobileSidebar = ({ isOpen, onClose, categories = [], quickLinks = [] }) =>
           </section>
 
           {/* APP STATS (Amazon Style Small Banner) */}
-          <div className="mx-8 p-6 bg-zoop-canvas rounded-[2rem] border border-gray-100">
+          <div className="mx-8 p-6 bg-zoop-canvas dark:bg-white/5 rounded-[2rem] border border-gray-100 dark:border-white/10">
             <p className="text-[9px] font-black uppercase tracking-widest text-zoop-copper mb-1">
               Same-Day
             </p>
-            <p className="text-xs font-bold text-zoop-obsidian leading-tight">
+            <p className="text-xs font-bold text-zoop-obsidian dark:text-white leading-tight">
               Pick your city to see products that can arrive today.
             </p>
           </div>
         </div>
 
         {/* 3. FOOTER LOGOUT/LOGIN */}
-        <div className="border-t border-white/60 bg-gradient-to-t from-white via-white/95 to-white/80 p-4 backdrop-blur-xl">
+        <div className="border-t border-gray-100 dark:border-white/10 bg-gradient-to-t from-white via-white/95 to-white/80 dark:from-zoop-obsidian dark:via-zoop-obsidian/95 dark:to-zoop-obsidian/80 p-4 backdrop-blur-xl">
           {!user ? (
             <Link
               to="/login"

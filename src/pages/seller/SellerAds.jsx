@@ -59,30 +59,30 @@ const SellerAds = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-4xl font-900 tracking-tighter italic text-zoop-obsidian uppercase">
+        <h1 className="text-4xl font-900 tracking-tighter italic text-zoop-obsidian dark:text-white uppercase">
           Seller Ads
         </h1>
         <p className="text-gray-500 mt-1">Submit ad image/video creatives for admin approval.</p>
       </div>
 
-      <div className="bg-white rounded-2xl border border-gray-100 p-6 space-y-3">
-        <h2 className="text-xl font-black text-zoop-obsidian">Create Ad</h2>
+      <div className="bg-white dark:glass-card rounded-2xl border border-gray-100 dark:border-white/10 p-6 space-y-3">
+        <h2 className="text-xl font-black text-zoop-obsidian dark:text-white">Create Ad</h2>
         <input
           value={form.title}
           onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))}
-          className="w-full px-3 py-2 border border-gray-200 rounded-xl"
+          className="w-full px-3 py-2 border border-gray-200 dark:border-white/10 rounded-xl"
           placeholder="Campaign title"
         />
         <input
           value={form.targetUrl}
           onChange={(e) => setForm((p) => ({ ...p, targetUrl: e.target.value }))}
-          className="w-full px-3 py-2 border border-gray-200 rounded-xl"
+          className="w-full px-3 py-2 border border-gray-200 dark:border-white/10 rounded-xl"
           placeholder="Target URL (/product/123 or https://...)"
         />
         <select
           value={form.slotId}
           onChange={(e) => setForm((p) => ({ ...p, slotId: e.target.value }))}
-          className="w-full px-3 py-2 border border-gray-200 rounded-xl"
+          className="w-full px-3 py-2 border border-gray-200 dark:border-white/10 rounded-xl"
         >
           {slots.length === 0 && <option value="home_top">Home Top</option>}
           {slots.map((slot) => (
@@ -94,14 +94,14 @@ const SellerAds = () => {
         <input
           value={form.paidAmount}
           onChange={(e) => setForm((p) => ({ ...p, paidAmount: e.target.value }))}
-          className="w-full px-3 py-2 border border-gray-200 rounded-xl"
+          className="w-full px-3 py-2 border border-gray-200 dark:border-white/10 rounded-xl"
           placeholder="Amount paid (as per admin slot price)"
           type="number"
           min="0"
         />
 
-        <label className="block border border-dashed border-gray-300 rounded-xl p-4 bg-gray-50 cursor-pointer">
-          <p className="text-sm font-bold text-gray-700">
+        <label className="block border border-dashed border-gray-300 rounded-xl p-4 bg-gray-50 dark:bg-white/5 cursor-pointer">
+          <p className="text-sm font-bold text-gray-700 dark:text-gray-300">
             {uploading ? "Uploading..." : form.mediaUrl ? "Media selected" : "Upload image/video"}
           </p>
           <p className="text-xs text-gray-500 mt-1">PNG/JPG/WebP or MP4/WebM/MOV</p>
@@ -129,8 +129,8 @@ const SellerAds = () => {
         </button>
       </div>
 
-      <div className="bg-white rounded-2xl border border-gray-100 p-6">
-        <h2 className="text-xl font-black text-zoop-obsidian mb-4">My Ads</h2>
+      <div className="bg-white dark:glass-card rounded-2xl border border-gray-100 dark:border-white/10 p-6">
+        <h2 className="text-xl font-black text-zoop-obsidian dark:text-white mb-4">My Ads</h2>
         {loading ? (
           <p className="text-gray-500">Loading...</p>
         ) : ads.length === 0 ? (
@@ -138,8 +138,8 @@ const SellerAds = () => {
         ) : (
           <div className="space-y-3">
             {ads.map((ad) => (
-              <div key={ad.id} className="p-3 rounded-xl border border-gray-100 bg-gray-50">
-                <p className="font-bold text-zoop-obsidian">{ad.title}</p>
+              <div key={ad.id} className="p-3 rounded-xl border border-gray-100 dark:border-white/10 bg-gray-50 dark:bg-white/5">
+                <p className="font-bold text-zoop-obsidian dark:text-white">{ad.title}</p>
                 <p className="text-xs text-gray-500 mt-1">
                   Slot: {ad.slotId} • Status: {ad.status} • {ad.active ? "Active" : "Inactive"}
                 </p>

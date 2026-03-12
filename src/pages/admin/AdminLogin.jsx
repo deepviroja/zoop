@@ -119,7 +119,7 @@ const AdminLogin = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        <div className="bg-white rounded-3xl shadow-2xl p-8">
+        <div className="bg-white dark:glass-card rounded-3xl shadow-2xl dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)] p-8">
           {/* Header */}
           <div className="text-center mb-8">
             <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -137,10 +137,10 @@ const AdminLogin = () => {
                 />
               </svg>
             </div>
-            <h1 className="text-3xl font-black text-gray-900 mb-2">
+            <h1 className="text-3xl font-black text-gray-900 dark:text-white mb-2">
               Admin Access
             </h1>
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-gray-400">
               Restricted area — Authorized personnel only
             </p>
           </div>
@@ -155,7 +155,7 @@ const AdminLogin = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email */}
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                 Admin Email
               </label>
               <div className="relative">
@@ -175,7 +175,7 @@ const AdminLogin = () => {
                   className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 transition-all outline-none ${
                     errors.email
                       ? "border-red-500 bg-red-50 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
-                      : "border-gray-200 focus:border-red-600 focus:ring-2 focus:ring-red-600/20"
+                      : "border-gray-200 dark:border-white/10 focus:border-red-600 focus:ring-2 focus:ring-red-600/20"
                   }`}
                   placeholder="admin@zoop.com"
                   autoComplete="email"
@@ -190,7 +190,7 @@ const AdminLogin = () => {
 
             {/* Password */}
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                 Admin Password
               </label>
               <div className="relative">
@@ -210,7 +210,7 @@ const AdminLogin = () => {
                   className={`w-full pl-12 pr-12 py-3 rounded-xl border-2 transition-all outline-none ${
                     errors.password
                       ? "border-red-500 bg-red-50 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
-                      : "border-gray-200 focus:border-red-600 focus:ring-2 focus:ring-red-600/20"
+                      : "border-gray-200 dark:border-white/10 focus:border-red-600 focus:ring-2 focus:ring-red-600/20"
                   }`}
                   placeholder="••••••••"
                   autoComplete="current-password"

@@ -6,7 +6,7 @@ const Loader = ({ fullScreen = false }) => {
     const { brandName } = useSiteConfig();
     if (fullScreen) {
         return (
-            <div className="h-full fixed inset-0 bg-white z-[9999] flex flex-col items-center justify-center">
+            <div className="h-full fixed inset-0 bg-white dark:glass-card z-[9999] flex flex-col items-center justify-center">
                 <div className="relative">
                     <div className="w-16 h-16 border-4 border-zoop-canvas rounded-full"></div>
                     <div className="absolute inset-0 w-16 h-16 border-4 border-zoop-moss border-t-transparent rounded-full animate-spin"></div>
@@ -14,7 +14,7 @@ const Loader = ({ fullScreen = false }) => {
                         <Zap width={20} height={20} fill="#b7e84b" />
                     </div>
                 </div>
-                <h3 className="mt-8 text-xl font-900 tracking-tighter text-zoop-obsidian animate-pulse">
+                <h3 className="mt-8 text-xl font-900 tracking-tighter text-zoop-obsidian dark:text-white animate-pulse">
                     {brandName}<span className="text-zoop-moss">.in</span>
                 </h3>
                 <p className="text-xs font-bold text-gray-400 mt-2 tracking-widest uppercase">

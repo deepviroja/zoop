@@ -89,14 +89,14 @@ const SearchItems = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-white/5 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-zoop-moss"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-white/5">
       <div className="max-w-[1600px] mx-auto px-4 py-6">
         {/* Header */}
         <ProductListHeader
@@ -134,7 +134,7 @@ const SearchItems = () => {
                 {/* Active Search Query Display - only when there's an actual query */}
                 {searchQuery.trim() && (
                   <div className="mb-6 flex items-center justify-between">
-                    <h2 className="text-xl font-bold text-zoop-obsidian">
+                    <h2 className="text-xl font-bold text-zoop-obsidian dark:text-white">
                       Results for "
                       <span className="text-zoop-moss">{searchQuery}</span>"
                     </h2>
@@ -151,7 +151,7 @@ const SearchItems = () => {
                   className={`
                   ${
                     view === "grid"
-                      ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+                      ? "grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
                       : "space-y-4"
                   }
                 `}
@@ -173,11 +173,11 @@ const SearchItems = () => {
                 />
               </>
             ) : (
-              <div className="bg-white rounded-2xl p-12 text-center">
-                <div className="text-6xl mb-4 p-4 border border-gray-200 rounded-full inline-block">
+              <div className="bg-white dark:glass-card rounded-2xl p-12 text-center">
+                <div className="text-6xl mb-4 p-4 border border-gray-200 dark:border-white/10 rounded-full inline-block">
                   <SearchIcon />
                 </div>
-                <h2 className="text-2xl font-black text-zoop-obsidian mb-2">
+                <h2 className="text-2xl font-black text-zoop-obsidian dark:text-white mb-2">
                   No Products Found
                 </h2>
                 <p className="text-gray-500 mb-6">

@@ -125,9 +125,9 @@ const Cart = () => {
   if (cartItems.length === 0) {
     return (
       <div className="min-h-screen bg-zoop-canvas py-12 px-6 flex items-center justify-center">
-        <div className="bg-white rounded-[3rem] py-32 px-12 text-center border-2 border-dashed border-zoop-clay/30 max-w-2xl">
+        <div className="bg-white dark:glass-card rounded-[3rem] py-32 px-12 text-center border-2 border-dashed border-zoop-clay/30 max-w-2xl">
           <div className="text-8xl mb-6">🛒</div>
-          <h2 className="text-3xl font-black text-zoop-obsidian">
+          <h2 className="text-3xl font-black text-zoop-obsidian dark:text-white">
             Your Cart is Empty
           </h2>
           <p className="text-gray-400 mt-4 text-lg">
@@ -135,7 +135,7 @@ const Cart = () => {
           </p>
           <Link
             to="/"
-            className="inline-block mt-8 bg-zoop-obsidian text-white px-10 py-4 rounded-full font-black text-xs uppercase tracking-widest hover:bg-zoop-moss hover:text-zoop-obsidian transition-all shadow-lg hover:shadow-xl"
+            className="inline-block mt-8 bg-zoop-obsidian text-white px-10 py-4 rounded-full font-black text-xs uppercase tracking-widest hover:bg-zoop-moss hover:text-zoop-obsidian transition-all shadow-lg dark:shadow-[0_12px_32px_rgba(0,0,0,0.5)] hover:shadow-xl"
           >
             Start Shopping
           </Link>
@@ -151,7 +151,7 @@ const Cart = () => {
         <div className="lg:col-span-8 space-y-6">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-zoop-clay/20 pb-4 gap-2">
             <div>
-              <h1 className="text-3xl md:text-4xl font-900 tracking-tighter text-zoop-obsidian italic">
+              <h1 className="text-3xl md:text-4xl font-900 tracking-tighter text-zoop-obsidian dark:text-white italic">
                 Shopping Cart
               </h1>
               <p className="text-sm text-gray-500 mt-1">
@@ -174,9 +174,9 @@ const Cart = () => {
             {cartItems.map((item) => (
               <div
                 key={`${item.id}-${item.selectedSize}-${item.selectedColor}`}
-                className="bg-white border border-gray-100 rounded-2xl md:rounded-3xl p-4 md:p-6 flex flex-col gap-4 md:gap-6 hover:shadow-2xl transition-all group"
+                className="bg-white dark:glass-card border border-gray-100 dark:border-white/10 rounded-2xl md:rounded-3xl p-4 md:p-6 flex flex-col gap-2 md:gap-6 hover:shadow-2xl transition-all group"
               >
-                <div className="flex flex-col md:flex-row gap-4 md:gap-6">
+                <div className="flex flex-col md:flex-row gap-2 md:gap-6">
                 {/* Image */}
                 <Link
                   to={`/product/${item.id}`}
@@ -195,7 +195,7 @@ const Cart = () => {
                     }}
                   />
                   {item.type === "Local" && (
-                    <div className="absolute top-2 left-2 bg-zoop-moss text-zoop-obsidian px-2 py-1 rounded-md text-[8px] font-black uppercase">
+                    <div className="absolute top-2 left-2 bg-zoop-moss text-zoop-obsidian dark:text-white px-2 py-1 rounded-md text-[8px] font-black uppercase">
                       ⚡ Same-Day
                     </div>
                   )}
@@ -208,7 +208,7 @@ const Cart = () => {
                       <div className="flex-1">
                         <Link
                           to={`/product/${item.id}`}
-                          className="font-bold text-lg md:text-xl text-zoop-obsidian hover:text-zoop-moss transition-colors line-clamp-2"
+                          className="font-bold text-lg md:text-xl text-zoop-obsidian dark:text-white hover:text-zoop-moss transition-colors line-clamp-2"
                         >
                           {item.name}
                         </Link>
@@ -221,7 +221,7 @@ const Cart = () => {
                           </p>
                           <div className="flex items-center gap-2">
                             <span
-                              className={`text-[9px] font-black px-2 py-0.5 rounded uppercase tracking-wider ${item.type === "Local" ? "bg-zoop-moss text-zoop-obsidian" : "bg-blue-100 text-blue-700"}`}
+                              className={`text-[9px] font-black px-2 py-0.5 rounded uppercase tracking-wider ${item.type === "Local" ? "bg-zoop-moss text-zoop-obsidian dark:text-white" : "bg-blue-100 text-blue-700"}`}
                             >
                               {item.type || "Standard"}
                             </span>
@@ -236,12 +236,12 @@ const Cart = () => {
                         {(item.selectedSize || item.selectedColor) && (
                           <div className="flex flex-wrap items-center gap-2 mt-2">
                             {item.selectedSize && (
-                              <span className="text-[10px] font-black bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200 uppercase">
+                              <span className="text-[10px] font-black bg-gray-100 dark:bg-white/10 text-gray-600 dark:text-gray-400 px-2 py-1 rounded border border-gray-200 dark:border-white/10 uppercase">
                                 Size: {item.selectedSize}
                               </span>
                             )}
                             {item.selectedColor && (
-                              <span className="text-[10px] font-black bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200 uppercase">
+                              <span className="text-[10px] font-black bg-gray-100 dark:bg-white/10 text-gray-600 dark:text-gray-400 px-2 py-1 rounded border border-gray-200 dark:border-white/10 uppercase">
                                 Color: {item.selectedColor}
                               </span>
                             )}
@@ -249,7 +249,7 @@ const Cart = () => {
                         )}
                       </div>
                       <div className="text-right shrink-0">
-                        <p className="font-900 text-xl md:text-2xl text-zoop-obsidian">
+                        <p className="font-900 text-xl md:text-2xl text-zoop-obsidian dark:text-white">
                           {formatInrWithSymbol(
                             Number(item.price || 0) * Number(item.quantity || 0),
                             { maximumFractionDigits: 0 },
@@ -273,7 +273,7 @@ const Cart = () => {
 
                   {/* Controls */}
                   <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-50">
-                    <div className="flex items-center bg-zoop-canvas rounded-xl p-1 border border-gray-100">
+                    <div className="flex items-center bg-zoop-canvas rounded-xl p-1 border border-gray-100 dark:border-white/10">
                       <button
                         onClick={() =>
                           updateQuantity(
@@ -283,7 +283,7 @@ const Cart = () => {
                             item.selectedColor,
                           )
                         }
-                        className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center font-black text-zoop-obsidian hover:bg-white rounded-lg transition-colors"
+                        className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center font-black text-zoop-obsidian dark:text-white hover:bg-white rounded-lg transition-colors"
                         disabled={item.quantity <= 1}
                       >
                         –
@@ -300,7 +300,7 @@ const Cart = () => {
                             item.selectedColor,
                           )
                         }
-                        className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center font-black text-zoop-obsidian hover:bg-white rounded-lg transition-colors"
+                        className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center font-black text-zoop-obsidian dark:text-white hover:bg-white rounded-lg transition-colors"
                         disabled={item.stock && item.quantity >= item.stock}
                       >
                         +
@@ -345,16 +345,16 @@ const Cart = () => {
 
         {/* RIGHT: ORDER SUMMARY */}
         <div className="lg:col-span-4">
-          <div className="bg-white rounded-2xl md:rounded-[2.5rem] p-6 md:p-8 shadow-lg border border-gray-100 lg:sticky lg:top-24">
+          <div className="bg-white dark:glass-card rounded-2xl md:rounded-[2.5rem] p-6 md:p-8 shadow-lg dark:shadow-[0_12px_32px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-white/10 lg:sticky lg:top-24">
             <div className="mb-6 md:mb-8">
-              <h2 className="text-xl md:text-2xl font-900 uppercase tracking-tight text-zoop-obsidian">
+              <h2 className="text-xl md:text-2xl font-900 uppercase tracking-tight text-zoop-obsidian dark:text-white">
                 Order Summary
               </h2>
               <div className="h-1 w-16 bg-zoop-moss mt-2"></div>
             </div>
 
             {/* Coupon Code */}
-            <div className="mb-6 pb-6 border-b border-gray-100">
+            <div className="mb-6 pb-6 border-b border-gray-100 dark:border-white/10">
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-2">
                 Have a Coupon?
               </label>
@@ -364,7 +364,7 @@ const Cart = () => {
                   value={couponCode}
                   onChange={(e) => setCouponCode(e.target.value)}
                   placeholder="Enter code"
-                  className="flex-1 px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-zoop-moss focus:border-transparent"
+                  className="flex-1 px-4 py-2 border border-gray-200 dark:border-white/10 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-zoop-moss focus:border-transparent"
                 />
                 <button
                   onClick={handleApplyCoupon}
@@ -384,9 +384,9 @@ const Cart = () => {
             </div>
 
             {/* Price Breakdown */}
-            <div className="space-y-4 mb-6 pb-6 border-b border-gray-100">
+            <div className="space-y-4 mb-6 pb-6 border-b border-gray-100 dark:border-white/10">
               <div className="flex justify-between text-sm">
-                <span className="text-gray-600 font-medium">
+                <span className="text-gray-600 dark:text-gray-400 font-medium">
                   Subtotal ({cartItems.length} items)
                 </span>
                 <span className="font-black text-lg">
@@ -398,7 +398,7 @@ const Cart = () => {
 
               {shipping > 0 && (
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600 font-medium">
+                  <span className="text-gray-600 dark:text-gray-400 font-medium">
                     Shipping (National)
                   </span>
                   <span className="font-bold">
@@ -412,7 +412,7 @@ const Cart = () => {
               {localDelivery === 0 &&
                 cartItems.some((item) => item.type === "Local") && (
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600 font-medium">
+                    <span className="text-gray-600 dark:text-gray-400 font-medium">
                       Local Delivery
                     </span>
                     <span className="text-zoop-moss font-black">FREE</span>
@@ -420,7 +420,7 @@ const Cart = () => {
                 )}
 
               <div className="flex justify-between text-sm">
-                <span className="text-gray-600 font-medium">Tax (5%)</span>
+                <span className="text-gray-600 dark:text-gray-400 font-medium">Tax (5%)</span>
                 <span className="font-bold">
                   {formatInrWithSymbol(tax, {
                     maximumFractionDigits: 0,
@@ -446,7 +446,7 @@ const Cart = () => {
                 <span className="text-xs font-black uppercase tracking-widest text-gray-400">
                   Total Amount
                 </span>
-                <span className="text-3xl md:text-4xl font-900 text-zoop-obsidian">
+                <span className="text-3xl md:text-4xl font-900 text-zoop-obsidian dark:text-white">
                   {formatInrWithSymbol(total, {
                     maximumFractionDigits: 0,
                   })}
@@ -456,20 +456,20 @@ const Cart = () => {
               <button
                 onClick={handleProceedToCheckout}
                 disabled={proceeding}
-                className="w-full bg-zoop-moss text-zoop-obsidian py-4 md:py-5 rounded-xl font-black text-sm uppercase tracking-wider hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95"
+                className="w-full bg-zoop-moss text-zoop-obsidian dark:text-white py-4 md:py-5 rounded-xl font-black text-sm uppercase tracking-wider hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95"
               >
                 {proceeding ? "Reserving items..." : "Proceed to Checkout"}
               </button>
 
               <Link
                 to="/"
-                className="block w-full text-center mt-4 py-3 border-2 border-gray-200 rounded-xl font-bold text-sm text-gray-600 hover:border-zoop-moss hover:text-zoop-obsidian transition-all"
+                className="block w-full text-center mt-4 py-3 border-2 border-gray-200 dark:border-white/10 rounded-xl font-bold text-sm text-gray-600 dark:text-gray-400 hover:border-zoop-moss hover:text-zoop-obsidian transition-all"
               >
                 Continue Shopping
               </Link>
             </div>
 
-            <div className="space-y-3 pt-6 border-t border-gray-100">
+            <div className="space-y-3 pt-6 border-t border-gray-100 dark:border-white/10">
               <div className="flex items-center gap-3 text-xs text-gray-500">
                 <svg
                   className="w-4 h-4 text-green-500"
@@ -505,9 +505,9 @@ const Cart = () => {
       {showBlockedPopup && (
         <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/50" onClick={() => setShowBlockedPopup(false)} />
-          <div className="relative bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl">
-            <h4 className="text-lg font-900 text-zoop-obsidian mb-3">Checkout Unavailable</h4>
-            <p className="text-sm text-gray-600">
+          <div className="relative bg-white dark:glass-card rounded-2xl p-6 max-w-md w-full shadow-2xl dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)]">
+            <h4 className="text-lg font-900 text-zoop-obsidian dark:text-white mb-3">Checkout Unavailable</h4>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
               One or more items are reserved by another buyer for a short time.
             </p>
             <p className="text-xs text-gray-500 mt-1">
@@ -526,7 +526,7 @@ const Cart = () => {
               <button
                 type="button"
                 onClick={() => setShowBlockedPopup(false)}
-                className="flex-1 py-2.5 border border-gray-200 rounded-lg font-bold"
+                className="flex-1 py-2.5 border border-gray-200 dark:border-white/10 rounded-lg font-bold"
               >
                 Close
               </button>
@@ -548,7 +548,7 @@ const Cart = () => {
                     setNotifySubmitting(false);
                   }
                 }}
-                className="flex-1 py-2.5 bg-zoop-moss text-zoop-obsidian rounded-lg font-bold disabled:opacity-60"
+                className="flex-1 py-2.5 bg-zoop-moss text-zoop-obsidian dark:text-white rounded-lg font-bold disabled:opacity-60"
               >
                 {notifySubmitting ? "Please wait..." : "Notify Me"}
               </button>
@@ -558,13 +558,13 @@ const Cart = () => {
       )}
 
       {relatedSuggestions.length > 0 && (
-        <div className="max-w-[1200px] mx-auto mt-10 rounded-[2rem] border border-[#e9dfcf] bg-white p-5 md:p-7 shadow-[0_18px_44px_rgba(42,32,15,0.08)]">
+        <div className="max-w-[1200px] mx-auto mt-10 rounded-[2rem] border border-[#e9dfcf] bg-white dark:glass-card p-5 md:p-7 shadow-[0_18px_44px_rgba(42,32,15,0.08)]">
           <div className="mb-5 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
             <div>
               <p className="text-xs font-black uppercase tracking-[0.24em] text-[#8b5e3c]">
                 Frequently Bought Together
               </p>
-              <h3 className="text-2xl font-900 text-zoop-obsidian">
+              <h3 className="text-2xl font-900 text-zoop-obsidian dark:text-white">
                 Complete your cart before checkout
               </h3>
             </div>

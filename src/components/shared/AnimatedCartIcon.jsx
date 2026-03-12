@@ -73,7 +73,7 @@ const AnimatedCartIcon = ({ className = "", stroke = "#b7e84b" }) => {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0 }}
-              className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] min-w-[18px] h-[18px] rounded-full flex items-center justify-center font-black shadow-lg"
+              className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] min-w-[18px] h-[18px] rounded-full flex items-center justify-center font-black shadow-lg dark:shadow-[0_12px_32px_rgba(0,0,0,0.5)]"
             >
               <Motion.span
                 key={count}

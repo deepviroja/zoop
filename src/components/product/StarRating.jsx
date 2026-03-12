@@ -37,7 +37,7 @@ const StarRating = ({ rating = 0, totalReviews, size = 18 }) => {
         })}
       </div>
       <div className="inline-flex items-center gap-1.5">
-        <span className="text-sm font-black text-zoop-obsidian tabular-nums">{safeRating.toFixed(1)}</span>
+        <span className="text-sm font-black text-zoop-obsidian dark:text-white tabular-nums">{safeRating.toFixed(1)}</span>
         {totalReviews !== undefined && (
           <span className="text-xs font-medium text-gray-500 tabular-nums">
             ({Number(totalReviews || 0).toLocaleString()} reviews)

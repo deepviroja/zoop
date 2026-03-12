@@ -188,7 +188,7 @@ const CompleteProfile = () => {
       />
       <div className="rounded-[1.75rem] bg-gradient-to-br from-zoop-moss/15 via-white to-zoop-copper/10 p-3 sm:p-4">
         <div className="w-full max-w-xl">
-          <div className="rounded-[1.75rem] bg-white p-5 shadow-2xl sm:p-8">
+          <div className="rounded-[1.75rem] bg-white dark:glass-card p-5 shadow-2xl dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)] sm:p-8">
             <div className="mb-8 text-center">
               <Link
                 to="/"
@@ -196,7 +196,7 @@ const CompleteProfile = () => {
               >
                 {brandName}
               </Link>
-              <h1 className="mt-4 text-2xl font-black text-zoop-obsidian">
+              <h1 className="mt-4 text-2xl font-black text-zoop-obsidian dark:text-white">
                 Complete Your Profile
               </h1>
               <p className="mt-2 text-sm text-gray-500">
@@ -208,7 +208,7 @@ const CompleteProfile = () => {
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label className="mb-2 block text-sm font-bold text-gray-700">
+                <label className="mb-2 block text-sm font-bold text-gray-700 dark:text-gray-300">
                   Full Name
                 </label>
                 <input
@@ -222,7 +222,7 @@ const CompleteProfile = () => {
                   className={`w-full rounded-xl border-2 px-4 py-3 outline-none transition-all ${
                     errors.displayName
                       ? "border-red-500 bg-red-50"
-                      : "border-gray-200 focus:border-zoop-moss"
+                      : "border-gray-200 dark:border-white/10 focus:border-zoop-moss"
                   }`}
                   placeholder="John Doe"
                 />
@@ -247,7 +247,7 @@ const CompleteProfile = () => {
               />
 
               <div>
-                <label className="mb-2 block text-sm font-bold text-gray-700">
+                <label className="mb-2 block text-sm font-bold text-gray-700 dark:text-gray-300">
                   Address
                 </label>
                 <textarea
@@ -262,7 +262,7 @@ const CompleteProfile = () => {
                   className={`w-full rounded-xl border-2 px-4 py-3 outline-none transition-all ${
                     errors.address
                       ? "border-red-500 bg-red-50"
-                      : "border-gray-200 focus:border-zoop-moss"
+                      : "border-gray-200 dark:border-white/10 focus:border-zoop-moss"
                   }`}
                   placeholder="House No, Street, Area"
                 />
@@ -312,7 +312,7 @@ const CompleteProfile = () => {
               />
 
               <div>
-                <label className="mb-2 block text-sm font-bold text-gray-700">
+                <label className="mb-2 block text-sm font-bold text-gray-700 dark:text-gray-300">
                   Pincode
                 </label>
                 <input
@@ -326,7 +326,7 @@ const CompleteProfile = () => {
                   className={`w-full rounded-xl border-2 px-4 py-3 outline-none transition-all ${
                     errors.pincode
                       ? "border-red-500 bg-red-50"
-                      : "border-gray-200 focus:border-zoop-moss"
+                      : "border-gray-200 dark:border-white/10 focus:border-zoop-moss"
                   }`}
                   placeholder="395003"
                 />

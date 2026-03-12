@@ -37,50 +37,50 @@ const Payouts = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-4xl font-900 tracking-tighter italic text-zoop-obsidian uppercase">
+        <h1 className="text-4xl font-900 tracking-tighter italic text-zoop-obsidian dark:text-white uppercase">
           Payouts
         </h1>
         <p className="text-gray-500 mt-2">Funds are released only after admin transfer.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4">
-        <div className="bg-white rounded-2xl p-5 border border-gray-100">
+        <div className="bg-white dark:glass-card rounded-2xl p-5 border border-gray-100 dark:border-white/10">
           <p className="text-xs font-black uppercase tracking-widest text-gray-400">Awaiting Settlement</p>
           <p className={`${amountCardClass} text-sky-600`}>
             {fmtInr(payload?.totals?.awaitingSettlement, { compact: true })}
           </p>
           <p className="mt-2 text-xs text-gray-500">Delivered orders still inside the return window.</p>
         </div>
-        <div className="bg-white rounded-2xl p-5 border border-gray-100">
+        <div className="bg-white dark:glass-card rounded-2xl p-5 border border-gray-100 dark:border-white/10">
           <p className="text-xs font-black uppercase tracking-widest text-gray-400">On Hold</p>
           <p className={`${amountCardClass} text-rose-600`}>
             {fmtInr(payload?.totals?.onHold, { compact: true })}
           </p>
           <p className="mt-2 text-xs text-gray-500">Return or dispute review is delaying release.</p>
         </div>
-        <div className="bg-white rounded-2xl p-5 border border-gray-100">
+        <div className="bg-white dark:glass-card rounded-2xl p-5 border border-gray-100 dark:border-white/10">
           <p className="text-xs font-black uppercase tracking-widest text-gray-400">Pending Transfer</p>
           <p className={`${amountCardClass} text-amber-600`}>
             {fmtInr(payload?.totals?.pendingTransfer, { compact: true })}
           </p>
         </div>
-        <div className="bg-white rounded-2xl p-5 border border-gray-100">
+        <div className="bg-white dark:glass-card rounded-2xl p-5 border border-gray-100 dark:border-white/10">
           <p className="text-xs font-black uppercase tracking-widest text-gray-400">Transferred</p>
           <p className={`${amountCardClass} text-green-600`}>
             {fmtInr(payload?.totals?.transferred, { compact: true })}
           </p>
         </div>
-        <div className="bg-white rounded-2xl p-5 border border-gray-100">
+        <div className="bg-white dark:glass-card rounded-2xl p-5 border border-gray-100 dark:border-white/10">
           <p className="text-xs font-black uppercase tracking-widest text-gray-400">Approx Balance</p>
-          <p className={`${amountCardClass} text-zoop-obsidian`}>
+          <p className={`${amountCardClass} text-zoop-obsidian dark:text-white`}>
             {fmtInr(payload?.totals?.approximateBalance, { compact: true })}
           </p>
         </div>
       </div>
 
-      <div className="bg-white border border-gray-100 rounded-3xl overflow-hidden">
-        <div className="p-6 border-b border-gray-100">
-          <h2 className="text-xl font-black text-zoop-obsidian">Payout Records</h2>
+      <div className="bg-white dark:glass-card border border-gray-100 dark:border-white/10 rounded-3xl overflow-hidden">
+        <div className="p-6 border-b border-gray-100 dark:border-white/10">
+          <h2 className="text-xl font-black text-zoop-obsidian dark:text-white">Payout Records</h2>
         </div>
         {loading ? (
           <p className="p-6 text-gray-500 font-bold">Loading payouts...</p>
@@ -91,7 +91,7 @@ const Payouts = () => {
         ) : (
           <div className="overflow-x-auto scrollbar-gap">
             <table className="w-full">
-              <thead className="bg-gray-50">
+              <thead className="bg-gray-50 dark:bg-white/5">
                 <tr>
                   {["Order", "Product", "Gross", "Commission", "Payout", "Status", "Available", "Released"].map((h) => (
                     <th
@@ -107,15 +107,15 @@ const Payouts = () => {
                 {rows.map((row) => (
                   <tr key={row.id}>
                     <td className="px-6 py-4">
-                      <p className="font-bold text-zoop-obsidian">
+                      <p className="font-bold text-zoop-obsidian dark:text-white">
                         {row.displayOrderId || row.orderId}
                       </p>
                       {row.customer?.name && (
                         <p className="text-xs text-gray-500">{row.customer.name}</p>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
-                      <p className="font-bold text-zoop-obsidian">
+                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
+                      <p className="font-bold text-zoop-obsidian dark:text-white">
                         {row.productTitle || row.productId}
                       </p>
                       <p className="text-xs text-gray-500">{row.productId}</p>

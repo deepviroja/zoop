@@ -349,16 +349,16 @@ const SellerSignup = () => {
         <Toast message={toast.message} type={toast.type} onClose={hideToast} />
       )}
       <div className="w-full max-w-md">
-        <div className="bg-white rounded-[1.75rem] sm:rounded-3xl shadow-2xl p-5 sm:p-8">
+        <div className="bg-white dark:glass-card rounded-[1.75rem] sm:rounded-3xl shadow-2xl dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)] p-5 sm:p-8">
           <div className="text-center mb-8">
             <Link
               to="/"
               className="inline-block text-3xl font-black text-zoop-moss mb-4"
             >
               ZOOP
-              <span className="text-zoop-obsidian text-xs italic">.in</span>
+              <span className="text-zoop-obsidian dark:text-white text-xs italic">.in</span>
             </Link>
-            <h1 className="text-2xl font-black text-zoop-obsidian mb-1">
+            <h1 className="text-2xl font-black text-zoop-obsidian dark:text-white mb-1">
               {step === 1 ? "Create Seller Account" : "Verify Email"}
             </h1>
             <p className="text-gray-500 text-sm">
@@ -377,7 +377,7 @@ const SellerSignup = () => {
           {step === 1 ? (
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">
+                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                   Full Name
                 </label>
                 <div className="relative">
@@ -393,7 +393,7 @@ const SellerSignup = () => {
                       updateFormField("displayName", e.target.value)
                     }
                     disabled={loading}
-                    className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 transition-all outline-none ${errors.displayName ? "border-red-500 bg-red-50 focus:border-red-500 focus:ring-2 focus:ring-red-500/20" : loading ? "border-zoop-moss bg-zoop-moss/5 animate-pulse" : "border-gray-200 focus:border-zoop-moss focus:ring-2 focus:ring-zoop-moss/20"}`}
+                    className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 transition-all outline-none ${errors.displayName ? "border-red-500 bg-red-50 focus:border-red-500 focus:ring-2 focus:ring-red-500/20" : loading ? "border-zoop-moss bg-zoop-moss/5 animate-pulse" : "border-gray-200 dark:border-white/10 focus:border-zoop-moss focus:ring-2 focus:ring-zoop-moss/20"}`}
                     placeholder="John Doe"
                   />
                 </div>
@@ -405,7 +405,7 @@ const SellerSignup = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">
+                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                   Email Address
                 </label>
                 <div className="relative">
@@ -419,7 +419,7 @@ const SellerSignup = () => {
                     value={formData.email}
                     onChange={(e) => updateFormField("email", e.target.value)}
                     disabled={loading}
-                    className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 transition-all outline-none ${errors.email ? "border-red-500 bg-red-50 focus:border-red-500 focus:ring-2 focus:ring-red-500/20" : loading ? "border-zoop-moss bg-zoop-moss/5 animate-pulse" : "border-gray-200 focus:border-zoop-moss focus:ring-2 focus:ring-zoop-moss/20"}`}
+                    className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 transition-all outline-none ${errors.email ? "border-red-500 bg-red-50 focus:border-red-500 focus:ring-2 focus:ring-red-500/20" : loading ? "border-zoop-moss bg-zoop-moss/5 animate-pulse" : "border-gray-200 dark:border-white/10 focus:border-zoop-moss focus:ring-2 focus:ring-zoop-moss/20"}`}
                     placeholder="you@example.com"
                   />
                 </div>
@@ -431,21 +431,21 @@ const SellerSignup = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">
+                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                   OTP Delivery
                 </label>
-                <div className="grid grid-cols-2 gap-2 rounded-xl bg-gray-100 p-1">
+                <div className="grid grid-cols-2 gap-2 rounded-xl bg-gray-100 dark:bg-white/10 p-1">
                   <button
                     type="button"
                     onClick={() => setOtpChannel("email")}
-                    className={`rounded-lg py-2 text-xs font-black uppercase ${otpChannel === "email" ? "bg-white text-zoop-obsidian shadow-sm" : "text-gray-500"}`}
+                    className={`rounded-lg py-2 text-xs font-black uppercase ${otpChannel === "email" ? "bg-white dark:glass-card text-zoop-obsidian dark:text-white shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]" : "text-gray-500"}`}
                   >
                     Email OTP
                   </button>
                   <button
                     type="button"
                     onClick={() => setOtpChannel("phone")}
-                    className={`rounded-lg py-2 text-xs font-black uppercase ${otpChannel === "phone" ? "bg-white text-zoop-obsidian shadow-sm" : "text-gray-500"}`}
+                    className={`rounded-lg py-2 text-xs font-black uppercase ${otpChannel === "phone" ? "bg-white dark:glass-card text-zoop-obsidian dark:text-white shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]" : "text-gray-500"}`}
                   >
                     Mobile OTP
                   </button>
@@ -454,7 +454,7 @@ const SellerSignup = () => {
                   <p className="mt-2 text-xs leading-5 text-gray-500">
                     Enter your mobile number in international format. Example:
                     {" "}
-                    <span className="font-bold text-zoop-obsidian">
+                    <span className="font-bold text-zoop-obsidian dark:text-white">
                       +91 9876543210
                     </span>
                   </p>
@@ -486,7 +486,7 @@ const SellerSignup = () => {
               />
 
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">
+                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                   Password
                 </label>
                 <div className="relative">
@@ -502,7 +502,7 @@ const SellerSignup = () => {
                       updateFormField("password", e.target.value)
                     }
                     disabled={loading}
-                    className={`w-full pl-12 pr-12 py-3 rounded-xl border-2 transition-all outline-none ${errors.password ? "border-red-500 bg-red-50 focus:border-red-500 focus:ring-2 focus:ring-red-500/20" : loading ? "border-zoop-moss bg-zoop-moss/5 animate-pulse" : "border-gray-200 focus:border-zoop-moss focus:ring-2 focus:ring-zoop-moss/20"}`}
+                    className={`w-full pl-12 pr-12 py-3 rounded-xl border-2 transition-all outline-none ${errors.password ? "border-red-500 bg-red-50 focus:border-red-500 focus:ring-2 focus:ring-red-500/20" : loading ? "border-zoop-moss bg-zoop-moss/5 animate-pulse" : "border-gray-200 dark:border-white/10 focus:border-zoop-moss focus:ring-2 focus:ring-zoop-moss/20"}`}
                     placeholder="••••••••"
                   />
                   <button
@@ -550,8 +550,8 @@ const SellerSignup = () => {
               </button>
 
               <div className="relative flex items-center justify-center my-4">
-                <div className="absolute inset-0 bg-gray-200 h-px w-full"></div>
-                <span className="relative bg-white px-4 text-xs font-bold text-gray-400 uppercase tracking-widest">
+                <div className="absolute inset-0 bg-gray-200 dark:bg-white/20 h-px w-full"></div>
+                <span className="relative bg-white dark:glass-card px-4 text-xs font-bold text-gray-400 uppercase tracking-widest">
                   Or
                 </span>
               </div>
@@ -560,7 +560,7 @@ const SellerSignup = () => {
                 type="button"
                 onClick={handleGoogleSignup}
                 disabled={loading}
-                className="w-full flex items-center justify-center gap-3 py-4 bg-white border-2 border-gray-100 rounded-xl font-bold text-gray-700 hover:bg-gray-50 hover:border-gray-200 transition-all shadow-sm disabled:opacity-50"
+                className="w-full flex items-center justify-center gap-3 py-4 bg-white dark:glass-card border-2 border-gray-100 dark:border-white/10 rounded-xl font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 hover:border-gray-200 transition-all shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] disabled:opacity-50"
               >
                 <svg
                   width="24"
@@ -591,7 +591,7 @@ const SellerSignup = () => {
                 If Google sign-in loops back, finish by setting a password on the Profile Completion page—accounts often need a password before social login sticks.
               </p>
 
-              <p className="text-center text-gray-600 text-sm">
+              <p className="text-center text-gray-600 dark:text-gray-400 text-sm">
                 Already have a seller account?{" "}
                 <Link
                   to="/login?redirect=/seller/dashboard"
@@ -609,7 +609,7 @@ const SellerSignup = () => {
                 disabled={loading}
               />
               <div className="text-center">
-                <p className="text-gray-600 mb-2">Didn't receive the code?</p>
+                <p className="text-gray-600 dark:text-gray-400 mb-2">Didn't receive the code?</p>
                 <p className="text-xs text-gray-500 mb-2">
                   OTP expires in {formatMMSS(otpSecondsLeft)}
                 </p>
@@ -628,7 +628,7 @@ const SellerSignup = () => {
                   setStep(1);
                   setGeneralError("");
                 }}
-                className="w-full py-3 bg-gray-100 text-gray-700 rounded-xl font-bold hover:bg-gray-200 transition-all"
+                className="w-full py-3 bg-gray-100 dark:bg-white/10 text-gray-700 dark:text-gray-300 rounded-xl font-bold hover:bg-gray-200 transition-all"
               >
                 Back to Signup
               </button>

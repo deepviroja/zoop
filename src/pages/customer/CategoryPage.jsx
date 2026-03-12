@@ -89,7 +89,7 @@ const CategoryPage = () => {
   }, [categoryKey]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-white/5">
       <Seo
         title={`${category.name} | Zoop Category`}
         description={`Browse ${category.name} products on Zoop with curated listings, filters, and fast delivery options.`}
@@ -143,9 +143,9 @@ const CategoryPage = () => {
       <div className="max-w-[1600px] mx-auto px-4 py-8">
         {/* Subcategory Navigation from Mock Data (only if active category matches param) */}
         {availableSubcategories.length > 0 && (
-            <div className="rounded-2xl p-6 mb-8 shadow-sm bg-white overflow-x-auto">
+            <div className="rounded-2xl p-6 mb-8 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] bg-white dark:glass-card overflow-x-auto">
               {/* Removed sticky to avoid conflict with ProductListHeader */}
-              <h2 className="text-lg font-black text-zoop-obsidian mb-4 uppercase tracking-wider">
+              <h2 className="text-lg font-black text-zoop-obsidian dark:text-white mb-4 uppercase tracking-wider">
                 Shop by Category
               </h2>
               <div className="flex gap-4 min-w-max">
@@ -158,7 +158,7 @@ const CategoryPage = () => {
                     onClick={() =>
                       handleFilterChange({ ...filters, category: subcat })
                     }
-                    className="px-4 py-3 bg-gray-50 hover:bg-zoop-moss/10 hover:border-zoop-moss border-2 border-transparent rounded-xl font-bold text-sm transition-all text-left whitespace-nowrap"
+                    className="px-4 py-3 bg-gray-50 dark:bg-white/5 hover:bg-zoop-moss/10 hover:border-zoop-moss border-2 border-transparent rounded-xl font-bold text-sm transition-all text-left whitespace-nowrap"
                   >
                     {subcat}
                   </button>
@@ -203,13 +203,13 @@ const CategoryPage = () => {
           <main className="flex-1">
             {/* Active Filters Pills */}
             {activeFiltersCount > 0 && (
-              <div className="bg-white rounded-xl p-4 mb-6 shadow-sm">
+              <div className="bg-white dark:glass-card rounded-xl p-4 mb-6 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-sm font-bold text-gray-600">
+                  <span className="text-sm font-bold text-gray-600 dark:text-gray-400">
                     Active Filters:
                   </span>
                   {filters.category !== "all" && (
-                    <span className="px-3 py-1 bg-zoop-moss/20 text-zoop-obsidian rounded-full text-xs font-bold flex items-center gap-1">
+                    <span className="px-3 py-1 bg-zoop-moss/20 text-zoop-obsidian dark:text-white rounded-full text-xs font-bold flex items-center gap-1">
                       {filters.category}
                       <button
                         onClick={() =>
@@ -278,15 +278,15 @@ const CategoryPage = () => {
             )}
             {/* Search Results */}
             {apiLoading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 md:gap-6">
                 {[...Array(8)].map((_, i) => (
                   <div
                     key={i}
-                    className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm p-4 animate-pulse"
+                    className="bg-white dark:glass-card rounded-2xl overflow-hidden border border-gray-100 dark:border-white/10 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] p-4 animate-pulse"
                   >
-                    <div className="aspect-square bg-gray-200 rounded-xl mb-4"></div>
-                    <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                    <div className="aspect-4-5 bg-gray-200 dark:bg-white/20 rounded-xl mb-4"></div>
+                    <div className="h-4 bg-gray-200 dark:bg-white/20 rounded w-3/4 mb-2"></div>
+                    <div className="h-4 bg-gray-200 dark:bg-white/20 rounded w-1/2"></div>
                   </div>
                 ))}
               </div>
@@ -296,7 +296,7 @@ const CategoryPage = () => {
                   className={`
                   ${
                     view === "grid"
-                      ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6"
+                      ? "grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 md:gap-6"
                       : "space-y-4 "
                   }
                 `}
@@ -317,11 +317,11 @@ const CategoryPage = () => {
                 />
               </>
             ) : (
-              <div className="bg-white rounded-2xl p-12 text-center">
-                <div className="text-6xl mb-4 p-4 border border-gray-200 rounded-full inline-block">
+              <div className="bg-white dark:glass-card rounded-2xl p-12 text-center">
+                <div className="text-6xl mb-4 p-4 border border-gray-200 dark:border-white/10 rounded-full inline-block">
                   <SearchIcon />
                 </div>
-                <h2 className="text-2xl font-black text-zoop-obsidian mb-2">
+                <h2 className="text-2xl font-black text-zoop-obsidian dark:text-white mb-2">
                   No Products Found
                 </h2>
                 <p className="text-gray-500 mb-6">

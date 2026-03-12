@@ -20,12 +20,12 @@ class ErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
-          <div className="bg-white p-8 rounded-3xl shadow-xl max-w-lg w-full text-center border border-red-100">
+        <div className="min-h-screen bg-gray-50 dark:bg-white/5 flex flex-col items-center justify-center p-4">
+          <div className="bg-white dark:glass-card p-8 rounded-3xl shadow-xl dark:shadow-[0_16px_48px_rgba(0,0,0,0.5)] max-w-lg w-full text-center border border-red-100">
             <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
               <AlertCircle width={40} height={40} className="text-red-500" />
             </div>
-            <h1 className="text-3xl font-black text-gray-900 mb-2">
+            <h1 className="text-3xl font-black text-gray-900 dark:text-white mb-2">
               Something went wrong.
             </h1>
             <p className="text-gray-500 mb-6">

@@ -96,12 +96,12 @@ const AdminProfile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-white/5 p-6">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-4xl font-900 tracking-tighter italic text-zoop-obsidian uppercase">
+            <h1 className="text-4xl font-900 tracking-tighter italic text-zoop-obsidian dark:text-white uppercase">
               Admin_Profile
             </h1>
             <p className="text-gray-400 font-bold text-xs uppercase tracking-widest mt-1">
@@ -111,7 +111,7 @@ const AdminProfile = () => {
         </div>
 
         {/* Profile Card */}
-        <div className="bg-gradient-to-br from-zoop-obsidian via-gray-900 to-zoop-obsidian text-white rounded-3xl p-10 shadow-2xl relative overflow-hidden">
+        <div className="bg-gradient-to-br from-zoop-obsidian via-gray-900 to-zoop-obsidian text-white rounded-3xl p-10 shadow-2xl dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)] relative overflow-hidden">
           <div className="relative z-10">
             <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
               <div className="w-32 h-32 bg-zoop-moss rounded-full flex items-center justify-center text-6xl">
@@ -120,7 +120,7 @@ const AdminProfile = () => {
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
                   <h2 className="text-3xl font-black">{profileData.name}</h2>
-                  <span className="px-3 py-1 bg-zoop-moss text-zoop-obsidian rounded-full text-xs font-black">
+                  <span className="px-3 py-1 bg-zoop-moss text-zoop-obsidian dark:text-white rounded-full text-xs font-black">
                     {profileData.role}
                   </span>
                 </div>
@@ -139,25 +139,25 @@ const AdminProfile = () => {
 
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
-            <div className="text-3xl font-black text-zoop-obsidian">{stats.totalActions}</div>
+          <div className="bg-white dark:glass-card rounded-2xl p-6 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
+            <div className="text-3xl font-black text-zoop-obsidian dark:text-white">{stats.totalActions}</div>
             <div className="text-xs font-black uppercase tracking-widest text-gray-400 mt-1">
               Total Actions
             </div>
           </div>
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
+          <div className="bg-white dark:glass-card rounded-2xl p-6 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
             <div className="text-3xl font-black text-blue-600">{stats.usersManaged}</div>
             <div className="text-xs font-black uppercase tracking-widest text-gray-400 mt-1">
               Users Managed
             </div>
           </div>
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
+          <div className="bg-white dark:glass-card rounded-2xl p-6 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
             <div className="text-3xl font-black text-purple-600">{stats.sellersVerified}</div>
             <div className="text-xs font-black uppercase tracking-widest text-gray-400 mt-1">
               Sellers Verified
             </div>
           </div>
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
+          <div className="bg-white dark:glass-card rounded-2xl p-6 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
             <div className="text-3xl font-black text-green-600">{stats.issuesResolved}</div>
             <div className="text-xs font-black uppercase tracking-widest text-gray-400 mt-1">
               Issues Resolved
@@ -166,7 +166,7 @@ const AdminProfile = () => {
         </div>
 
         {/* Tabs */}
-        <div className="bg-white rounded-2xl p-2 shadow-sm">
+        <div className="bg-white dark:glass-card rounded-2xl p-2 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
           <div className="flex gap-2">
             {[
               { key: 'profile', label: 'Profile Info', icon: User },
@@ -181,8 +181,8 @@ const AdminProfile = () => {
                   onClick={() => setActiveTab(tab.key)}
                   className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold text-sm transition-all ${
                     activeTab === tab.key
-                      ? 'bg-zoop-moss text-zoop-obsidian shadow'
-                      : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                      ? 'bg-zoop-moss text-zoop-obsidian dark:text-white shadow'
+                      : 'bg-gray-50 dark:bg-white/5 text-gray-600 dark:text-gray-400 hover:bg-gray-100'
                   }`}
                 >
                   <Icon width={18} height={18} />
@@ -194,18 +194,18 @@ const AdminProfile = () => {
         </div>
 
         {/* Tab Content */}
-        <div className="bg-white rounded-3xl p-8 shadow-sm">
+        <div className="bg-white dark:glass-card rounded-3xl p-8 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
           {/* Profile Tab */}
           {activeTab === 'profile' && (
             <div className="space-y-6">
-              <h3 className="text-2xl font-black text-zoop-obsidian mb-6">Profile Information</h3>
+              <h3 className="text-2xl font-black text-zoop-obsidian dark:text-white mb-6">Profile Information</h3>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="text-xs font-black uppercase tracking-widest text-gray-400 block mb-2">
                     Name
                   </label>
-                  <p className="w-full px-4 py-3 border-2 rounded-xl font-bold border-gray-100 bg-gray-50 text-gray-600">
+                  <p className="w-full px-4 py-3 border-2 rounded-xl font-bold border-gray-100 dark:border-white/10 bg-gray-50 dark:bg-white/5 text-gray-600 dark:text-gray-400">
                     {profileData.name}
                   </p>
                 </div>
@@ -214,7 +214,7 @@ const AdminProfile = () => {
                   <label className="text-xs font-black uppercase tracking-widest text-gray-400 block mb-2">
                     Email Address
                   </label>
-                  <p className="w-full px-4 py-3 border-2 rounded-xl font-bold border-gray-100 bg-gray-50 text-gray-600">
+                  <p className="w-full px-4 py-3 border-2 rounded-xl font-bold border-gray-100 dark:border-white/10 bg-gray-50 dark:bg-white/5 text-gray-600 dark:text-gray-400">
                     {profileData.email}
                   </p>
                 </div>
@@ -226,7 +226,7 @@ const AdminProfile = () => {
           {activeTab === 'activity' && (
             <div className="space-y-6">
               <div className="flex items-center justify-between gap-3">
-                <h3 className="text-2xl font-black text-zoop-obsidian mb-6">Recent Activity</h3>
+                <h3 className="text-2xl font-black text-zoop-obsidian dark:text-white mb-6">Recent Activity</h3>
                 {String(profileData.email || "").toLowerCase() === "admin@zoop.com" && (
                   <button
                     onClick={async () => {
@@ -247,13 +247,13 @@ const AdminProfile = () => {
               
               <div className="space-y-4">
                 {notifications.map((activity, idx) => (
-                  <div key={idx} className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-all">
-                    <div className="w-10 h-10 rounded-full flex items-center justify-center bg-zoop-moss/20 text-zoop-obsidian">
+                  <div key={idx} className="flex items-start gap-4 p-4 bg-gray-50 dark:bg-white/5 rounded-xl hover:bg-gray-100 transition-all">
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center bg-zoop-moss/20 text-zoop-obsidian dark:text-white">
                       <Shield width={18} height={18} />
                     </div>
                     <div className="flex-1">
-                      <p className="font-bold text-zoop-obsidian">{activity.title || "Admin event"}</p>
-                      <p className="text-sm text-gray-600">{activity.message || "-"}</p>
+                      <p className="font-bold text-zoop-obsidian dark:text-white">{activity.title || "Admin event"}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{activity.message || "-"}</p>
                       <p className="text-xs text-gray-400 mt-1">
                         {activity.createdAt ? new Date(activity.createdAt).toLocaleString() : "-"}
                       </p>
@@ -267,7 +267,7 @@ const AdminProfile = () => {
 
           {activeTab === 'notifications' && (
             <div id="admin-notifications" className="space-y-6">
-              <h3 className="text-2xl font-black text-zoop-obsidian mb-6">Admin Notifications</h3>
+              <h3 className="text-2xl font-black text-zoop-obsidian dark:text-white mb-6">Admin Notifications</h3>
               {notifications.length === 0 ? (
                 <p className="text-sm text-gray-500">No notifications yet.</p>
               ) : (
@@ -276,11 +276,11 @@ const AdminProfile = () => {
                     <div
                       key={n.id}
                       className={`p-4 rounded-xl border ${
-                        n.read ? 'bg-gray-50 border-gray-100' : 'bg-zoop-moss/10 border-zoop-moss/30'
+                        n.read ? 'bg-gray-50 dark:bg-white/5 border-gray-100 dark:border-white/10' : 'bg-zoop-moss/10 border-zoop-moss/30'
                       }`}
                     >
-                      <p className="font-bold text-zoop-obsidian">{n.title}</p>
-                      <p className="text-sm text-gray-600 mt-1">{n.message}</p>
+                      <p className="font-bold text-zoop-obsidian dark:text-white">{n.title}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{n.message}</p>
                       {n.createdAt && (
                         <p className="text-xs text-gray-500 mt-2">{new Date(n.createdAt).toLocaleString()}</p>
                       )}
@@ -293,15 +293,15 @@ const AdminProfile = () => {
 
           {activeTab === 'admins' && (
             <div className="space-y-6">
-              <h3 className="text-2xl font-black text-zoop-obsidian">Admin Accounts</h3>
+              <h3 className="text-2xl font-black text-zoop-obsidian dark:text-white">Admin Accounts</h3>
               {String(profileData.email || "").toLowerCase() === "admin@zoop.com" ? (
-                <form onSubmit={handleAddAdmin} className="grid grid-cols-1 md:grid-cols-3 gap-3 p-4 bg-gray-50 rounded-xl">
+                <form onSubmit={handleAddAdmin} className="grid grid-cols-1 md:grid-cols-3 gap-3 p-4 bg-gray-50 dark:bg-white/5 rounded-xl">
                   <input
                     required
                     value={newAdmin.displayName}
                     onChange={(e) => setNewAdmin((prev) => ({ ...prev, displayName: e.target.value }))}
                     placeholder="Full name"
-                    className="px-4 py-3 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-zoop-moss"
+                    className="px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl outline-none focus:ring-2 focus:ring-zoop-moss"
                   />
                   <input
                     required
@@ -309,7 +309,7 @@ const AdminProfile = () => {
                     value={newAdmin.email}
                     onChange={(e) => setNewAdmin((prev) => ({ ...prev, email: e.target.value }))}
                     placeholder="admin@zoop.com"
-                    className="px-4 py-3 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-zoop-moss"
+                    className="px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl outline-none focus:ring-2 focus:ring-zoop-moss"
                   />
                   <input
                     required
@@ -317,7 +317,7 @@ const AdminProfile = () => {
                     value={newAdmin.password}
                     onChange={(e) => setNewAdmin((prev) => ({ ...prev, password: e.target.value }))}
                     placeholder="Temporary password"
-                    className="px-4 py-3 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-zoop-moss"
+                    className="px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl outline-none focus:ring-2 focus:ring-zoop-moss"
                   />
                   <button
                     type="submit"
@@ -327,7 +327,7 @@ const AdminProfile = () => {
                   </button>
                 </form>
               ) : (
-                <p className="text-sm text-gray-500 p-4 bg-gray-50 rounded-xl">
+                <p className="text-sm text-gray-500 p-4 bg-gray-50 dark:bg-white/5 rounded-xl">
                   Only super admin (<span className="font-black">admin@zoop.com</span>) can add or remove admins.
                 </p>
               )}
@@ -337,9 +337,9 @@ const AdminProfile = () => {
                   <p className="text-sm text-gray-500">No admins found.</p>
                 ) : (
                   admins.map((admin) => (
-                    <div key={admin.id} className="p-4 border border-gray-200 rounded-xl bg-white">
-                      <p className="font-black text-zoop-obsidian">{admin.displayName || admin.email}</p>
-                      <p className="text-sm text-gray-600">{admin.email}</p>
+                    <div key={admin.id} className="p-4 border border-gray-200 dark:border-white/10 rounded-xl bg-white dark:glass-card">
+                      <p className="font-black text-zoop-obsidian dark:text-white">{admin.displayName || admin.email}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{admin.email}</p>
                       <p className="text-xs text-gray-500 mt-1">
                         Joined: {admin.createdAt ? new Date(admin.createdAt).toLocaleString() : "-"} | Last login:{" "}
                         {admin.lastLoginAt ? new Date(admin.lastLoginAt).toLocaleString() : "-"}

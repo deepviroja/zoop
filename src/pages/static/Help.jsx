@@ -89,14 +89,14 @@ const Help = () => {
     : faqs;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-gray-50 dark:bg-white/5 py-12">
       <div className="max-w-6xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-black text-zoop-obsidian mb-4">
+          <h1 className="text-4xl md:text-5xl font-black text-zoop-obsidian dark:text-white mb-4">
             How Can We Help You?
           </h1>
-          <p className="text-gray-600 text-lg">
+          <p className="text-gray-600 dark:text-gray-400 text-lg">
             Find answers to common questions or contact our support team
           </p>
         </div>
@@ -109,7 +109,7 @@ const Help = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search for help..."
-              className="w-full px-6 py-4 pl-12 border-2 border-gray-200 rounded-xl text-lg focus:outline-none focus:border-zoop-moss transition-colors"
+              className="w-full px-6 py-4 pl-12 border-2 border-gray-200 dark:border-white/10 rounded-xl text-lg focus:outline-none focus:border-zoop-moss transition-colors"
             />
             <svg
               className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
@@ -127,12 +127,12 @@ const Help = () => {
 
         {/* Contact Cards */}
         <div className="grid md:grid-cols-3 gap-6 mb-12">
-          <div className="bg-white rounded-2xl p-6 text-center shadow-sm hover:shadow-lg transition-shadow">
+          <div className="bg-white dark:glass-card rounded-2xl p-6 text-center shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] hover:shadow-lg transition-shadow">
             <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <Mail width={32} height={32} className="text-blue-600" />
             </div>
-            <h3 className="font-black text-zoop-obsidian mb-2">Email Support</h3>
-            <p className="text-sm text-gray-600 mb-4">
+            <h3 className="font-black text-zoop-obsidian dark:text-white mb-2">Email Support</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
               Get help via email within 24 hours
             </p>
             <a
@@ -143,12 +143,12 @@ const Help = () => {
             </a>
           </div>
 
-          <div className="bg-white rounded-2xl p-6 text-center shadow-sm hover:shadow-lg transition-shadow">
+          <div className="bg-white dark:glass-card rounded-2xl p-6 text-center shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] hover:shadow-lg transition-shadow">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <Phone width={32} height={32} className="text-green-600" />
             </div>
-            <h3 className="font-black text-zoop-obsidian mb-2">Phone Support</h3>
-            <p className="text-sm text-gray-600 mb-4">
+            <h3 className="font-black text-zoop-obsidian dark:text-white mb-2">Phone Support</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
               Mon-Sat, 9 AM - 6 PM IST
             </p>
             <a
@@ -159,12 +159,12 @@ const Help = () => {
             </a>
           </div>
 
-          <div className="bg-white rounded-2xl p-6 text-center shadow-sm hover:shadow-lg transition-shadow">
+          <div className="bg-white dark:glass-card rounded-2xl p-6 text-center shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] hover:shadow-lg transition-shadow">
             <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <MessageCircle width={32} height={32} className="text-purple-600" />
             </div>
-            <h3 className="font-black text-zoop-obsidian mb-2">Live Chat</h3>
-            <p className="text-sm text-gray-600 mb-4">
+            <h3 className="font-black text-zoop-obsidian dark:text-white mb-2">Live Chat</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
               Chat with our support team
             </p>
             <button className="text-zoop-moss font-bold hover:underline">
@@ -174,8 +174,8 @@ const Help = () => {
         </div>
 
         {/* FAQs */}
-        <div className="bg-white rounded-2xl p-8 shadow-sm">
-          <h2 className="text-2xl font-black text-zoop-obsidian mb-8">
+        <div className="bg-white dark:glass-card rounded-2xl p-8 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
+          <h2 className="text-2xl font-black text-zoop-obsidian dark:text-white mb-8">
             Frequently Asked Questions
           </h2>
 
@@ -190,10 +190,10 @@ const Help = () => {
                     {category.questions.map((item, qIdx) => (
                       <details
                         key={qIdx}
-                        className="group border-b border-gray-200 pb-4"
+                        className="group border-b border-gray-200 dark:border-white/10 pb-4"
                       >
                         <summary className="flex justify-between items-center cursor-pointer list-none">
-                          <span className="font-bold text-zoop-obsidian group-open:text-zoop-moss transition-colors">
+                          <span className="font-bold text-zoop-obsidian dark:text-white group-open:text-zoop-moss transition-colors">
                             {item.q}
                           </span>
                           <svg
@@ -210,7 +210,7 @@ const Help = () => {
                             />
                           </svg>
                         </summary>
-                        <p className="mt-4 text-gray-600 leading-relaxed">
+                        <p className="mt-4 text-gray-600 dark:text-gray-400 leading-relaxed">
                           {item.a}
                         </p>
                       </details>
@@ -227,9 +227,9 @@ const Help = () => {
             </div>
           )}
         </div>
-        <div className="bg-white rounded-2xl p-8 shadow-sm mt-8">
-          <h2 className="text-2xl font-black text-zoop-obsidian mb-4">Returns Policy</h2>
-          <div className="space-y-3 text-sm text-gray-700">
+        <div className="bg-white dark:glass-card rounded-2xl p-8 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] mt-8">
+          <h2 className="text-2xl font-black text-zoop-obsidian dark:text-white mb-4">Returns Policy</h2>
+          <div className="space-y-3 text-sm text-gray-700 dark:text-gray-300">
             <p>
               Most items are eligible for return within <span className="font-black">7 days</span> of delivery.
               Products must be unused, with original packaging and tags.
@@ -251,10 +251,10 @@ const Help = () => {
 
         {/* Still Need Help */}
         <div className="mt-12 bg-gradient-to-r from-zoop-moss/20 to-zoop-copper/20 rounded-2xl p-8 text-center">
-          <h3 className="text-2xl font-black text-zoop-obsidian mb-4">
+          <h3 className="text-2xl font-black text-zoop-obsidian dark:text-white mb-4">
             Still Need Help?
           </h3>
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-600 dark:text-gray-400 mb-6">
             Our support team is here to assist you with any questions
           </p>
           <a

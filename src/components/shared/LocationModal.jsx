@@ -8,10 +8,8 @@ const LocationModal = ({ isOpen, onClose }) => {
   const { detectCity, loading, error } = useGeoLocation();
   const { updateLocation } = useUser();
   const [searchQuery, setSearchQuery] = useState("");
-  const [cities, setCities] = useState([]);
-
-  useEffect(() => {
-    const fallbackCities = Array.from(
+  const [cities, setCities] = useState(() => {
+    return Array.from(
       new Set(
         [
           ...getCitiesOfCountry("IN").map((item) =>
@@ -21,8 +19,7 @@ const LocationModal = ({ isOpen, onClose }) => {
         ].filter(Boolean),
       ),
     ).sort((a, b) => a.localeCompare(b));
-    setCities(fallbackCities);
-  }, []);
+  });
 
   useEffect(() => {
     let cancelled = false;
@@ -78,9 +75,9 @@ const LocationModal = ({ isOpen, onClose }) => {
         onClick={onClose}
       ></div>
 
-      <div className="relative bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+      <div className="relative bg-white dark:glass-card w-full max-w-md rounded-2xl shadow-2xl dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)] overflow-hidden animate-in zoom-in-95 duration-200">
         <div className="p-6 space-y-6">
-          <h3 className="text-xl font-900 text-zoop-obsidian text-center">
+          <h3 className="text-xl font-900 text-zoop-obsidian dark:text-white text-center">
             Set Your <span className="text-zoop-moss">Local Node</span>
           </h3>
           <p className="text-center text-gray-500 text-xs">
@@ -115,7 +112,7 @@ const LocationModal = ({ isOpen, onClose }) => {
                 // Error state is already handled by the hook
               }
             }}
-            className="w-full bg-zoop-moss p-4 rounded-xl font-black flex justify-center items-center gap-2 cursor-pointer hover:shadow-lg hover:brightness-105 transition-all disabled:opacity-50 text-zoop-obsidian"
+            className="w-full bg-zoop-moss p-4 rounded-xl font-black flex justify-center items-center gap-2 cursor-pointer hover:shadow-lg hover:brightness-105 transition-all disabled:opacity-50 text-zoop-obsidian dark:text-white"
             disabled={loading}
           >
             {loading ? (
@@ -128,10 +125,10 @@ const LocationModal = ({ isOpen, onClose }) => {
 
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-gray-100" />
+              <span className="w-full border-t border-gray-100 dark:border-white/10" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-gray-500 font-bold">Or select manually</span>
+              <span className="bg-white dark:glass-card px-2 text-gray-500 font-bold">Or select manually</span>
             </div>
           </div>
 
@@ -142,7 +139,7 @@ const LocationModal = ({ isOpen, onClose }) => {
               placeholder="Search for your city..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-4 py-3 pr-10 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-zoop-moss focus:border-transparent"
+              className="w-full px-4 py-3 pr-10 border border-gray-200 dark:border-white/10 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-zoop-moss focus:border-transparent"
             />
             <svg
               className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
@@ -167,7 +164,7 @@ const LocationModal = ({ isOpen, onClose }) => {
                 <button
                   key={city}
                   onClick={() => handleCitySelect(city)}
-                  className="mb-2 w-full px-4 py-3 rounded-lg border border-gray-100 text-left text-sm font-bold text-gray-600 hover:border-zoop-moss hover:bg-zoop-moss/10 hover:text-zoop-obsidian transition-all"
+                  className="mb-2 w-full px-4 py-3 rounded-lg border border-gray-100 dark:border-white/10 text-left text-sm font-bold text-gray-600 dark:text-gray-400 hover:border-zoop-moss hover:bg-zoop-moss/10 hover:text-zoop-obsidian transition-all"
                 >
                   {city}
                 </button>

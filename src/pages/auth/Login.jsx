@@ -99,9 +99,7 @@ const Login = () => {
     if (!nextUser) return from;
     if (nextUser.role === "seller") return "/seller/dashboard";
     if (nextUser.role === "admin") return "/admin";
-    if (
-      nextUser.profileNeedsSetup
-    ) {
+    if (nextUser.profileNeedsSetup && nextUser.role === "seller") {
       return nextUser.profileSetupRoute || "/complete-profile";
     }
     return from;
@@ -312,7 +310,7 @@ const Login = () => {
       {redirecting && <Loader fullScreen />}
       <div className="bg-gradient-to-br from-zoop-moss/20 via-white to-zoop-moss/10 p-3 sm:p-4 rounded-[1.75rem] sm:rounded-3xl">
         <div className="w-full max-w-md">
-          <div className="bg-white rounded-[1.75rem] sm:rounded-3xl shadow-2xl p-5 sm:p-8">
+          <div className="bg-white dark:glass-card rounded-[1.75rem] sm:rounded-3xl shadow-2xl dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)] p-5 sm:p-8">
             {/* Header */}
             <div className="text-center mb-8">
               <Link
@@ -320,9 +318,9 @@ const Login = () => {
                 className="inline-block text-3xl font-black text-zoop-moss mb-4"
               >
                 {brandName}
-                <span className="text-zoop-obsidian text-xs italic">.in</span>
+                <span className="text-zoop-obsidian dark:text-white text-xs italic">.in</span>
               </Link>
-              <h1 className="text-2xl font-black text-zoop-obsidian mb-1">
+              <h1 className="text-2xl font-black text-zoop-obsidian dark:text-white mb-1">
                 Welcome Back
               </h1>
               <p className="text-gray-500 text-sm">
@@ -350,7 +348,7 @@ const Login = () => {
             <button
               onClick={handleGoogleLogin}
               disabled={loading}
-              className="w-full flex items-center justify-center gap-3 py-3.5 bg-white border-2 border-gray-200 rounded-xl font-bold text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm mb-6"
+              className="w-full flex items-center justify-center gap-3 py-3.5 bg-white dark:glass-card border-2 border-gray-200 dark:border-white/10 rounded-xl font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] mb-6"
             >
               <svg width="20" height="20" viewBox="0 0 24 24">
                 <path
@@ -378,14 +376,14 @@ const Login = () => {
             </p>
 
             <div className="relative flex items-center justify-center mb-6">
-              <div className="absolute inset-0 bg-gray-200 h-px w-full top-1/2" />
-              <span className="relative bg-white px-4 text-xs font-bold text-gray-400 uppercase tracking-widest">
+              <div className="absolute inset-0 bg-gray-200 dark:bg-white/20 h-px w-full top-1/2" />
+              <span className="relative bg-white dark:glass-card px-4 text-xs font-bold text-gray-400 uppercase tracking-widest">
                 {replaceBrandText("Or login with Zoop")}
               </span>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
-              <div className="grid grid-cols-2 gap-2 p-1 bg-gray-100 rounded-xl">
+              <div className="grid grid-cols-2 gap-2 p-1 bg-gray-100 dark:bg-white/10 rounded-xl">
                 <button
                   type="button"
                   onClick={() => {
@@ -395,7 +393,7 @@ const Login = () => {
                   }}
                   className={`py-2 rounded-lg text-xs font-black uppercase tracking-wider transition-all ${
                     loginMode === "password"
-                      ? "bg-white text-zoop-obsidian shadow-sm"
+                      ? "bg-white dark:glass-card text-zoop-obsidian dark:text-white shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]"
                       : "text-gray-500"
                   }`}
                 >
@@ -409,7 +407,7 @@ const Login = () => {
                   }}
                   className={`py-2 rounded-lg text-xs font-black uppercase tracking-wider transition-all ${
                     loginMode === "otp"
-                      ? "bg-white text-zoop-obsidian shadow-sm"
+                      ? "bg-white dark:glass-card text-zoop-obsidian dark:text-white shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]"
                       : "text-gray-500"
                   }`}
                 >
@@ -419,7 +417,7 @@ const Login = () => {
 
               {/* Email */}
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">
+                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                   Email Address
                 </label>
                 <div className="relative">
@@ -436,7 +434,7 @@ const Login = () => {
                       setGeneralError("");
                     }}
                     disabled={loading}
-                    className={`w-full pl-11 pr-4 py-3 rounded-xl border-2 ${errors.email ? "border-red-500" : loading ? "border-zoop-moss bg-zoop-moss/5 animate-pulse" : "border-gray-200"} focus:border-zoop-moss focus:ring-2 focus:ring-zoop-moss/20 transition-all outline-none`}
+                    className={`w-full pl-11 pr-4 py-3 rounded-xl border-2 ${errors.email ? "border-red-500" : loading ? "border-zoop-moss bg-zoop-moss/5 animate-pulse" : "border-gray-200 dark:border-white/10"} focus:border-zoop-moss focus:ring-2 focus:ring-zoop-moss/20 transition-all outline-none`}
                     placeholder="you@example.com"
                   />
                 </div>
@@ -450,7 +448,7 @@ const Login = () => {
               {/* Password */}
               {loginMode === "password" && (
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                  <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                     Password
                   </label>
                   <div className="relative">
@@ -467,7 +465,7 @@ const Login = () => {
                         setGeneralError("");
                       }}
                       disabled={loading}
-                      className={`w-full pl-11 pr-12 py-3 rounded-xl border-2 ${errors.password ? "border-red-500" : loading ? "border-zoop-moss bg-zoop-moss/5 animate-pulse" : "border-gray-200"} focus:border-zoop-moss focus:ring-2 focus:ring-zoop-moss/20 transition-all outline-none`}
+                      className={`w-full pl-11 pr-12 py-3 rounded-xl border-2 ${errors.password ? "border-red-500" : loading ? "border-zoop-moss bg-zoop-moss/5 animate-pulse" : "border-gray-200 dark:border-white/10"} focus:border-zoop-moss focus:ring-2 focus:ring-zoop-moss/20 transition-all outline-none`}
                       placeholder="••••••••"
                     />
                     <button
@@ -501,8 +499,8 @@ const Login = () => {
               )}
 
               {loginMode === "otp" && (
-                <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
-                  <div className="mb-3 grid grid-cols-2 gap-2 rounded-xl bg-white p-1">
+                <div className="bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-4">
+                  <div className="mb-3 grid grid-cols-2 gap-2 rounded-xl bg-white dark:glass-card p-1">
                     <button
                       type="button"
                       onClick={() => {
@@ -555,7 +553,7 @@ const Login = () => {
                   )}
                   {otpStep ? (
                     <>
-                      <p className="text-sm font-bold text-zoop-obsidian mb-3">
+                      <p className="text-sm font-bold text-zoop-obsidian dark:text-white mb-3">
                         Enter the OTP sent to your{" "}
                         {otpChannel === "phone" ? "phone number" : "email"}
                       </p>
@@ -581,7 +579,7 @@ const Login = () => {
                   ) : (
                     <div className="space-y-2">
                       <p></p>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
                         Choose where the OTP should be delivered, then send it.
                       </p>
                   {otpChannel === "phone" && (
@@ -639,7 +637,7 @@ const Login = () => {
                 </button>
               )}
 
-              <p className="text-center text-gray-600 text-sm">
+              <p className="text-center text-gray-600 dark:text-gray-400 text-sm">
                 Don't have an account?{" "}
                 <Link
                   to="/signup"

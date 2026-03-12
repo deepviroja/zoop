@@ -47,7 +47,7 @@ const BottomNav = () => {
 
   return (
     <nav
-      className={`fixed bottom-0 left-0 right-0 bg-zoop-moss/5 backdrop-blur-2xl text-zoop-obsidian border-t border-white/20 shadow-[0_-10px_40px_rgba(0,0,0,0.18)] z-50 md:hidden safe-bottom transition-transform duration-300 ease-in-out ${
+      className={`fixed bottom-0 left-0 right-0 bg-zoop-moss/5 backdrop-blur-2xl text-zoop-obsidian dark:text-white border-t border-white/20 shadow-[0_-10px_40px_rgba(0,0,0,0.18)] z-50 md:hidden safe-bottom transition-transform duration-300 ease-in-out ${
         isVisible ? "translate-y-0" : "translate-y-full"
       }`}
     >
@@ -61,7 +61,7 @@ const BottomNav = () => {
               to={item.path}
               className={({ isActive }) =>
                 `flex flex-col items-center justify-center gap-1 transition-all relative ${
-                  isActive ? "text-zoop-obsidian" : "text-zoop-moss"
+                  isActive ? "text-zoop-obsidian dark:text-white" : "text-zoop-moss"
                 }`
               }
             >

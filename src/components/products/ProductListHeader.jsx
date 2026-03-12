@@ -17,13 +17,13 @@ const ProductListHeader = ({
 }) => {
   return (
     <div
-      className={`bg-white rounded-2xl p-4 md:p-6 mb-6 shadow-sm sticky z-40 backdrop-blur-md bg-white/90 transition-[top] duration-300 ${
-        headerVisible ? "lg:top-[5rem] top-[7.8rem]" : "top-4"
+      className={`bg-white dark:glass-card rounded-2xl p-4 md:p-6 mb-6 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] sticky z-40 backdrop-blur-md bg-white/90 transition-[top] duration-300 ${
+        headerVisible ? "lg:top-[5rem] top-[4.5rem]" : "top-16"
       }`}
     >
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div className="hidden md:block">
-          <h1 className="text-2xl font-black text-zoop-obsidian">
+          <h1 className="text-2xl font-black text-zoop-obsidian dark:text-white">
             {heading || `${productCount} Products`}
           </h1>
         </div>
@@ -39,7 +39,7 @@ const ProductListHeader = ({
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
               aria-label="Sort products"
-              className="w-full md:w-48 appearance-none px-4 py-2 pr-8 border border-gray-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-zoop-moss bg-white cursor-pointer hover:border-zoop-moss transition-colors"
+              className="w-full md:w-48 appearance-none px-4 py-2 pr-8 border border-gray-200 dark:border-white/10 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-zoop-moss bg-white dark:glass-card cursor-pointer hover:border-zoop-moss transition-colors"
             >
               <option value="popularity">Most Popular</option>
               <option value="price-low">Price: Low to High</option>
@@ -67,12 +67,12 @@ const ProductListHeader = ({
           </div>
 
           {/* View Toggle */}
-          <div className="flex gap-1 bg-gray-100 p-1 rounded-lg">
+          <div className="flex gap-1 bg-gray-100 dark:bg-white/10 p-1 rounded-lg">
             <button
               onClick={() => setView("grid")}
               aria-label="Show products in grid view"
               className={`p-2 rounded-md transition-all ${
-                view === "grid" ? "bg-white shadow-sm" : "hover:bg-gray-200"
+                view === "grid" ? "bg-white dark:glass-card shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]" : "hover:bg-gray-200"
               }`}
               title="Grid View"
             >
@@ -80,7 +80,7 @@ const ProductListHeader = ({
                 width={18}
                 height={18}
                 className={
-                  view === "grid" ? "text-zoop-obsidian" : "text-gray-400"
+                  view === "grid" ? "text-zoop-obsidian dark:text-white" : "text-gray-400"
                 }
               />
             </button>
@@ -88,7 +88,7 @@ const ProductListHeader = ({
               onClick={() => setView("list")}
               aria-label="Show products in list view"
               className={`hidden md:block p-2 rounded-md transition-all ${
-                view === "list" ? "bg-white shadow-sm" : "hover:bg-gray-200"
+                view === "list" ? "bg-white dark:glass-card shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]" : "hover:bg-gray-200"
               }`}
               title="List View"
             >
@@ -96,7 +96,7 @@ const ProductListHeader = ({
                 width={18}
                 height={18}
                 className={
-                  view === "list" ? "text-zoop-obsidian" : "text-gray-400"
+                  view === "list" ? "text-zoop-obsidian dark:text-white" : "text-gray-400"
                 }
               />
             </button>

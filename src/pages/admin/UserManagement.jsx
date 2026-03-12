@@ -123,10 +123,10 @@ const UserManagement = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-white/5 p-6">
       <div className="max-w-[1600px] mx-auto space-y-6">
         <div>
-          <h1 className="text-4xl font-900 tracking-tighter italic text-zoop-obsidian uppercase">
+          <h1 className="text-4xl font-900 tracking-tighter italic text-zoop-obsidian dark:text-white uppercase">
             Customer_Management
           </h1>
           <p className="text-gray-400 font-bold text-xs uppercase tracking-widest mt-1">
@@ -135,8 +135,8 @@ const UserManagement = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
-            <div className="text-3xl font-black text-zoop-obsidian">{stats.totalUsers}</div>
+          <div className="bg-white dark:glass-card rounded-2xl p-5 border border-gray-100 dark:border-white/10 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
+            <div className="text-3xl font-black text-zoop-obsidian dark:text-white">{stats.totalUsers}</div>
             <div className="text-[10px] font-black uppercase tracking-widest text-gray-400 mt-1">
               Total Customers
             </div>
@@ -160,14 +160,14 @@ const UserManagement = () => {
             </div>
           </div>
           <div className="bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl p-5 border border-gray-300">
-            <div className="text-3xl font-black text-gray-700">{stats.deleted}</div>
-            <div className="text-[10px] font-black uppercase tracking-widest text-gray-600 mt-1">
+            <div className="text-3xl font-black text-gray-700 dark:text-gray-300">{stats.deleted}</div>
+            <div className="text-[10px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-400 mt-1">
               Deleted
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl p-6 shadow-sm">
+        <div className="bg-white dark:glass-card rounded-2xl p-6 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
               <Search
@@ -180,13 +180,13 @@ const UserManagement = () => {
                 placeholder="Search by customer name or email..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-zoop-moss outline-none font-bold"
+                className="w-full pl-12 pr-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl focus:ring-2 focus:ring-zoop-moss outline-none font-bold"
               />
             </div>
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-zoop-moss outline-none font-bold"
+              className="px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl focus:ring-2 focus:ring-zoop-moss outline-none font-bold"
             >
               <option value="all">All Status</option>
               <option value="active">Active</option>
@@ -197,11 +197,11 @@ const UserManagement = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-3xl shadow-sm overflow-hidden">
+        <div className="bg-white dark:glass-card rounded-3xl shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] overflow-hidden">
           <div className="overflow-x-auto scrollbar-gap">
             <table className="w-full">
               <thead>
-                <tr className="bg-gray-50">
+                <tr className="bg-gray-50 dark:bg-white/5">
                   <th className="px-6 py-4 text-left text-[10px] font-black uppercase tracking-widest text-gray-400">
                     Customer
                   </th>
@@ -236,7 +236,7 @@ const UserManagement = () => {
                   filteredUsers.map((user) => (
                     <tr key={user.id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4">
-                        <p className="font-bold text-zoop-obsidian">
+                        <p className="font-bold text-zoop-obsidian dark:text-white">
                           {user.displayName || user.name || user.email}
                         </p>
                         <p className="text-xs text-gray-500">
@@ -245,11 +245,11 @@ const UserManagement = () => {
                       </td>
                       <td className="px-6 py-4">
                         <div className="space-y-1">
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                             <Mail width={14} height={14} />
                             {user.email || "-"}
                           </div>
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                             <Phone width={14} height={14} />
                             {user.phone || "-"}
                           </div>
@@ -258,14 +258,14 @@ const UserManagement = () => {
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2 text-sm">
                           <ShoppingCart width={14} height={14} className="text-gray-400" />
-                          <span className="font-bold text-zoop-obsidian">{user.totalOrders || 0}</span>
+                          <span className="font-bold text-zoop-obsidian dark:text-white">{user.totalOrders || 0}</span>
                           <span className="text-gray-500">orders</span>
                         </div>
                         <p className="text-xs text-zoop-moss font-black mt-1">
                           Rs. {fmtInr(user.totalSpent)}
                         </p>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">
+                      <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
                         <p>{fmtDateTime(user.lastLoginAt)}</p>
                         {user.isActiveNow && (
                           <span className="inline-flex mt-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-green-100 text-green-700">
@@ -275,7 +275,7 @@ const UserManagement = () => {
                         <span
                           className={`inline-flex mt-1 ml-2 px-2 py-0.5 rounded-full text-[10px] font-black ${
                             getAccountState(user) === "deleted"
-                              ? "bg-gray-200 text-gray-700"
+                              ? "bg-gray-200 dark:bg-white/20 text-gray-700 dark:text-gray-300"
                               : getAccountState(user) === "pending"
                                 ? "bg-sky-100 text-sky-700"
                               : getAccountState(user) === "banned"
@@ -324,9 +324,9 @@ const UserManagement = () => {
 
         {selectedUser && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-3xl p-8 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="bg-white dark:glass-card rounded-3xl p-8 max-w-2xl w-full shadow-2xl dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)] max-h-[90vh] overflow-y-auto">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-2xl font-black text-zoop-obsidian">Customer Details</h3>
+                <h3 className="text-2xl font-black text-zoop-obsidian dark:text-white">Customer Details</h3>
                 <button
                   onClick={() => setSelectedUser(null)}
                   className="p-2 hover:bg-gray-100 rounded-lg transition-all"
@@ -336,35 +336,35 @@ const UserManagement = () => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-4 bg-gray-50 rounded-xl">
+                <div className="p-4 bg-gray-50 dark:bg-white/5 rounded-xl">
                   <p className="text-xs text-gray-500 font-bold uppercase">Name</p>
-                  <p className="font-black text-zoop-obsidian mt-1">
+                  <p className="font-black text-zoop-obsidian dark:text-white mt-1">
                     {selectedUser.displayName || selectedUser.name || "-"}
                   </p>
                 </div>
-                <div className="p-4 bg-gray-50 rounded-xl">
+                <div className="p-4 bg-gray-50 dark:bg-white/5 rounded-xl">
                   <p className="text-xs text-gray-500 font-bold uppercase">Email</p>
-                  <p className="font-black text-zoop-obsidian mt-1">{selectedUser.email || "-"}</p>
+                  <p className="font-black text-zoop-obsidian dark:text-white mt-1">{selectedUser.email || "-"}</p>
                 </div>
-                <div className="p-4 bg-gray-50 rounded-xl">
+                <div className="p-4 bg-gray-50 dark:bg-white/5 rounded-xl">
                   <p className="text-xs text-gray-500 font-bold uppercase">Joined</p>
-                  <p className="font-black text-zoop-obsidian mt-1">
+                  <p className="font-black text-zoop-obsidian dark:text-white mt-1">
                     {fmtDateTime(selectedUser.joinedAt || selectedUser.createdAt)}
                   </p>
                 </div>
-                <div className="p-4 bg-gray-50 rounded-xl">
+                <div className="p-4 bg-gray-50 dark:bg-white/5 rounded-xl">
                   <p className="text-xs text-gray-500 font-bold uppercase">Last Login</p>
-                  <p className="font-black text-zoop-obsidian mt-1">{fmtDateTime(selectedUser.lastLoginAt)}</p>
+                  <p className="font-black text-zoop-obsidian dark:text-white mt-1">{fmtDateTime(selectedUser.lastLoginAt)}</p>
                 </div>
-                <div className="p-4 bg-gray-50 rounded-xl">
+                <div className="p-4 bg-gray-50 dark:bg-white/5 rounded-xl">
                   <p className="text-xs text-gray-500 font-bold uppercase">Last Order</p>
-                  <p className="font-black text-zoop-obsidian mt-1">{fmtDateTime(selectedUser.lastOrderAt)}</p>
+                  <p className="font-black text-zoop-obsidian dark:text-white mt-1">{fmtDateTime(selectedUser.lastOrderAt)}</p>
                 </div>
-                <div className="p-4 bg-gray-50 rounded-xl">
+                <div className="p-4 bg-gray-50 dark:bg-white/5 rounded-xl">
                   <p className="text-xs text-gray-500 font-bold uppercase">Order Count</p>
-                  <p className="font-black text-zoop-obsidian mt-1">{selectedUser.totalOrders || 0}</p>
+                  <p className="font-black text-zoop-obsidian dark:text-white mt-1">{selectedUser.totalOrders || 0}</p>
                 </div>
-                <div className="p-4 bg-gray-50 rounded-xl md:col-span-2">
+                <div className="p-4 bg-gray-50 dark:bg-white/5 rounded-xl md:col-span-2">
                   <p className="text-xs text-gray-500 font-bold uppercase">Total Spent</p>
                   <p className="font-black text-zoop-moss text-xl mt-1">Rs. {fmtInr(selectedUser.totalSpent)}</p>
                 </div>

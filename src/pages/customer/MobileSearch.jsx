@@ -92,11 +92,11 @@ const MobileSearch = () => {
   ];
 
   return (
-    <div className="fixed inset-0 bg-white z-[9999] flex flex-col font-sans">
+    <div className="fixed inset-0 bg-white dark:glass-card z-[9999] flex flex-col font-sans">
       {/* Header / Search Bar */}
       <form
         onSubmit={handleSearch}
-        className="flex items-center gap-3 p-4 border-b border-gray-100 bg-white sticky top-0 z-10 shadow-sm"
+        className="flex items-center gap-3 p-4 border-b border-gray-100 dark:border-white/10 bg-white dark:glass-card sticky top-0 z-10 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]"
       >
         <button
           type="button"
@@ -119,7 +119,7 @@ const MobileSearch = () => {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search for products, brands..."
-            className="w-full bg-gray-100 text-zoop-obsidian placeholder:text-gray-400 pl-10 pr-10 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-zoop-moss/20 font-medium text-base h-12"
+            className="w-full bg-gray-100 dark:bg-white/10 text-zoop-obsidian dark:text-white placeholder:text-gray-400 pl-10 pr-10 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-zoop-moss/20 font-medium text-base h-12"
           />
           {query && (
             <button
@@ -168,7 +168,7 @@ const MobileSearch = () => {
                     <button
                       key={idx}
                       onClick={() => handleSuggestionClick(term)}
-                      className="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-bold text-gray-700 hover:border-zoop-moss hover:bg-zoop-moss/5 transition-colors flex items-center gap-2"
+                      className="px-4 py-2 bg-white dark:glass-card border border-gray-200 dark:border-white/10 rounded-lg text-sm font-bold text-gray-700 dark:text-gray-300 hover:border-zoop-moss hover:bg-zoop-moss/5 transition-colors flex items-center gap-2"
                     >
                       <span className="text-gray-300">🕐</span>
                       {term}
@@ -188,7 +188,7 @@ const MobileSearch = () => {
                   <button
                     key={idx}
                     onClick={() => handleSuggestionClick(term)}
-                    className="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-bold text-gray-700 flex items-center gap-2 hover:border-zoop-moss hover:bg-zoop-moss/5 transition-colors"
+                    className="px-4 py-2 bg-white dark:glass-card border border-gray-200 dark:border-white/10 rounded-lg text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2 hover:border-zoop-moss hover:bg-zoop-moss/5 transition-colors"
                   >
                     <span className="w-4 h-4 flex items-center justify-center bg-red-100 text-red-500 text-[10px] rounded font-black">
                       ↗
@@ -216,7 +216,7 @@ const MobileSearch = () => {
                   <Link
                     key={cat.name}
                     to={`/category/${cat.name.toLowerCase()}`}
-                    className="flex flex-col items-center py-4 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-700 hover:border-zoop-moss hover:bg-zoop-moss/5 transition-colors"
+                    className="flex flex-col items-center py-4 bg-white dark:glass-card border border-gray-200 dark:border-white/10 rounded-xl text-xs font-bold text-gray-700 dark:text-gray-300 hover:border-zoop-moss hover:bg-zoop-moss/5 transition-colors"
                   >
                     <span className="text-2xl mb-1">{cat.emoji}</span>
                     {cat.name}
@@ -245,9 +245,9 @@ const MobileSearch = () => {
                     <Link
                       key={product.id}
                       to={`/product/${product.id}`}
-                      className="flex items-center gap-4 bg-white p-3 rounded-xl border border-gray-100 shadow-sm active:scale-[0.98] transition-transform"
+                      className="flex items-center gap-4 bg-white dark:glass-card p-3 rounded-xl border border-gray-100 dark:border-white/10 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] active:scale-[0.98] transition-transform"
                     >
-                      <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                      <div className="w-16 h-16 bg-gray-100 dark:bg-white/10 rounded-lg overflow-hidden flex-shrink-0">
                         <img
                           src={
                             product.thumbnailUrl ||
@@ -262,14 +262,14 @@ const MobileSearch = () => {
                         />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-bold text-zoop-obsidian text-sm line-clamp-1">
+                        <p className="font-bold text-zoop-obsidian dark:text-white text-sm line-clamp-1">
                           {product.title || product.name}
                         </p>
                         <p className="text-gray-500 text-xs mb-1">
                           {product.brand}
                         </p>
                         <div className="flex items-center gap-2">
-                          <span className="text-zoop-obsidian font-black text-sm">
+                          <span className="text-zoop-obsidian dark:text-white font-black text-sm">
                             Rs. {(product.price || 0).toLocaleString()}
                           </span>
                           {product.stock > 0 && (
@@ -287,7 +287,7 @@ const MobileSearch = () => {
 
                   {liveResults.length === 0 && (
                     <div className="text-center py-12">
-                      <div className="bg-white inline-block p-4 rounded-full mb-3 shadow-sm">
+                      <div className="bg-white dark:glass-card inline-block p-4 rounded-full mb-3 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
                         <SearchIcon
                           width={32}
                           height={32}
@@ -306,7 +306,7 @@ const MobileSearch = () => {
                   {liveResults.length > 0 && (
                     <button
                       onClick={handleSearch}
-                      className="w-full py-4 bg-zoop-obsidian text-white font-bold rounded-xl mt-2 shadow-lg active:scale-95 transition-transform"
+                      className="w-full py-4 bg-zoop-obsidian text-white font-bold rounded-xl mt-2 shadow-lg dark:shadow-[0_12px_32px_rgba(0,0,0,0.5)] active:scale-95 transition-transform"
                     >
                       View All Results for "{query}"
                     </button>

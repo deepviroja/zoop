@@ -151,21 +151,21 @@ const SellerOrders = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 p-6 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-white/5 p-6 flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-zoop-moss border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-600 font-bold">Loading orders...</p>
+          <p className="text-gray-600 dark:text-gray-400 font-bold">Loading orders...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-white/5 p-4 md:p-6">
       {/* Toast */}
       {toast && (
         <div
-          className={`fixed top-6 right-6 z-50 px-5 py-4 rounded-2xl shadow-2xl text-white font-bold text-sm flex items-center gap-3 transition-all ${
+          className={`fixed top-6 right-6 z-50 px-5 py-4 rounded-2xl shadow-2xl dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)] text-white font-bold text-sm flex items-center gap-3 transition-all ${
             toast.type === "error" ? "bg-red-600" : "bg-green-600"
           }`}
         >
@@ -181,7 +181,7 @@ const SellerOrders = () => {
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-black text-zoop-obsidian tracking-tighter">
+          <h1 className="text-3xl font-black text-zoop-obsidian dark:text-white tracking-tighter">
             Order Management
           </h1>
           <p className="text-gray-500 mt-1">
@@ -195,7 +195,7 @@ const SellerOrders = () => {
             {
               label: "Total",
               value: stats.total,
-              color: "bg-gray-100 text-gray-700",
+              color: "bg-gray-100 dark:bg-white/10 text-gray-700 dark:text-gray-300",
               icon: ClipboardList,
             },
             {
@@ -253,7 +253,7 @@ const SellerOrders = () => {
               className={`px-4 py-2 rounded-full text-xs font-black uppercase tracking-wider transition-all ${
                 filterStatus === s
                   ? "bg-zoop-obsidian text-white shadow"
-                  : "bg-white text-gray-600 border border-gray-200 hover:border-zoop-moss"
+                  : "bg-white dark:glass-card text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-white/10 hover:border-zoop-moss"
               }`}
             >
               {s === "all" ? "All Orders" : s}
@@ -269,11 +269,11 @@ const SellerOrders = () => {
 
         {/* Orders List */}
         {filteredOrders.length === 0 ? (
-          <div className="bg-white rounded-3xl p-16 text-center shadow-sm">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
+          <div className="bg-white dark:glass-card rounded-3xl p-16 text-center shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100 dark:bg-white/10">
               <Package width={34} height={34} className="text-gray-500" />
             </div>
-            <h2 className="text-2xl font-black text-zoop-obsidian mb-2">
+            <h2 className="text-2xl font-black text-zoop-obsidian dark:text-white mb-2">
               {filterStatus === "all"
                 ? "No Orders Yet"
                 : `No ${filterStatus} orders`}
@@ -299,7 +299,7 @@ const SellerOrders = () => {
               return (
                 <div
                   key={order.id}
-                  className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden"
+                  className="bg-white dark:glass-card rounded-2xl border border-gray-100 dark:border-white/10 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] overflow-hidden"
                 >
                   {/* Order Header */}
                   <div
@@ -314,7 +314,7 @@ const SellerOrders = () => {
                           <cfg.icon width={18} height={18} />
                         </div>
                         <div>
-                          <p className="font-black text-zoop-obsidian text-sm">
+                          <p className="font-black text-zoop-obsidian dark:text-white text-sm">
                             {order.displayOrderId || `#${order.id?.slice(-8).toUpperCase() || "N/A"}`}
                           </p>
                           <p className="text-xs text-gray-500 mt-0.5">
@@ -344,7 +344,7 @@ const SellerOrders = () => {
                         >
                           <cfg.icon width={14} height={14} /> {cfg.label}
                         </span>
-                        <p className="font-black text-xl text-zoop-obsidian">
+                        <p className="font-black text-xl text-zoop-obsidian dark:text-white">
                           Rs. {(order.totalAmount || 0).toLocaleString()}
                         </p>
                         <span className="text-gray-400 text-sm">
@@ -379,7 +379,7 @@ const SellerOrders = () => {
                           </p>
                           {order.items.map((item, i) => (
                             <div key={i} className="flex items-start gap-3">
-                              <div className="w-12 h-12 bg-gray-100 rounded-xl overflow-hidden shrink-0 mt-1">
+                              <div className="w-12 h-12 bg-gray-100 dark:bg-white/10 rounded-xl overflow-hidden shrink-0 mt-1">
                                 {item.thumbnailUrl ? (
                                   <img
                                     src={item.thumbnailUrl}
@@ -393,7 +393,7 @@ const SellerOrders = () => {
                                 )}
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className="font-bold text-sm text-zoop-obsidian truncate">
+                                <p className="font-bold text-sm text-zoop-obsidian dark:text-white truncate">
                                   {item.title || "Product"}
                                 </p>
                                 <p className="text-xs text-gray-500">
@@ -426,7 +426,7 @@ const SellerOrders = () => {
                                       Return {item.returnRequest.status}
                                     </span>
                                     {item.returnRequest.reason && (
-                                      <p className="text-[11px] text-gray-600 mt-1">
+                                      <p className="text-[11px] text-gray-600 dark:text-gray-400 mt-1">
                                         Reason: {item.returnRequest.reason}
                                       </p>
                                     )}
@@ -453,7 +453,7 @@ const SellerOrders = () => {
                                   </div>
                                 )}
                               </div>
-                              <p className="font-black text-zoop-obsidian">
+                              <p className="font-black text-zoop-obsidian dark:text-white">
                                 Rs. {(item.price * item.quantity).toLocaleString()}
                               </p>
                             </div>
@@ -463,11 +463,11 @@ const SellerOrders = () => {
 
                       {/* Shipping Info */}
                       {order.shippingAddress && (
-                        <div className="mt-4 bg-gray-50 rounded-xl p-3">
+                        <div className="mt-4 bg-gray-50 dark:bg-white/5 rounded-xl p-3">
                           <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">
                             Ship To
                           </p>
-                          <p className="text-sm text-gray-700 font-medium">
+                          <p className="text-sm text-gray-700 dark:text-gray-300 font-medium">
                             {order.shippingAddress.street},{" "}
                             {order.shippingAddress.city},{" "}
                             {order.shippingAddress.state} —{" "}
@@ -497,7 +497,7 @@ const SellerOrders = () => {
                               <div key={s} className="flex items-center flex-1">
                                 <div
                                   className={`flex-1 h-2 rounded-full transition-all ${
-                                    isDone ? "bg-zoop-moss" : "bg-gray-200"
+                                    isDone ? "bg-zoop-moss" : "bg-gray-200 dark:bg-white/20"
                                   } ${isCurrent ? "ring-2 ring-zoop-moss ring-offset-1" : ""}`}
                                   title={s}
                                 />
@@ -506,7 +506,7 @@ const SellerOrders = () => {
                                     className={`w-2 h-2 rounded-full mx-0.5 ${
                                       idx < currentIdx
                                         ? "bg-zoop-moss"
-                                        : "bg-gray-200"
+                                        : "bg-gray-200 dark:bg-white/20"
                                     }`}
                                   />
                                 )}
@@ -519,7 +519,7 @@ const SellerOrders = () => {
                             <span
                               key={s}
                               className={`capitalize font-bold ${
-                                s === order.status ? "text-zoop-obsidian" : ""
+                                s === order.status ? "text-zoop-obsidian dark:text-white" : ""
                               }`}
                             >
                               {s}

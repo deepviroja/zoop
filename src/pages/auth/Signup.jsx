@@ -417,10 +417,10 @@ const Signup = () => {
       {/* OTP Processing Overlay */}
       {otpProcessing && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center">
-          <div className="bg-white rounded-3xl p-10 text-center shadow-2xl flex flex-col items-center gap-4">
+          <div className="bg-white dark:glass-card rounded-3xl p-10 text-center shadow-2xl dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)] flex flex-col items-center gap-4">
             <div className="w-16 h-16 border-4 border-zoop-moss border-t-transparent rounded-full animate-spin" />
             <div>
-              <p className="text-xl font-black text-zoop-obsidian">
+              <p className="text-xl font-black text-zoop-obsidian dark:text-white">
                 Verifying OTP...
               </p>
               <p className="text-gray-500 text-sm mt-1">
@@ -432,16 +432,16 @@ const Signup = () => {
       )}
 
       <div className="w-full max-w-md">
-        <div className="bg-white rounded-[1.75rem] sm:rounded-3xl shadow-2xl p-5 sm:p-8">
+        <div className="bg-white dark:glass-card rounded-[1.75rem] sm:rounded-3xl shadow-2xl dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)] p-5 sm:p-8">
           {/* Header */}
           <div className="text-center mb-8">
             <Link
               to="/"
               className="inline-block text-3xl font-black text-zoop-moss mb-4"
             >
-              {brandName}<span className="text-zoop-obsidian text-xs italic">.in</span>
+              {brandName}<span className="text-zoop-obsidian dark:text-white text-xs italic">.in</span>
             </Link>
-            <h1 className="text-2xl font-black text-zoop-obsidian mb-1">
+            <h1 className="text-2xl font-black text-zoop-obsidian dark:text-white mb-1">
               {step === 1 ? "Create Account" : "Verify Email"}
             </h1>
             <p className="text-gray-500 text-sm">
@@ -462,7 +462,7 @@ const Signup = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Name */}
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">
+                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                   Full Name
                 </label>
                 <div className="relative">
@@ -498,7 +498,7 @@ const Signup = () => {
                         ? "border-red-500 bg-red-50 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
                         : fieldSuccess.displayName
                           ? "border-zoop-moss bg-zoop-moss/5 focus:border-zoop-moss focus:ring-2 focus:ring-zoop-moss/20"
-                          : "border-gray-200 focus:border-zoop-moss focus:ring-2 focus:ring-zoop-moss/20"
+                          : "border-gray-200 dark:border-white/10 focus:border-zoop-moss focus:ring-2 focus:ring-zoop-moss/20"
                     }`}
                     placeholder="John Doe"
                   />
@@ -512,7 +512,7 @@ const Signup = () => {
 
               {/* Email */}
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">
+                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                   Email Address
                 </label>
                 <div className="relative">
@@ -545,7 +545,7 @@ const Signup = () => {
                         ? "border-red-500 bg-red-50 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
                         : fieldSuccess.email
                           ? "border-zoop-moss bg-zoop-moss/5 focus:border-zoop-moss focus:ring-2 focus:ring-zoop-moss/20"
-                          : "border-gray-200 focus:border-zoop-moss focus:ring-2 focus:ring-zoop-moss/20"
+                          : "border-gray-200 dark:border-white/10 focus:border-zoop-moss focus:ring-2 focus:ring-zoop-moss/20"
                     }`}
                     placeholder="john@example.com"
                   />
@@ -561,21 +561,21 @@ const Signup = () => {
               {/* Sellers get a separate entry point below */}
 
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">
+                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                   OTP Delivery
                 </label>
-                <div className="grid grid-cols-2 gap-2 rounded-xl bg-gray-100 p-1">
+                <div className="grid grid-cols-2 gap-2 rounded-xl bg-gray-100 dark:bg-white/10 p-1">
                   <button
                     type="button"
                     onClick={() => setOtpChannel("email")}
-                    className={`rounded-lg py-2 text-xs font-black uppercase ${otpChannel === "email" ? "bg-white text-zoop-obsidian shadow-sm" : "text-gray-500"}`}
+                    className={`rounded-lg py-2 text-xs font-black uppercase ${otpChannel === "email" ? "bg-white dark:glass-card text-zoop-obsidian dark:text-white shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]" : "text-gray-500"}`}
                   >
                     Email OTP
                   </button>
                   <button
                     type="button"
                     onClick={() => setOtpChannel("phone")}
-                    className={`rounded-lg py-2 text-xs font-black uppercase ${otpChannel === "phone" ? "bg-white text-zoop-obsidian shadow-sm" : "text-gray-500"}`}
+                    className={`rounded-lg py-2 text-xs font-black uppercase ${otpChannel === "phone" ? "bg-white dark:glass-card text-zoop-obsidian dark:text-white shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]" : "text-gray-500"}`}
                   >
                     Mobile OTP
                   </button>
@@ -584,7 +584,7 @@ const Signup = () => {
                   <p className="mt-2 text-xs leading-5 text-gray-500">
                     Enter your mobile number in international format. Example:
                     {" "}
-                    <span className="font-bold text-zoop-obsidian">
+                    <span className="font-bold text-zoop-obsidian dark:text-white">
                       +91 9876543210
                     </span>
                   </p>
@@ -607,7 +607,7 @@ const Signup = () => {
               />
 
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">
+                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                   Address
                 </label>
                 <textarea
@@ -626,7 +626,7 @@ const Signup = () => {
                   className={`w-full px-4 py-3 rounded-xl border-2 transition-all outline-none ${
                     errors.address
                       ? "border-red-500 bg-red-50"
-                      : "border-gray-200 focus:border-zoop-moss focus:ring-2 focus:ring-zoop-moss/20"
+                      : "border-gray-200 dark:border-white/10 focus:border-zoop-moss focus:ring-2 focus:ring-zoop-moss/20"
                   }`}
                 />
                 {errors.address && (
@@ -699,7 +699,7 @@ const Signup = () => {
               />
 
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">
+                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                   Pincode
                 </label>
                 <input
@@ -720,7 +720,7 @@ const Signup = () => {
                   className={`w-full px-4 py-3 rounded-xl border-2 transition-all outline-none ${
                     errors.pincode
                       ? "border-red-500 bg-red-50"
-                      : "border-gray-200 focus:border-zoop-moss focus:ring-2 focus:ring-zoop-moss/20"
+                      : "border-gray-200 dark:border-white/10 focus:border-zoop-moss focus:ring-2 focus:ring-zoop-moss/20"
                   }`}
                 />
                 {errors.pincode && (
@@ -731,7 +731,7 @@ const Signup = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">
+                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                   Gender
                 </label>
                 <select
@@ -739,7 +739,7 @@ const Signup = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, gender: e.target.value })
                   }
-                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-zoop-moss focus:ring-2 focus:ring-zoop-moss/20 outline-none"
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-white/10 focus:border-zoop-moss focus:ring-2 focus:ring-zoop-moss/20 outline-none"
                 >
                   <option value="">Select Gender</option>
                   <option value="male">Male</option>
@@ -751,7 +751,7 @@ const Signup = () => {
 
               {/* Password */}
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">
+                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                   Password
                 </label>
                 <div className="relative">
@@ -777,7 +777,7 @@ const Signup = () => {
                         ? "border-red-500 bg-red-50 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
                         : fieldSuccess.password
                           ? "border-zoop-moss bg-zoop-moss/5 focus:border-zoop-moss focus:ring-2 focus:ring-zoop-moss/20"
-                          : "border-gray-200 focus:border-zoop-moss focus:ring-2 focus:ring-zoop-moss/20"
+                          : "border-gray-200 dark:border-white/10 focus:border-zoop-moss focus:ring-2 focus:ring-zoop-moss/20"
                     }`}
                     placeholder="••••••••"
                   />
@@ -827,8 +827,8 @@ const Signup = () => {
               </button>
 
               <div className="relative flex items-center justify-center my-4">
-                <div className="absolute inset-0 bg-gray-200 h-px w-full"></div>
-                <span className="relative bg-white px-4 text-xs font-bold text-gray-400 uppercase tracking-widest">
+                <div className="absolute inset-0 bg-gray-200 dark:bg-white/20 h-px w-full"></div>
+                <span className="relative bg-white dark:glass-card px-4 text-xs font-bold text-gray-400 uppercase tracking-widest">
                   Or
                 </span>
               </div>
@@ -836,7 +836,7 @@ const Signup = () => {
               <button
                 type="button"
                 onClick={handleGoogleSignup}
-                className="w-full flex items-center justify-center gap-3 py-4 bg-white border-2 border-gray-100 rounded-xl font-bold text-gray-700 hover:bg-gray-50 hover:border-gray-200 transition-all shadow-sm"
+                className="w-full flex items-center justify-center gap-3 py-4 bg-white dark:glass-card border-2 border-gray-100 dark:border-white/10 rounded-xl font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 hover:border-gray-200 transition-all shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]"
               >
                 <svg
                   width="24"
@@ -868,7 +868,7 @@ const Signup = () => {
               </p>
 
               {/* Login & Seller Links */}
-              <p className="text-center text-gray-600 text-sm">
+              <p className="text-center text-gray-600 dark:text-gray-400 text-sm">
                 Already have an account?{" "}
                 <Link
                   to="/login"
@@ -881,7 +881,7 @@ const Signup = () => {
                 {replaceBrandText("Want to sell on Zoop?")}{" "}
                 <Link
                   to="/seller/signup"
-                  className="text-zoop-obsidian hover:underline"
+                  className="text-zoop-obsidian dark:text-white hover:underline"
                 >
                   Create a seller account
                 </Link>
@@ -898,7 +898,7 @@ const Signup = () => {
 
               {/* Resend OTP */}
               <div className="text-center">
-                <p className="text-gray-600 mb-2">Didn't receive the code?</p>
+                <p className="text-gray-600 dark:text-gray-400 mb-2">Didn't receive the code?</p>
                 <p className="text-xs text-gray-500 mb-2">
                   OTP expires in {formatMMSS(otpSecondsLeft)}
                 </p>
@@ -919,7 +919,7 @@ const Signup = () => {
                   setStep(1);
                   setGeneralError("");
                 }}
-                className="w-full py-3 bg-gray-100 text-gray-700 rounded-xl font-bold hover:bg-gray-200 transition-all"
+                className="w-full py-3 bg-gray-100 dark:bg-white/10 text-gray-700 dark:text-gray-300 rounded-xl font-bold hover:bg-gray-200 transition-all"
               >
                 Back to Signup
               </button>

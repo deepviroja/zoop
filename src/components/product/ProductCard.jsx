@@ -123,7 +123,7 @@ const ProductCard = ({ product, view = "grid" }) => {
     return (
       <Link
         to={`/product/${product.id}`}
-        className="block bg-white border border-gray-100 rounded-xl overflow-hidden hover:shadow-2xl transition-all group"
+        className="block bg-white dark:glass-card border border-gray-100 dark:border-white/10 rounded-xl overflow-hidden hover:shadow-2xl transition-all group"
       >
         <div className="flex gap-6 p-6">
           {/* Image */}
@@ -137,7 +137,7 @@ const ProductCard = ({ product, view = "grid" }) => {
               }}
             />
             {product.type === "Local" && (
-              <div className="absolute top-2 left-2 bg-zoop-moss text-zoop-obsidian text-[10px] font-black px-2 py-1 rounded-full shadow-lg flex items-center gap-1">
+              <div className="absolute top-2 left-2 bg-zoop-moss text-zoop-obsidian dark:text-white text-[10px] font-black px-2 py-1 rounded-full shadow-lg dark:shadow-[0_12px_32px_rgba(0,0,0,0.5)] flex items-center gap-1">
                 <Zap width={10} height={10} fill="black" /> SAME-DAY
               </div>
             )}
@@ -156,10 +156,10 @@ const ProductCard = ({ product, view = "grid" }) => {
                   <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">
                     {product.brand}
                   </p>
-                  <h3 className="text-xl font-bold text-zoop-obsidian mt-1 line-clamp-2 group-hover:text-zoop-moss transition-colors">
+                  <h3 className="text-xl font-bold text-zoop-obsidian dark:text-white mt-1 line-clamp-2 group-hover:text-zoop-moss transition-colors">
                     {product.title || product.name}
                   </h3>
-                  <p className="text-sm text-gray-600 mt-2 line-clamp-2">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 line-clamp-2">
                     {product.description}
                   </p>
                 </div>
@@ -198,7 +198,7 @@ const ProductCard = ({ product, view = "grid" }) => {
             <div className="flex items-center justify-between mt-4">
               <div>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-2xl font-black text-zoop-obsidian">
+                  <span className="text-2xl font-black text-zoop-obsidian dark:text-white">
                     {formatInrWithSymbol(product.price || 0, {
                       maximumFractionDigits: 0,
                     })}
@@ -234,7 +234,7 @@ const ProductCard = ({ product, view = "grid" }) => {
                 className={`px-6 py-3 rounded-lg font-black text-sm uppercase tracking-wider transition-all flex items-center gap-2 ${
                   isInStock
                     ? "bg-zoop-obsidian text-white hover:bg-zoop-moss hover:text-zoop-obsidian hover:scale-105"
-                    : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                    : "bg-gray-200 dark:bg-white/20 text-gray-400 cursor-not-allowed"
                 }`}
               >
                 {isInCart(product.id) ? (
@@ -263,12 +263,12 @@ const ProductCard = ({ product, view = "grid" }) => {
     <>
       <Link
         to={`/product/${product.id}`}
-        className="block bg-white border border-gray-100 rounded-2xl overflow-hidden hover:shadow-2xl transition-all group"
+        className="block bg-white dark:glass-card border border-gray-100 dark:border-white/10 rounded-2xl overflow-hidden hover:shadow-2xl transition-all group"
         onMouseEnter={() => displayImages.length > 1 && setImageIndex(1)}
         onMouseLeave={() => setImageIndex(0)}
       >
         {/* Image Container */}
-        <div className="relative aspect-square bg-zoop-canvas overflow-hidden">
+        <div className="relative aspect-4-5 bg-zoop-canvas overflow-hidden">
           <img
             src={optimizedDisplayImages[imageIndex] || optimizedDisplayImage}
             alt={productTitle}
@@ -281,18 +281,18 @@ const ProductCard = ({ product, view = "grid" }) => {
           {/* Badges - Limited to 2 most important */}
           <div className="absolute top-3 left-3 flex flex-col gap-2">
             {discount > 0 && (
-              <div className="bg-red-500 text-white text-xs font-black px-3 py-1 rounded-full shadow-lg">
+              <div className="bg-red-500 text-white text-xs font-black px-3 py-1 rounded-full shadow-lg dark:shadow-[0_12px_32px_rgba(0,0,0,0.5)]">
                 {discount}% OFF
               </div>
             )}
             {product.type === "Local" && (
-              <div className="bg-zoop-moss text-zoop-obsidian text-[10px] font-black px-3 py-1 rounded-full shadow-lg flex items-center gap-1">
+              <div className="bg-zoop-moss text-zoop-obsidian dark:text-white text-[10px] font-black px-3 py-1 rounded-full shadow-lg dark:shadow-[0_12px_32px_rgba(0,0,0,0.5)] flex items-center gap-1">
                 <Zap width={10} height={10} fill="black" /> SAME-DAY
               </div>
             )}
             {/* Show tag only if no discount and not local delivery */}
             {!discount && product.type !== "Local" && product.tag && (
-              <div className="bg-white/90 backdrop-blur text-zoop-obsidian text-[10px] font-black px-3 py-1 rounded-full">
+              <div className="bg-white/90 backdrop-blur text-zoop-obsidian dark:text-white text-[10px] font-black px-3 py-1 rounded-full">
                 {product.tag}
               </div>
             )}
@@ -302,7 +302,7 @@ const ProductCard = ({ product, view = "grid" }) => {
           <div className="absolute top-3 right-3 z-10">
             <button
               onClick={handleLike}
-              className="p-2 bg-white/90 backdrop-blur rounded-full hover:bg-white transition-all shadow-lg hover:scale-110 active:scale-95 cursor-pointer"
+              className="p-2 bg-white/90 backdrop-blur rounded-full hover:bg-white transition-all shadow-lg dark:shadow-[0_12px_32px_rgba(0,0,0,0.5)] hover:scale-110 active:scale-95 cursor-pointer"
               aria-label={isLiked ? "Remove from wishlist" : "Add to wishlist"}
             >
               <Heart
@@ -364,7 +364,7 @@ const ProductCard = ({ product, view = "grid" }) => {
           </div>
 
           {/* Product Name */}
-          <h3 className="text-base font-bold text-zoop-obsidian line-clamp-2 min-h-[3rem] group-hover:text-zoop-moss transition-colors">
+          <h3 className="text-base font-bold text-zoop-obsidian dark:text-white line-clamp-2 min-h-[3rem] group-hover:text-zoop-moss transition-colors">
             {product.title || product.name}
           </h3>
 
@@ -383,7 +383,7 @@ const ProductCard = ({ product, view = "grid" }) => {
           {/* Price & Mobile Add */}
           <div className="flex items-center justify-between mt-3">
             <div className="flex items-baseline gap-2">
-              <span className="text-xl font-black text-zoop-obsidian">
+              <span className="text-xl font-black text-zoop-obsidian dark:text-white">
                 {formatInrWithSymbol(product.price || 0, {
                   maximumFractionDigits: 0,
                 })}
@@ -406,7 +406,7 @@ const ProductCard = ({ product, view = "grid" }) => {
                   ? `Choose size for ${productTitle}`
                   : `Add ${productTitle} to cart`
               }
-              className="md:hidden bg-zoop-obsidian text-white p-2.5 rounded-xl hover:bg-zoop-moss hover:text-zoop-obsidian transition-colors shadow-lg active:scale-95"
+              className="md:hidden bg-zoop-obsidian text-white p-2.5 rounded-xl hover:bg-zoop-moss hover:text-zoop-obsidian transition-colors shadow-lg dark:shadow-[0_12px_32px_rgba(0,0,0,0.5)] active:scale-95"
             >
               <ShoppingCart width={18} height={18} />
             </button>
@@ -439,13 +439,13 @@ const ProductCard = ({ product, view = "grid" }) => {
         >
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
           <div
-            className="w-full bg-white rounded-t-[2rem] p-6 relative z-10 animate-in slide-in-from-bottom duration-300"
+            className="w-full bg-white dark:glass-card rounded-t-[2rem] p-6 relative z-10 animate-in slide-in-from-bottom duration-300"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="w-12 h-1 bg-gray-200 rounded-full mx-auto mb-6" />
+            <div className="w-12 h-1 bg-gray-200 dark:bg-white/20 rounded-full mx-auto mb-6" />
 
             <div className="flex gap-4 mb-6">
-              <div className="w-20 h-20 bg-gray-100 rounded-xl overflow-hidden">
+              <div className="w-20 h-20 bg-gray-100 dark:bg-white/10 rounded-xl overflow-hidden">
                 <img
                   src={optimizedDisplayImage}
                   alt={productTitle}
@@ -453,10 +453,10 @@ const ProductCard = ({ product, view = "grid" }) => {
                 />
               </div>
               <div>
-                <h3 className="font-bold text-zoop-obsidian text-lg line-clamp-1">
+                <h3 className="font-bold text-zoop-obsidian dark:text-white text-lg line-clamp-1">
                   {product.title || product.name}
                 </h3>
-                <p className="text-zoop-obsidian font-black text-xl mt-1">
+                <p className="text-zoop-obsidian dark:text-white font-black text-xl mt-1">
                   {formatInrWithSymbol(product.price || 0, {
                     maximumFractionDigits: 0,
                   })}
@@ -475,8 +475,8 @@ const ProductCard = ({ product, view = "grid" }) => {
                   aria-label={`Select size ${size}`}
                   className={`w-12 h-12 rounded-xl flex items-center justify-center font-black transition-all ${
                     selectedSize === size
-                      ? "bg-zoop-obsidian text-white shadow-lg scale-110"
-                      : "bg-gray-100 text-gray-400"
+                      ? "bg-zoop-obsidian text-white shadow-lg dark:shadow-[0_12px_32px_rgba(0,0,0,0.5)] scale-110"
+                      : "bg-gray-100 dark:bg-white/10 text-gray-400"
                   }`}
                 >
                   {size}
@@ -490,8 +490,8 @@ const ProductCard = ({ product, view = "grid" }) => {
               aria-label={`Add ${productTitle} to cart${selectedSize ? ` in size ${selectedSize}` : ""}`}
               className={`w-full py-4 rounded-xl font-black text-sm uppercase tracking-widest flex items-center justify-center gap-2 ${
                 selectedSize
-                  ? "bg-zoop-moss text-zoop-obsidian shadow-lg shadow-zoop-moss/20"
-                  : "bg-gray-200 text-gray-400"
+                  ? "bg-zoop-moss text-zoop-obsidian dark:text-white shadow-lg dark:shadow-[0_12px_32px_rgba(0,0,0,0.5)] shadow-zoop-moss/20"
+                  : "bg-gray-200 dark:bg-white/20 text-gray-400"
               }`}
             >
               <ShoppingCart width={18} height={18} />

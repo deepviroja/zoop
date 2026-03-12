@@ -5,7 +5,7 @@ import { useSiteConfig } from "../../context/SiteConfigContext";
 const AuthLayout = () => {
   const { brandName, replaceBrandText } = useSiteConfig();
   return (
-    <div className="min-h-screen bg-white md:h-screen md:overflow-hidden">
+    <div className="min-h-screen bg-white dark:glass-card md:h-screen md:overflow-hidden">
       <div className="flex min-h-screen flex-col md:h-screen md:flex-row">
       {/* --- LEFT SIDE: THE VIBE (Hidden on Mobile) --- */}
       <div className="hidden md:flex md:sticky md:top-0 md:h-screen md:w-1/2 bg-zoop-obsidian p-12 flex-col justify-between relative overflow-hidden">
@@ -60,14 +60,14 @@ const AuthLayout = () => {
             <Outlet />
 
             {/* Global Auth Footer */}
-            <div className="pt-8 border-t border-gray-100">
+            <div className="pt-8 border-t border-gray-100 dark:border-white/10">
               <p className="text-center text-xs text-gray-400">
                 {replaceBrandText("By continuing, you agree to Zoop's")}
-                <span className="text-zoop-obsidian font-bold underline px-1 cursor-pointer">
+                <span className="text-zoop-obsidian dark:text-white font-bold underline px-1 cursor-pointer">
                   Terms of Service
                 </span>
                 and
-                <span className="text-zoop-obsidian font-bold underline px-1 cursor-pointer">
+                <span className="text-zoop-obsidian dark:text-white font-bold underline px-1 cursor-pointer">
                   Privacy Policy
                 </span>
                 .

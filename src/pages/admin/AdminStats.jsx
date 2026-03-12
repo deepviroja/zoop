@@ -20,7 +20,7 @@ const statusColor = (s) =>
           : "bg-yellow-100 text-yellow-700";
 
 const Skeleton = ({ className = "" }) => (
-  <div className={`bg-gray-200 animate-pulse rounded-xl ${className}`} />
+  <div className={`bg-gray-200 dark:bg-white/20 animate-pulse rounded-xl ${className}`} />
 );
 const statValueClass =
   "break-words text-[clamp(1.9rem,2vw,2.45rem)] font-black leading-none tracking-tight tabular-nums";
@@ -173,15 +173,15 @@ const AdminStats = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 p-6 flex items-center justify-center">
-        <div className="bg-white rounded-2xl p-8 text-center shadow">
+      <div className="min-h-screen bg-gray-50 dark:bg-white/5 p-6 flex items-center justify-center">
+        <div className="bg-white dark:glass-card rounded-2xl p-8 text-center shadow">
           <p className="text-red-500 font-bold text-lg mb-4">
             Failed to load analytics
           </p>
           <p className="text-gray-500 mb-4">{error}</p>
           <button
             onClick={() => window.location.reload()}
-            className="px-6 py-3 bg-zoop-moss text-zoop-obsidian rounded-xl font-black"
+            className="px-6 py-3 bg-zoop-moss text-zoop-obsidian dark:text-white rounded-xl font-black"
           >
             Retry
           </button>
@@ -191,12 +191,12 @@ const AdminStats = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-white/5 p-6">
       <div className="max-w-[1600px] mx-auto space-y-6">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-black text-zoop-obsidian">
+            <h1 className="text-3xl font-black text-zoop-obsidian dark:text-white">
               Dashboard
             </h1>
             <p className="text-gray-500 mt-1">
@@ -210,8 +210,8 @@ const AdminStats = () => {
                 onClick={() => setTimeRange(range)}
                 className={`px-4 py-2 rounded-lg font-bold text-sm transition-all ${
                   timeRange === range
-                    ? "bg-zoop-moss text-zoop-obsidian"
-                    : "bg-white text-gray-600 hover:bg-gray-100"
+                    ? "bg-zoop-moss text-zoop-obsidian dark:text-white"
+                    : "bg-white dark:glass-card text-gray-600 dark:text-gray-400 hover:bg-gray-100"
                 }`}
               >
                 {range.charAt(0).toUpperCase() + range.slice(1)}
@@ -259,7 +259,7 @@ const AdminStats = () => {
           ].map((card, i) => (
             <div
               key={i}
-              className={`bg-gradient-to-br ${card.bg} rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition-all`}
+              className={`bg-gradient-to-br ${card.bg} rounded-2xl p-6 text-white shadow-lg dark:shadow-[0_12px_32px_rgba(0,0,0,0.5)] hover:shadow-xl transition-all`}
             >
               <div className="flex items-center justify-between mb-4">
                 <div className="p-3 bg-white/20 backdrop-blur rounded-xl">
@@ -284,9 +284,9 @@ const AdminStats = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Sales Chart */}
-          <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm overflow-hidden">
+          <div className="lg:col-span-2 bg-white dark:glass-card rounded-2xl p-6 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] overflow-hidden">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-black text-zoop-obsidian">
+              <h2 className="text-xl font-black text-zoop-obsidian dark:text-white">
                 Sales Overview
               </h2>
               <span className="text-sm text-gray-500">This {timeRange}</span>
@@ -301,7 +301,7 @@ const AdminStats = () => {
                     key={i}
                     className="flex min-w-[56px] flex-1 flex-col items-center gap-3"
                   >
-                    <p className="text-[11px] font-black text-zoop-obsidian whitespace-nowrap">
+                    <p className="text-[11px] font-black text-zoop-obsidian dark:text-white whitespace-nowrap">
                       {formatInrWithSymbol(Math.round(data.value))}
                     </p>
                     <div
@@ -325,8 +325,8 @@ const AdminStats = () => {
           </div>
 
           {/* Category Distribution */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
-            <h2 className="text-xl font-black text-zoop-obsidian mb-6">
+          <div className="bg-white dark:glass-card rounded-2xl p-6 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
+            <h2 className="text-xl font-black text-zoop-obsidian dark:text-white mb-6">
               Categories
             </h2>
             {loading ? (
@@ -340,14 +340,14 @@ const AdminStats = () => {
                 {categoryStats.map((cat, i) => (
                   <div key={i}>
                     <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm font-bold text-gray-700">
+                      <span className="text-sm font-bold text-gray-700 dark:text-gray-300">
                         {cat.name}
                       </span>
-                      <span className="text-sm font-black text-zoop-obsidian">
+                      <span className="text-sm font-black text-zoop-obsidian dark:text-white">
                         {cat.value}%
                       </span>
                     </div>
-                    <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="h-2 bg-gray-100 dark:bg-white/10 rounded-full overflow-hidden">
                       <div
                         className={`h-full ${cat.color} rounded-full`}
                         style={{ width: `${cat.value}%` }}
@@ -366,9 +366,9 @@ const AdminStats = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Recent Orders */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
+          <div className="bg-white dark:glass-card rounded-2xl p-6 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-black text-zoop-obsidian">
+              <h2 className="text-xl font-black text-zoop-obsidian dark:text-white">
                 Recent Orders
               </h2>
               <Link
@@ -389,10 +389,10 @@ const AdminStats = () => {
                 {analytics.recentOrders.map((order) => (
                   <div
                     key={order.id}
-                    className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-all"
+                    className="flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 rounded-xl hover:bg-gray-100 transition-all"
                   >
                     <div className="flex-1">
-                      <p className="font-bold text-zoop-obsidian text-sm truncate">
+                      <p className="font-bold text-zoop-obsidian dark:text-white text-sm truncate">
                         {order.displayOrderId || order.id}
                       </p>
                       <p className="text-xs text-gray-500">
@@ -416,7 +416,7 @@ const AdminStats = () => {
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="font-black text-zoop-obsidian">
+                      <p className="font-black text-zoop-obsidian dark:text-white">
                         <span className="tabular-nums">
                           {formatInrWithSymbol(order.totalAmount || 0, {
                             maximumFractionDigits: 0,
@@ -438,9 +438,9 @@ const AdminStats = () => {
           </div>
 
           {/* Order Status Summary */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
+          <div className="bg-white dark:glass-card rounded-2xl p-6 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-black text-zoop-obsidian">
+              <h2 className="text-xl font-black text-zoop-obsidian dark:text-white">
                 Order Status
               </h2>
               <Link
@@ -463,14 +463,14 @@ const AdminStats = () => {
                   ([status, count]) => (
                     <div
                       key={status}
-                      className="flex items-center justify-between p-3 bg-gray-50 rounded-xl"
+                      className="flex items-center justify-between p-3 bg-gray-50 dark:bg-white/5 rounded-xl"
                     >
                       <span
                         className={`inline-block px-3 py-1 rounded-full text-xs font-black uppercase ${statusColor(status)}`}
                       >
                         {status}
                       </span>
-                      <span className="font-black text-zoop-obsidian text-lg">
+                      <span className="font-black text-zoop-obsidian dark:text-white text-lg">
                         {count}
                       </span>
                     </div>
@@ -479,9 +479,9 @@ const AdminStats = () => {
               </div>
             ) : (
               <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+                <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-white/5 rounded-xl">
                   <span className="text-sm text-gray-500">Total Sellers</span>
-                  <span className="font-black text-zoop-obsidian">
+                  <span className="font-black text-zoop-obsidian dark:text-white">
                     {analytics?.totalSellers || 0}
                   </span>
                 </div>
@@ -495,13 +495,13 @@ const AdminStats = () => {
 
         <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
           {productInsights.map((group) => (
-            <div key={group.id} className="bg-white rounded-2xl p-6 shadow-sm">
+            <div key={group.id} className="bg-white dark:glass-card rounded-2xl p-6 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
               <div className="flex items-center justify-between mb-5">
                 <div>
                   <p className="text-xs font-black uppercase tracking-widest text-gray-400">
                     Product Signals
                   </p>
-                  <h2 className="text-xl font-black text-zoop-obsidian mt-1">
+                  <h2 className="text-xl font-black text-zoop-obsidian dark:text-white mt-1">
                     {group.label}
                   </h2>
                 </div>
@@ -523,7 +523,7 @@ const AdminStats = () => {
                   {group.items.map((item, index) => (
                     <div
                       key={item.id}
-                      className="relative group overflow-hidden rounded-2xl bg-white border border-gray-100 p-4 transition-all duration-300 hover:shadow-2xl hover:border-zoop-moss/30 hover:-translate-y-1"
+                      className="relative group overflow-hidden rounded-2xl bg-white dark:glass-card border border-gray-100 dark:border-white/10 p-4 transition-all duration-300 hover:shadow-2xl hover:border-zoop-moss/30 hover:-translate-y-1"
                     >
                       <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-zoop-moss/20 to-transparent rounded-bl-full -z-10 transition-transform group-hover:scale-150" />
 
@@ -532,14 +532,14 @@ const AdminStats = () => {
                           #{index + 1}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-black text-zoop-obsidian line-clamp-2 leading-snug group-hover:text-zoop-moss transition-colors">
+                          <p className="font-black text-zoop-obsidian dark:text-white line-clamp-2 leading-snug group-hover:text-zoop-moss transition-colors">
                             {item.name || item.title}
                           </p>
                           <div className="flex items-center gap-2 mt-1.5">
                             <span className="text-[10px] font-black uppercase tracking-wider text-white bg-zoop-obsidian px-2 py-0.5 rounded-md">
                               {item.brand || "Brand"}
                             </span>
-                            <span className="text-[10px] font-black uppercase tracking-wider text-zoop-obsidian bg-gray-100 px-2 py-0.5 rounded-md truncate">
+                            <span className="text-[10px] font-black uppercase tracking-wider text-zoop-obsidian dark:text-white bg-gray-100 dark:bg-white/10 px-2 py-0.5 rounded-md truncate">
                               {item.category || item.categoryId || "Category"}
                             </span>
                           </div>
@@ -549,11 +549,11 @@ const AdminStats = () => {
                               <span className="text-[9px] font-black tracking-widest uppercase text-gray-400">
                                 {group.metricLabel}
                               </span>
-                              <span className="text-sm font-black text-zoop-obsidian">
+                              <span className="text-sm font-black text-zoop-obsidian dark:text-white">
                                 {group.metricValue(item)}
                               </span>
                             </div>
-                            <div className="w-px h-8 bg-gray-100 mx-2" />
+                            <div className="w-px h-8 bg-gray-100 dark:bg-white/10 mx-2" />
                             <div className="flex flex-col items-end">
                               <span className="text-[9px] font-black tracking-widest uppercase text-gray-400">
                                 Revenue
@@ -571,7 +571,7 @@ const AdminStats = () => {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-10 bg-gray-50 rounded-2xl border border-gray-100 border-dashed">
+                <div className="text-center py-10 bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/10 border-dashed">
                   <p className="text-sm font-bold text-gray-400">
                     No signals found
                   </p>

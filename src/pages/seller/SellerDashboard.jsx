@@ -5,7 +5,7 @@ import { useUser } from "../../context/UserContext";
 import { formatInrWithSymbol } from "../../utils/currency";
 
 const Skeleton = ({ className = "" }) => (
-  <div className={`bg-gray-200 animate-pulse rounded-xl ${className}`} />
+  <div className={`bg-gray-200 dark:bg-white/20 animate-pulse rounded-xl ${className}`} />
 );
 const statValueClass =
   "break-words text-[clamp(1.8rem,2vw,2.35rem)] font-black leading-none tracking-tight tabular-nums";
@@ -174,7 +174,7 @@ const SellerDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 p-6">
+      <div className="min-h-screen bg-gray-50 dark:bg-white/5 p-6">
         <div className="max-w-6xl mx-auto space-y-6">
           <Skeleton className="h-12 w-64" />
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -190,8 +190,8 @@ const SellerDashboard = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="bg-white p-8 rounded-2xl text-center max-w-md shadow">
+      <div className="min-h-screen bg-gray-50 dark:bg-white/5 flex items-center justify-center">
+        <div className="bg-white dark:glass-card p-8 rounded-2xl text-center max-w-md shadow">
           <p className="text-red-500 font-black text-lg mb-4">
             {error?.title || "Error loading dashboard"}
           </p>
@@ -203,7 +203,7 @@ const SellerDashboard = () => {
           )}
           <button
             onClick={() => window.location.reload()}
-            className="px-6 py-3 bg-zoop-moss text-zoop-obsidian rounded-xl font-black"
+            className="px-6 py-3 bg-zoop-moss text-zoop-obsidian dark:text-white rounded-xl font-black"
           >
             Retry
           </button>
@@ -225,7 +225,7 @@ const SellerDashboard = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-white/5">
       {/* Header */}
       <div className="bg-gradient-to-r from-zoop-obsidian to-slate-800 text-white p-6 md:p-8">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
@@ -249,7 +249,7 @@ const SellerDashboard = () => {
           <div className="flex gap-3">
             <Link
               to="/seller/add-product"
-              className="bg-zoop-moss text-zoop-obsidian px-5 py-3 rounded-xl font-black text-sm hover:scale-105 transition-all"
+              className="bg-zoop-moss text-zoop-obsidian dark:text-white px-5 py-3 rounded-xl font-black text-sm hover:scale-105 transition-all"
             >
               + Add Product
             </Link>
@@ -297,10 +297,10 @@ const SellerDashboard = () => {
           ].map((s, i) => (
             <div
               key={i}
-              className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-all"
+              className="bg-white dark:glass-card rounded-2xl p-5 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-white/10 hover:shadow-md transition-all"
             >
               <p className="text-gray-500 text-sm font-medium">{s.label}</p>
-              <h3 className={`${statValueClass} text-zoop-obsidian mt-1`}>
+              <h3 className={`${statValueClass} text-zoop-obsidian dark:text-white mt-1`}>
                 {s.value}
               </h3>
               <p className={`text-xs font-bold mt-2 ${s.color}`}>{s.sub}</p>
@@ -309,14 +309,14 @@ const SellerDashboard = () => {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-2 border-b border-gray-200">
+        <div className="flex gap-2 border-b border-gray-200 dark:border-white/10">
           {["overview", "products", "orders"].map((tab) => (
             <button
               key={tab}
               onClick={() => handleTabChange(tab)}
               className={`px-5 py-3 font-black text-sm uppercase tracking-wide transition-all border-b-2 -mb-px ${
                 activeTab === tab
-                  ? "border-zoop-moss text-zoop-obsidian bg-zoop-moss/5"
+                  ? "border-zoop-moss text-zoop-obsidian dark:text-white bg-zoop-moss/5"
                   : "border-transparent text-gray-400 hover:text-gray-700"
               }`}
             >
@@ -328,9 +328,9 @@ const SellerDashboard = () => {
         {/* Overview Tab */}
         {activeTab === "overview" && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            <div className="bg-white dark:glass-card rounded-2xl p-6 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-white/10">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="font-black text-zoop-obsidian">
+                <h3 className="font-black text-zoop-obsidian dark:text-white">
                   Recent Products
                 </h3>
                 <button
@@ -345,9 +345,9 @@ const SellerDashboard = () => {
                   {(data?.products || []).map((p) => (
                     <div
                       key={p.id}
-                      className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl"
+                      className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-white/5 rounded-xl"
                     >
-                      <div className="w-12 h-12 bg-gray-200 rounded-lg overflow-hidden shrink-0">
+                      <div className="w-12 h-12 bg-gray-200 dark:bg-white/20 rounded-lg overflow-hidden shrink-0">
                         {p.thumbnailUrl && (
                           <img
                             src={p.thumbnailUrl}
@@ -388,9 +388,9 @@ const SellerDashboard = () => {
               )}
             </div>
 
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            <div className="bg-white dark:glass-card rounded-2xl p-6 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-white/10">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="font-black text-zoop-obsidian">Recent Orders</h3>
+                <h3 className="font-black text-zoop-obsidian dark:text-white">Recent Orders</h3>
                 <button
                   onClick={() => handleTabChange("orders")}
                   className="text-xs text-zoop-moss font-bold hover:underline"
@@ -403,7 +403,7 @@ const SellerDashboard = () => {
                   {(data?.recentOrders || []).map((o) => (
                     <div
                       key={o.id}
-                      className="flex items-center justify-between p-3 bg-gray-50 rounded-xl"
+                      className="flex items-center justify-between p-3 bg-gray-50 dark:bg-white/5 rounded-xl"
                     >
                       <div>
                         <p className="font-bold text-xs font-mono truncate max-w-[120px]">
@@ -434,10 +434,10 @@ const SellerDashboard = () => {
                 <p className="text-gray-400 text-center py-8">No orders yet.</p>
               )}
             </div>
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 md:col-span-2 overflow-hidden">
+            <div className="bg-white dark:glass-card rounded-2xl p-6 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-white/10 md:col-span-2 overflow-hidden">
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h3 className="text-xl font-black text-zoop-obsidian">
+                  <h3 className="text-xl font-black text-zoop-obsidian dark:text-white">
                     Sales Overview
                   </h3>
                   <p className="text-sm text-gray-500 mt-1">
@@ -450,7 +450,7 @@ const SellerDashboard = () => {
                       key={range}
                       onClick={() => setTimeRange(range)}
                       className={`px-3 py-1.5 rounded-lg text-xs font-black uppercase ${
-                        timeRange === range ? "bg-zoop-moss text-zoop-obsidian" : "bg-gray-100 text-gray-600"
+                        timeRange === range ? "bg-zoop-moss text-zoop-obsidian dark:text-white" : "bg-gray-100 dark:bg-white/10 text-gray-600 dark:text-gray-400"
                       }`}
                     >
                       {range}
@@ -467,7 +467,7 @@ const SellerDashboard = () => {
                       key={point.label}
                       className="flex min-w-[56px] flex-1 flex-col items-center gap-3"
                     >
-                      <p className="text-[11px] font-black text-zoop-obsidian whitespace-nowrap">
+                      <p className="text-[11px] font-black text-zoop-obsidian dark:text-white whitespace-nowrap">
                         {formatInrWithSymbol(Math.round(point.value))}
                       </p>
                       <div
@@ -494,12 +494,12 @@ const SellerDashboard = () => {
 
         {/* Products Tab */}
         {activeTab === "products" && (
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="bg-white dark:glass-card rounded-2xl shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-white/10 overflow-hidden">
             <div className="flex justify-between items-center p-6 border-b border-gray-50">
-              <h3 className="font-black text-zoop-obsidian">All Products</h3>
+              <h3 className="font-black text-zoop-obsidian dark:text-white">All Products</h3>
               <Link
                 to="/seller/add-product"
-                className="bg-zoop-moss text-zoop-obsidian px-4 py-2 rounded-xl font-black text-sm hover:scale-105 transition-all"
+                className="bg-zoop-moss text-zoop-obsidian dark:text-white px-4 py-2 rounded-xl font-black text-sm hover:scale-105 transition-all"
               >
                 + Add Product
               </Link>
@@ -517,7 +517,7 @@ const SellerDashboard = () => {
                     key={p.id}
                     className="flex items-center gap-4 p-4 hover:bg-gray-50 transition-all"
                   >
-                    <div className="w-16 h-16 bg-gray-100 rounded-xl overflow-hidden shrink-0">
+                    <div className="w-16 h-16 bg-gray-100 dark:bg-white/10 rounded-xl overflow-hidden shrink-0">
                       {p.thumbnailUrl && (
                         <img
                           src={p.thumbnailUrl}
@@ -535,7 +535,7 @@ const SellerDashboard = () => {
                         {p.stock || p.inventory || "N/A"}
                       </p>
                     </div>
-                    <p className="font-black text-lg text-zoop-obsidian whitespace-nowrap">
+                    <p className="font-black text-lg text-zoop-obsidian dark:text-white whitespace-nowrap">
                       {formatInrWithSymbol(p.price || 0, {
                         maximumFractionDigits: 0,
                       })}
@@ -565,7 +565,7 @@ const SellerDashboard = () => {
                 </p>
                 <Link
                   to="/seller/add-product"
-                  className="bg-zoop-moss text-zoop-obsidian px-6 py-3 rounded-xl font-black text-sm"
+                  className="bg-zoop-moss text-zoop-obsidian dark:text-white px-6 py-3 rounded-xl font-black text-sm"
                 >
                   Add Product
                 </Link>
@@ -576,9 +576,9 @@ const SellerDashboard = () => {
 
         {/* Orders Tab */}
         {activeTab === "orders" && (
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="bg-white dark:glass-card rounded-2xl shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-white/10 overflow-hidden">
             <div className="flex justify-between items-center p-6 border-b border-gray-50">
-              <h3 className="font-black text-zoop-obsidian">All Orders</h3>
+              <h3 className="font-black text-zoop-obsidian dark:text-white">All Orders</h3>
               <p className="text-sm text-gray-500">{orders.length} total</p>
             </div>
             {tabLoading ? (
@@ -602,7 +602,7 @@ const SellerDashboard = () => {
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="font-black text-zoop-obsidian">
+                      <p className="font-black text-zoop-obsidian dark:text-white">
                         <span className="tabular-nums">
                           {formatInrWithSymbol(o.totalAmount || 0, {
                             maximumFractionDigits: 0,
