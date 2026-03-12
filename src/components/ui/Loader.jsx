@@ -15,7 +15,7 @@ const Loader = ({ fullScreen = false }) => {
                     </div>
                 </div>
                 <h3 className="mt-8 text-xl font-900 tracking-tighter text-zoop-obsidian dark:text-white animate-pulse">
-                    {brandName}<span className="text-zoop-moss">.in</span>
+                    {brandName}
                 </h3>
                 <p className="text-xs font-bold text-gray-400 mt-2 tracking-widest uppercase">
                     Fetching inventory...
