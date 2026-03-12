@@ -5,17 +5,17 @@ const API_URL = API_BASE_URL;
 
 // Helper to get auth token
 const getAuthToken = async (): Promise<string | null> => {
-  const cachedToken = localStorage.getItem('authToken');
-  if (cachedToken) return cachedToken;
   const currentUser = auth.currentUser;
-  if (!currentUser) return null;
-  try {
-    const freshToken = await currentUser.getIdToken();
-    if (freshToken) localStorage.setItem("authToken", freshToken);
-    return freshToken;
-  } catch {
-    return null;
+  if (currentUser) {
+    try {
+      const freshToken = await currentUser.getIdToken();
+      if (freshToken) localStorage.setItem("authToken", freshToken);
+      return freshToken;
+    } catch {
+      // fall through to cached token
+    }
   }
+  return localStorage.getItem('authToken');
 };
 
 /** Map raw error → user-friendly message (mirrors errorMessages.js for TS side) */

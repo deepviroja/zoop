@@ -34,9 +34,14 @@ import { ChevronRight } from "../assets/icons/ChevronRight";
 import { User } from "../assets/icons/User";
 import { LogOut } from "../assets/icons/LogOut";
 import { useSiteConfig } from "../context/SiteConfigContext";
+import { useTheme } from "../context/ThemeContext";
+import { ShoppingCart } from "../assets/icons/ShoppingCart";
+import { Moon } from "../assets/icons/Moon";
+import { Sun } from "../assets/icons/Sun";
 import { formatInrWithSymbol } from "../utils/currency";
 
 const CustomerLayout = () => {
+  const { isDarkMode, toggleTheme } = useTheme();
   const { location, updateLocation, isLoading, user, logout } = useUser();
   const [searchSearchParams] = useSearchParams();
   const locationPath = useLocation();
@@ -323,39 +328,44 @@ const CustomerLayout = () => {
 
       {/* --- HEADER (Sticky Liquid) --- */}
       <header
-        className={`supports-[backdrop-filter]:backdrop-blur-2xl bg-zoop-moss/5 self-center text-white sticky top-1 z-50 transition-all duration-500 shadow-[0_16px_60px_rgba(0,0,0,0.1)] m-1 rounded-2xl border-b border-white/15 ${
-          scrollDir === "down" ? "backdrop-blur-3xl dark:bg-black/90 w-[98%]" : "backdrop-blur-2xl w-full"
+        className={`supports-[backdrop-filter]:backdrop-blur-3xl bg-white/70 dark:bg-black/60 self-center text-zoop-obsidian dark:text-white sticky top-0 z-[60] transition-all duration-500 shadow-sm border-b border-gray-100 dark:border-white/10 ${
+          scrollDir === "down" ? "w-[96%] md:w-[94%] rounded-full mt-2 mx-auto" : "w-full"
         }`}
       >
         <div className="max-w-[1400px] mx-auto px-4 relative ">
           <div
-            className={`flex items-center gap-4 transition-all duration-500 overflow-visible ${
-              scrollDir === "down" ? "h-14 py-1 justify-center" : "h-18 py-2 justify-between"
+            className={`flex items-center gap-6 transition-all duration-500 overflow-visible ${
+              scrollDir === "down" 
+                ? "h-16 py-1 justify-between px-6" 
+                : "h-20 md:h-24 py-2 justify-between px-4"
             }`}
           >
-            {/* LOGO - Hidden on mobile if scrollDir is down, or showing Z */}
+            {/* LOGO */}
             <Link
               to="/"
-              className={`transition-all duration-500 flex items-center gap-2 ${
+              className={`transition-all duration-500 flex items-center gap-2 flex-shrink-0 ${
                 scrollDir === "down" 
-                  ? "scale-110 text-3xl !pl-0" 
-                  : "text-3xl pl-4 tracking-tighter scale-100"
+                  ? "text-2xl scale-110" 
+                  : "text-3xl md:text-4xl pl-2 md:pl-4 tracking-tighter"
               }`}
             >
-              <span style={brandStyle}>
-                {scrollDir === "down" ? (brandName || "Z")[0] : isCompact ? (brandName || "Z")[0] : brandName}
+              <span 
+                style={brandStyle}
+                className={`transition-transform duration-500 font-black tracking-tighter ${scrollDir === 'down' ? 'opacity-100' : ''}`}
+              >
+                {brandName || "ZOOP"}
               </span>
             </Link>
 
             {/* SPACER for compact mode centering */}
-            {scrollDir === "down" && <div className="w-4" />}
+            {scrollDir === "down" && <div className="w-8" />}
 
             {/* DESKTOP SEARCH BAR - SMART CAPSULE */}
             <form
               ref={desktopSearchRef}
               onSubmit={handleSearch}
-              className={`hidden md:flex items-center bg-white/90 backdrop-blur-xl rounded-full shadow-lg dark:shadow-[0_12px_32px_rgba(0,0,0,0.5)] transition-all duration-500 ring-2 ${
-                scrollDir === "down" ? "max-w-md flex-none w-full" : "flex-1 mx-8 max-w-3xl"
+              className={`hidden md:flex items-center bg-white/95 dark:bg-zoop-obsidian/90 backdrop-blur-2xl rounded-full shadow-lg dark:shadow-[0_12px_32px_rgba(0,0,0,0.5)] transition-all duration-700 ring-2 ${
+                scrollDir === "down" ? "flex-1 max-w-4xl mx-4" : "flex-1 mx-8 max-w-3xl"
               } relative ${
                 searchQuery
                   ? "ring-zoop-moss/50 shadow-zoop-moss/20 shadow-2xl dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)]"
@@ -480,7 +490,7 @@ const CustomerLayout = () => {
             <div
               className={`flex items-center gap-3 md:gap-4 text-sm font-bold transition-all duration-500 ${
                 scrollDir === "down"
-                  ? "opacity-0 invisible w-0 translate-x-10 scale-90 pointer-events-none"
+                  ? "opacity-100 visible w-auto translate-x-0 scale-100"
                   : "opacity-100 visible translate-x-0 scale-100"
               }`}
             >
@@ -489,11 +499,11 @@ const CustomerLayout = () => {
                   <button
                     type="button"
                     onClick={() => navigate("/notifications")}
-                    className="relative p-2 rounded-lg hover:bg-white/10 transition-colors"
+                    className="relative p-2.5 rounded-full bg-gray-50/50 dark:bg-white/5 hover:bg-zoop-moss/20 transition-all border border-gray-100 dark:border-white/10"
                     aria-label="Notifications"
                     title="Notifications"
                   >
-                    <BellRing width={20} height={20} stroke="white" />
+                    <BellRing width={20} height={20} className="stroke-zoop-obsidian dark:stroke-white" />
                     {unreadNotifications > 0 && (
                       <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-zoop-moss text-zoop-obsidian dark:text-white text-[10px] font-black flex items-center justify-center">
                         {unreadNotifications > 9 ? "9+" : unreadNotifications}
@@ -550,7 +560,7 @@ const CustomerLayout = () => {
                   className="md:hidden relative p-2 rounded-lg hover:bg-white/10 transition-colors"
                   aria-label="Notifications"
                 >
-                  <BellRing width={20} height={20} stroke="white" />
+                  <BellRing width={20} height={20} className="stroke-current" />
                   {unreadNotifications > 0 && (
                     <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-zoop-moss text-zoop-obsidian dark:text-white text-[10px] font-black flex items-center justify-center">
                       {unreadNotifications > 9 ? "9+" : unreadNotifications}
@@ -606,12 +616,13 @@ const CustomerLayout = () => {
                           <ChevronDown
                             width={12}
                             height={12}
+                            stroke="#121212"
                             className="text-white group-hover:rotate-180 transition-transform"
                           />
                         </p>
                       </div>
-                      <div className="h-8 w-8 bg-white/10 rounded-full flex items-center justify-center">
-                        <User width={16} height={16} stroke="white" />
+                      <div className="h-8 w-8 bg-white/10 dark:bg-zoop-moss/20 rounded-full flex items-center justify-center">
+                        <User width={16} height={16} className="text-zoop-obsidian dark:text-zoop-moss" />
                       </div>
                     </button>
 
@@ -672,13 +683,55 @@ const CustomerLayout = () => {
                         </Link>
                         <Link
                           to="/wishlist"
-                          className="flex items-center h-8 gap-2 py-1 px-0 rounded-md hover:bg-gray-100 transition-colors text-sm font-bold text-gray-700 dark:text-gray-300"
+                          className="flex items-center h-8 gap-2 py-1 px-2 rounded-md hover:bg-gray-100 dark:hover:bg-white/10 transition-colors text-sm font-bold text-gray-700 dark:text-gray-300"
                         >
                           <Heart width={18} height={18} />
                           My Wishlist
                         </Link>
+                        <Link
+                          to="/cart"
+                          className="flex items-center h-8 gap-2 py-1 px-2 rounded-md hover:bg-gray-100 dark:hover:bg-white/10 transition-colors text-sm font-bold text-gray-700 dark:text-gray-300"
+                        >
+                          <ShoppingCart width={18} height={18} />
+                          My Cart
+                        </Link>
+
+                        <div className="h-px bg-gray-100 dark:bg-white/10 my-2" />
+
+                        <button
+                          onClick={async () => {
+                            setIsLoggingOut(true);
+                            setTimeout(async () => {
+                              await logout();
+                              setIsLoggingOut(false);
+                            }, 800);
+                          }}
+                          className="flex items-center h-8 gap-2 py-1 px-2 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors text-sm font-bold text-red-600"
+                        >
+                          <LogOut width={18} height={18} />
+                          Logout
+                        </button>
+
+                        <div className="h-px bg-gray-100 dark:bg-white/10 my-2" />
+
+                        {/* Theme Toggle in Dropdown */}
+                        <button
+                          onClick={toggleTheme}
+                          className="flex items-center justify-between w-full h-10 px-2 rounded-md hover:bg-gray-100 dark:hover:bg-white/10 transition-colors text-sm font-bold text-gray-700 dark:text-gray-300"
+                        >
+                          <div className="flex items-center gap-2">
+                            {isDarkMode ? (
+                              <Moon width={18} height={18} className="text-zoop-moss" />
+                            ) : (
+                              <Sun width={18} height={18} className="text-zoop-obsidian" />
+                            )}
+                            {isDarkMode ? "Dark Mode" : "Light Mode"}
+                          </div>
+                          <div className={`w-8 h-4 rounded-full p-0.5 transition-colors ${isDarkMode ? 'bg-zoop-moss' : 'bg-gray-300'}`}>
+                            <div className={`w-3 h-3 rounded-full transition-transform duration-300 ${isDarkMode ? 'translate-x-4 bg-zoop-obsidian' : 'translate-x-0 bg-white'}`} />
+                          </div>
+                        </button>
                       </div>
-                      {/* Move Logout Button out of dropdown? Wait, no, maybe leave it here too, but the user requested "Move the 'Logout' button to the top navigation/header." I will just add it to the top. */}
                     </div>
                   </div>
                 </>
@@ -699,35 +752,21 @@ const CustomerLayout = () => {
                 </>
               )}
 
-              {user && (
-                <button
-                  onClick={async () => {
-                    setIsLoggingOut(true);
-                    setTimeout(async () => {
-                      await logout();
-                      setIsLoggingOut(false);
-                    }, 800);
-                  }}
-                  className="hidden md:flex items-center gap-2 px-3 py-2 bg-red-600/10 text-red-500 rounded-lg text-xs font-black hover:bg-red-600 hover:text-white transition-all border border-red-500/20"
-                >
-                  <LogOut width={14} height={14} />
-                  Logout
-                </button>
-              )}
+
 
               <div className="hidden md:flex items-center gap-4">
                 <Link
                   to="/wishlist"
-                  className="hover:scale-110 active:scale-95 transition-transform"
+                  className="hover:scale-110 active:scale-95 transition-transform text-zoop-obsidian dark:text-white"
                 >
-                  <Heart width={24} height={24} stroke="#1a1a1a" />
+                  <Heart width={24} height={24} className="stroke-current" />
                 </Link>
-                <AnimatedCartIcon stroke="#1a1a1a" />
+                <AnimatedCartIcon stroke="#1a1a1a" className="text-zoop-obsidian dark:text-white active:scale-95 transition-transform" />
               </div>
               <button onClick={() => setSidebarOpen(true)} className="block">
                 <div className="relative group">
-                  <div className="h-10 w-10 bg-zoop-moss hover:bg-zoop-canvas rounded-xl flex items-center justify-center cursor-pointer transition-all group shadow-lg dark:shadow-[0_12px_32px_rgba(0,0,0,0.5)]">
-                    <Menu width={24} height={24} stroke="#000" />
+                  <div className="h-10 w-10 bg-zoop-moss hover:bg-zoop-obsidian dark:hover:bg-white rounded-xl flex items-center justify-center cursor-pointer transition-all group shadow-lg dark:shadow-[0_12px_32px_rgba(0,0,0,0.5)]">
+                    <Menu width={24} height={24} className="stroke-zoop-obsidian hover:stroke-zoop-moss dark:stroke-zoop-obsidian " />
                   </div>
                   <span className="absolute -top-1 right-0 flex h-3 w-3">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-zoop-moss opacity-75"></span>

@@ -125,9 +125,9 @@ const AdminLayout = () => {
           </div>
           <button
             onClick={() => setSidebarOpen(false)}
-            className="md:hidden text-gray-400 hover:text-black transition-colors"
+            className="md:hidden text-gray-400 hover:text-zoop-moss transition-colors"
           >
-            <X width={24} height={24} stroke="black" />
+            <X width={24} height={24} className="stroke-current" />
           </button>
         </div>
 
@@ -141,8 +141,8 @@ const AdminLayout = () => {
               className={({ isActive }) =>
                 `px-4 py-3 rounded-xl text-sm font-bold transition-all flex items-center gap-3 group shrink-0 ${
                   isActive
-                    ? "bg-zoop-obsidian text-white shadow-lg dark:shadow-[0_12px_32px_rgba(0,0,0,0.5)] translate-x-2"
-                    : "text-zoop-obsidian/80 hover:bg-zoop-clay/20"
+                    ? "bg-zoop-obsidian dark:bg-zoop-moss text-white dark:text-zoop-obsidian shadow-lg dark:shadow-[0_12px_32px_rgba(0,0,0,0.5)] translate-x-2"
+                    : "text-gray-500 dark:text-white/80 hover:bg-gray-100 dark:hover:bg-white/5"
                 }`
               }
             >
@@ -151,7 +151,8 @@ const AdminLayout = () => {
                   <item.icon
                     width={20}
                     height={20}
-                    stroke={isActive ? "white" : "currentColor"}
+                    stroke="currentColor"
+                    className={isActive ? "" : "opacity-70 group-hover:opacity-100"}
                   />
                   <span className="flex-1">{item.label}</span>
                   {isActive && (
@@ -186,7 +187,7 @@ const AdminLayout = () => {
         <div className="mt-auto pt-6 flex-shrink-0">
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-xl transition-all group font-bold mb-4"
+            className="w-full flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all group font-bold mb-4"
           >
             <LogOut
               width={20}
@@ -206,7 +207,7 @@ const AdminLayout = () => {
       </aside>
 
       {/* --- MAIN CONTENT --- */}
-      <main className="flex-1 w-full overflow-y-auto overscroll-contain p-4 pt-20 md:p-8 md:pt-8">
+      <main className="flex-1 w-full overflow-y-auto overscroll-contain custom-scrollbar p-4 pt-20 md:p-8 md:pt-8">
         <div className="mb-4 flex items-center justify-between bg-white dark:glass-card border border-gray-100 dark:border-white/10 rounded-xl px-4 py-3 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
           <p className="text-xs font-black uppercase tracking-widest text-gray-500">
             Admin Console

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
 import { NavLink } from "react-router-dom";
 import { Home } from "../../assets/icons/Home";
 import { User } from "../../assets/icons/User";
@@ -15,35 +15,8 @@ const BottomNav = () => {
     { name: "Account", icon: User, path: "/profile" },
   ];
 
-  const [isVisible, setIsVisible] = useState(true);
-  const lastScrollYRef = useRef(0);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-
-      // Always show when near top
-      if (currentScrollY < 50) {
-        setIsVisible(true);
-      }
-      // Show when scrolling UP
-      else if (currentScrollY < lastScrollYRef.current) {
-        setIsVisible(true);
-      }
-      // Hide when scrolling DOWN past threshold
-      else if (
-        currentScrollY > lastScrollYRef.current &&
-        currentScrollY > 100
-      ) {
-        setIsVisible(false);
-      }
-
-      lastScrollYRef.current = currentScrollY;
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  // Permanently visible as requested
+  const isVisible = true;
 
   return (
     <nav

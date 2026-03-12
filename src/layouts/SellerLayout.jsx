@@ -119,9 +119,9 @@ const SellerLayout = () => {
       <div className="md:hidden fixed top-0 left-0 right-0 p-4 z-50 pointer-events-none">
         <button
           onClick={() => setSidebarOpen(true)}
-          className="bg-zoop-obsidian text-white p-2 rounded-xl pointer-events-auto shadow-xl dark:shadow-[0_16px_48px_rgba(0,0,0,0.5)]"
+          className="bg-zoop-obsidian dark:bg-zoop-moss text-white dark:text-zoop-obsidian p-2 rounded-xl pointer-events-auto shadow-xl dark:shadow-[0_16px_48px_rgba(0,0,0,0.5)]"
         >
-          <Menu width={24} height={24} stroke="white" />
+          <Menu width={24} height={24} className="stroke-current" />
         </button>
       </div>
 
@@ -135,7 +135,7 @@ const SellerLayout = () => {
 
       {/* --- SIDEBAR --- */}
       <aside
-        className={`fixed top-0 left-0 h-screen w-72 bg-zoop-obsidian text-white p-8 z-50 transition-transform duration-300 md:translate-x-0 md:sticky md:top-0 shadow-2xl dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)] md:shadow-none flex flex-col ${
+        className={`fixed top-0 left-0 h-screen w-72 bg-white dark:bg-zoop-obsidian text-zoop-obsidian dark:text-white border-r border-gray-100 dark:border-white/10 p-8 z-50 transition-transform duration-300 md:translate-x-0 md:sticky md:top-0 shadow-2xl dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)] md:shadow-none flex flex-col ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
         style={
@@ -150,41 +150,38 @@ const SellerLayout = () => {
               <img
                 src={siteConfig.brandLogoUrl}
                 alt="brand"
-                className="h-8 w-8 rounded object-cover bg-white dark:glass-card"
+                className="h-8 w-8 rounded object-cover bg-white/10"
               />
             ) : null}
             <h2 className="text-zoop-moss font-900 text-2xl tracking-tighter uppercase italic">
-              {siteConfig?.sellerPanelTitle || "Seller Panel"}
+              Seller
             </h2>
           </div>
           <button
             onClick={() => setSidebarOpen(false)}
-            className="md:hidden text-white/50 hover:text-white transition-colors"
+            className="md:hidden text-gray-400 hover:text-zoop-moss transition-colors"
           >
-            <X width={24} height={24} />
+            <X width={24} height={24} className="stroke-current" />
           </button>
         </div>
 
         {/* Seller info chip */}
         {user && (
-          <div className="mb-6 px-4 py-3 bg-white/5 rounded-2xl flex items-center gap-3 shrink-0">
-            <div className="w-9 h-9 bg-zoop-moss rounded-full flex items-center justify-center text-zoop-obsidian dark:text-white font-black text-sm shrink-0">
+          <div className="mb-6 px-4 py-3 bg-gray-50 dark:bg-white/5 rounded-2xl flex items-center gap-3 shrink-0 border border-gray-100 dark:border-white/5">
+            <div className="w-9 h-9 bg-zoop-moss rounded-full flex items-center justify-center text-zoop-obsidian font-black text-sm shrink-0">
               {(user.displayName ||
                 user.name ||
                 user.email ||
                 "S")[0].toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-white text-xs font-black truncate">
+              <p className="text-zoop-obsidian dark:text-white text-xs font-black truncate">
                 {user.displayName || user.name || "Seller"}
               </p>
-              <p className="text-white/40 text-[10px] truncate">{user.email}</p>
+              <p className="text-gray-500 dark:text-white/40 text-[10px] truncate">{user.email}</p>
               {user?.subscription?.planName && (
                 <p className="text-zoop-moss text-[10px] font-black truncate mt-1">
                   {user.subscription.planName}
-                  {user?.subscription?.expiresAt
-                    ? ` • expires ${new Date(user.subscription.expiresAt).toLocaleDateString()}`
-                    : ""}
                 </p>
               )}
             </div>
@@ -202,7 +199,7 @@ const SellerLayout = () => {
                 `px-5 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-3 shrink-0 ${
                   isActive
                     ? "bg-zoop-moss text-zoop-obsidian dark:text-white shadow-[0_0_20px_rgba(183,232,75,0.3)] scale-105"
-                    : "text-white/75 hover:text-white hover:bg-white/5"
+                    : "text-gray-500 dark:text-white/75 hover:text-zoop-obsidian dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5"
                 }`
               }
             >
@@ -211,7 +208,8 @@ const SellerLayout = () => {
                   <item.icon
                     width={18}
                     height={18}
-                    stroke={isActive ? "black" : "currentColor"}
+                    stroke={isActive ? "currentColor" : "currentColor"}
+                    className={isActive ? "" : "opacity-70 group-hover:opacity-100"}
                   />
                   {item.label}
                 </>
@@ -253,7 +251,7 @@ const SellerLayout = () => {
       </aside>
 
       {/* --- MAIN CONTENT --- */}
-      <main className="flex-1 w-full overflow-y-auto overscroll-contain p-4 pt-20 md:p-10 md:pt-10">
+      <main className="flex-1 w-full overflow-y-auto overscroll-contain custom-scrollbar p-4 pt-20 md:p-10 md:pt-10">
         <div className="mb-4 flex items-center justify-between bg-white dark:glass-card border border-gray-100 dark:border-white/10 rounded-xl px-4 py-3 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
           <p className="text-xs font-black uppercase tracking-widest text-gray-500">
             Seller Workspace

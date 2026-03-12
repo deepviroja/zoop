@@ -429,7 +429,7 @@ const Home = () => {
                   <div className="relative w-full aspect-4-5 max-w-md ml-auto">
                     <div className="absolute inset-0 bg-gradient-to-br from-zoop-moss/30 to-zoop-copper/30 rounded-3xl blur-2xl animate-pulse" />
                     <div className="relative bg-white/10 backdrop-blur-2xl border border-white/20 rounded-3xl p-8 hover:scale-105 transition-all duration-500 hover:rotate-2">
-                      <div className="aspect-4-5 bg-gradient-to-br from-white/5 to-white/10 rounded-2xl overflow-hidden mb-6">
+                      <div className="aspect-4-5 h-[50vh] w-full bg-gradient-to-br from-white/5 to-white/10 rounded-2xl overflow-hidden mb-6">
                         <img
                           src={optimizeCloudinaryUrl(activeSlide.img, { width: 900 })}
                           alt={activeSlide.title}
@@ -695,9 +695,9 @@ const Home = () => {
 
       {/* BRAND SHOWCASE */}
       {featuredBrands.length > 0 && (
-      <section className="bg-zoop-canvas rounded-[3rem] p-8 md:p-20 text-center overflow-hidden relative">
-        <div className="absolute -top-20 -left-20 w-64 h-64 bg-zoop-clay blur-3xl rounded-full opacity-50" />
-        <h2 className="text-3xl md:text-5xl font-black text-black italic relative z-10">
+      <section className="bg-zoop-canvas dark:bg-white/5 rounded-[3rem] p-8 md:p-20 text-center overflow-hidden relative">
+        <div className="absolute -top-20 -left-20 w-64 h-64 bg-zoop-clay dark:bg-zoop-moss/10 blur-3xl rounded-full opacity-50" />
+        <h2 className="text-3xl md:text-5xl font-black text-black dark:text-white italic relative z-10">
           Brands You Can Shop Now.
           <span className="text-zoop-moss"> Ready to deliver.</span>
         </h2>
@@ -742,9 +742,9 @@ const Home = () => {
 
       {/* CATEGORY GRID */}
       {collectionCategories.length > 0 && (
-      <section className="relative rounded-3xl border border-[#e7dfd4] dark:border-white/10 bg-gradient-to-br from-[#fcfaf7] via-[#fffefc] to-[#f7f4ee] p-6 md:p-10 shadow-[0_16px_40px_rgba(36,32,24,0.08)] overflow-hidden">
+      <section className="relative rounded-3xl border border-[#e7dfd4] dark:border-white/10 bg-gradient-to-br from-[#fcfaf7] via-[#fffefc] to-[#f7f4ee] dark:from-zoop-obsidian dark:via-zoop-ink dark:to-black p-6 md:p-10 shadow-[0_16px_40px_rgba(36,32,24,0.08)] dark:shadow-none overflow-hidden">
         <div
-          className="absolute inset-0 opacity-[0.05]"
+          className="absolute inset-0 opacity-[0.05] dark:opacity-[0.1]"
           style={{
             backgroundImage:
               "linear-gradient(45deg, #8b5e3c 1px, transparent 1px), linear-gradient(-45deg, #8b5e3c 1px, transparent 1px)",

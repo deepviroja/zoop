@@ -34,7 +34,7 @@ const CategoryPage = () => {
 
   // Fetch from backend API for this category
   useEffect(() => {
-    setApiLoading(true);
+    if (!apiLoading) setApiLoading(true);
     const categoryQuery = encodeURIComponent(categoryKey || categoryName || "");
     apiClient
       .get(`/products?category=${categoryQuery}`)
@@ -44,7 +44,7 @@ const CategoryPage = () => {
         setApiProducts([]);
       })
       .finally(() => setApiLoading(false));
-  }, [categoryName]);
+  }, [categoryName, categoryKey, apiLoading]);
 
   // Initialize hook with API products and this category as the default filter
   const {
@@ -86,6 +86,7 @@ const CategoryPage = () => {
     if (categoryKey && filters.category !== categoryKey) {
       handleFilterChange({ ...filters, category: categoryKey });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [categoryKey]);
 
   return (

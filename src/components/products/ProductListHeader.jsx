@@ -17,8 +17,8 @@ const ProductListHeader = ({
 }) => {
   return (
     <div
-      className={`bg-white dark:glass-card rounded-2xl p-4 md:p-6 mb-6 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] sticky z-40 backdrop-blur-md bg-white/90 transition-[top] duration-300 ${
-        headerVisible ? "lg:top-[5rem] top-[4.5rem]" : "top-16"
+      className={`bg-white dark:glass-card rounded-2xl p-4 md:p-6 mb-6 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] sticky z-40 backdrop-blur-md bg-white/90 transition-all duration-700 ${
+        headerVisible ? "lg:top-[7.5rem] top-[6rem]" : "lg:top-24 top-20"
       }`}
     >
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">

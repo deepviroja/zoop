@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { authApi } from "../../services/api";
 import { useToast } from "../../context/ToastContext";
+import { useTheme } from "../../context/ThemeContext";
+import { Moon } from "../../assets/icons/Moon";
+import { Sun } from "../../assets/icons/Sun";
 
 const defaultSettings = {
   orderNotifications: true,
@@ -19,6 +22,7 @@ const defaultSettings = {
 
 const StoreSettings = () => {
   const { showToast } = useToast();
+  const { isDarkMode, toggleTheme } = useTheme();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState(defaultSettings);
@@ -154,13 +158,32 @@ const StoreSettings = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-white/5 p-6">
       <div className="max-w-5xl mx-auto space-y-6">
-        <div>
-          <h1 className="text-4xl font-900 tracking-tighter italic text-zoop-obsidian dark:text-white uppercase">
-            Store_Settings
-          </h1>
-          <p className="text-gray-400 font-bold text-xs uppercase tracking-widest mt-1">
-            Configure operations, notifications, and payout preferences
-          </p>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div>
+            <h1 className="text-4xl font-900 tracking-tighter italic text-zoop-obsidian dark:text-white uppercase">
+              Store_Settings
+            </h1>
+            <p className="text-gray-400 font-bold text-xs uppercase tracking-widest mt-1">
+              Configure operations, notifications, and payout preferences
+            </p>
+          </div>
+          
+          <button
+            onClick={toggleTheme}
+            className="flex items-center gap-3 px-6 py-3 bg-white dark:bg-white/10 rounded-2xl border border-gray-100 dark:border-white/10 shadow-sm hover:scale-105 transition-all"
+          >
+            {isDarkMode ? (
+              <>
+                <Sun width={18} height={18} className="text-zoop-moss" />
+                <span className="text-xs font-black uppercase text-zoop-moss">Switch to Light</span>
+              </>
+            ) : (
+              <>
+                <Moon width={18} height={18} className="text-zoop-obsidian" />
+                <span className="text-xs font-black uppercase text-zoop-obsidian">Switch to Dark</span>
+              </>
+            )}
+          </button>
         </div>
 
         <div className="bg-white dark:glass-card rounded-3xl p-6 md:p-8 border border-gray-100 dark:border-white/10 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] space-y-6">

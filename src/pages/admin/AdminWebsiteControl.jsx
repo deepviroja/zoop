@@ -2,9 +2,13 @@ import React, { useEffect, useState } from "react";
 import { adminApi, authApi, contentApi } from "../../services/api";
 import { useSiteConfig } from "../../context/SiteConfigContext";
 import { DEFAULT_BRAND_NAME } from "../../utils/branding";
+import { useTheme } from "../../context/ThemeContext";
+import { Moon } from "../../assets/icons/Moon";
+import { Sun } from "../../assets/icons/Sun";
 
 const AdminWebsiteControl = () => {
   const { refreshSiteConfig } = useSiteConfig();
+  const { isDarkMode, toggleTheme } = useTheme();
   const [saving, setSaving] = useState(false);
   const [contactSaving, setContactSaving] = useState(false);
   const [maintenanceSaving, setMaintenanceSaving] = useState(false);
@@ -193,41 +197,60 @@ const AdminWebsiteControl = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-white/5 p-6">
       <div className="max-w-5xl mx-auto space-y-6">
-        <div>
-          <h1 className="text-4xl font-900 tracking-tighter italic text-zoop-obsidian dark:text-white uppercase">
-            Website_Control
-          </h1>
-          <p className="text-gray-500 mt-2">
-            Update live website settings and publish after final review.
-          </p>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div>
+            <h1 className="text-4xl font-900 tracking-tighter italic text-zoop-obsidian dark:text-white uppercase">
+              Website_Control
+            </h1>
+            <p className="text-gray-400 font-bold text-xs uppercase tracking-widest mt-1">
+              Update live website settings and publish after final review.
+            </p>
+          </div>
+
+          <button
+            onClick={toggleTheme}
+            className="flex items-center gap-3 px-6 py-3 bg-white dark:bg-white/10 rounded-2xl border border-gray-100 dark:border-white/10 shadow-sm hover:scale-105 transition-all"
+          >
+            {isDarkMode ? (
+              <>
+                <Sun width={18} height={18} className="text-zoop-moss" />
+                <span className="text-xs font-black uppercase text-zoop-moss">Switch to Light</span>
+              </>
+            ) : (
+              <>
+                <Moon width={18} height={18} className="text-zoop-obsidian" />
+                <span className="text-xs font-black uppercase text-zoop-obsidian">Switch to Dark</span>
+              </>
+            )}
+          </button>
         </div>
 
         <div className="bg-white dark:glass-card rounded-2xl p-6 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-white/10 space-y-5">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-black uppercase tracking-widest text-gray-500 mb-2">
+              <label className="block text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2 px-1">
                 Header Brand Name
               </label>
               <input
                 value={config.brandName}
                 onChange={(e) => setConfig((prev) => ({ ...prev, brandName: e.target.value }))}
-                className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl focus:ring-2 focus:ring-zoop-moss outline-none"
+                className="w-full px-5 py-4 bg-white dark:bg-white/5 border-2 border-gray-100 dark:border-white/10 rounded-2xl focus:border-zoop-moss focus:ring-4 focus:ring-zoop-moss/10 outline-none transition-all dark:text-white font-bold"
                 placeholder={DEFAULT_BRAND_NAME}
               />
             </div>
             <div>
-              <label className="block text-xs font-black uppercase tracking-widest text-gray-500 mb-2">
+              <label className="block text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2 px-1">
                 Brand Logo URL
               </label>
               <input
                 value={config.brandLogoUrl}
                 onChange={(e) => setConfig((prev) => ({ ...prev, brandLogoUrl: e.target.value }))}
-                className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl focus:ring-2 focus:ring-zoop-moss outline-none"
+                className="w-full px-5 py-4 bg-white dark:bg-white/5 border-2 border-gray-100 dark:border-white/10 rounded-2xl focus:border-zoop-moss focus:ring-4 focus:ring-zoop-moss/10 outline-none transition-all dark:text-white font-bold"
                 placeholder="https://..."
               />
             </div>
             <div>
-              <label className="block text-xs font-black uppercase tracking-widest text-gray-500 mb-2">
+              <label className="block text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2 px-1">
                 Announcement Banner
               </label>
               <input
@@ -235,7 +258,7 @@ const AdminWebsiteControl = () => {
                 onChange={(e) =>
                   setConfig((prev) => ({ ...prev, announcementBanner: e.target.value }))
                 }
-                className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl focus:ring-2 focus:ring-zoop-moss outline-none"
+                className="w-full px-5 py-4 bg-white dark:bg-white/5 border-2 border-gray-100 dark:border-white/10 rounded-2xl focus:border-zoop-moss focus:ring-4 focus:ring-zoop-moss/10 outline-none transition-all dark:text-white font-bold"
                 placeholder="Order before 6 PM for same-day delivery"
               />
             </div>

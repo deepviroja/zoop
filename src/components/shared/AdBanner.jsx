@@ -74,7 +74,9 @@ const AdBanner = ({ type = "horizontal", slotId: slotIdProp = "", size = "defaul
           setDismissedAds(next);
           try {
             sessionStorage.setItem(DISMISSED_ADS_KEY, JSON.stringify(next));
-          } catch {}
+          } catch (err) {
+            console.error("Ad dismissal failed:", err);
+          }
         }}
         className="absolute right-3 top-3 z-20 inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/20 bg-black/35 text-white/80 backdrop-blur hover:bg-black/55"
         aria-label="Close ad"

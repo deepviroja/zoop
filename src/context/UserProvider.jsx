@@ -12,6 +12,7 @@ import {
 } from "firebase/auth";
 import { showToast } from "../services/toastService";
 import { buildClientProfileState } from "../utils/profileCompletion";
+import { authApi } from "../services/api";
 
 const DELETED_ACCOUNT_NOTICE =
   "This account has been deleted. Sign up again to create a new account or use the recovery email if available.";
@@ -47,6 +48,7 @@ export const UserProvider = ({ children }) => {
       let verificationStatus;
       let dbProfile = {};
       let hasProfileDocument = false;
+      let apiProfile = null;
       try {
         const userDoc = await getDoc(doc(db, "users", currentUser.uid));
         if (userDoc.exists()) {
@@ -82,6 +84,30 @@ export const UserProvider = ({ children }) => {
         }
       } catch (e) {
         console.warn("Failed to fetch user data from Firestore", e);
+        try {
+          apiProfile = await authApi.getProfile();
+          if (apiProfile) {
+            hasProfileDocument = apiProfile?.hasProfileDocument !== false;
+            dbProfile = apiProfile;
+            role = role || apiProfile?.role;
+            verificationStatus = apiProfile?.verificationStatus || undefined;
+            const defaultAddress = Array.isArray(apiProfile.addresses)
+              ? apiProfile.addresses.find((item) => item?.isDefault) ||
+                apiProfile.addresses[0]
+              : null;
+            const preferredCity =
+              localStorage.getItem("zoop_city") ||
+              apiProfile.defaultLocation ||
+              defaultAddress?.city ||
+              apiProfile.city;
+            if (preferredCity) {
+              setLocation(preferredCity);
+              localStorage.setItem("zoop_city", preferredCity);
+            }
+          }
+        } catch (apiError) {
+          console.warn("Failed to fetch user data from API", apiError);
+        }
       }
 
       if (!hasProfileDocument) {
@@ -98,6 +124,7 @@ export const UserProvider = ({ children }) => {
           state: "",
           pincode: "",
           photoURL: currentUser.photoURL || "",
+          ...(apiProfile || {}),
         };
         const profileState = buildClientProfileState({
           ...provisionalProfile,

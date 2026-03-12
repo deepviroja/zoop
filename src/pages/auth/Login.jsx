@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { auth } from "../../firebase";
 import {
@@ -95,7 +95,7 @@ const Login = () => {
     return `${mins}:${String(secs).padStart(2, "0")}`;
   };
 
-  const getPostLoginPath = (nextUser) => {
+  const getPostLoginPath = useCallback((nextUser) => {
     if (!nextUser) return from;
     if (nextUser.role === "seller") return "/seller/dashboard";
     if (nextUser.role === "admin") return "/admin";
@@ -103,14 +103,14 @@ const Login = () => {
       return nextUser.profileSetupRoute || "/complete-profile";
     }
     return from;
-  };
+  }, [from]);
 
   // ✅ React to user state changes — navigate AFTER UserProvider sets user
   useEffect(() => {
     if (!isLoading && user) {
       navigate(getPostLoginPath(user), { replace: true });
     }
-  }, [user, isLoading, navigate, from]);
+  }, [user, isLoading, navigate, from, getPostLoginPath]);
 
   const validateForm = () => {
     const newErrors = {};
@@ -131,6 +131,13 @@ const Login = () => {
     try {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
+      // Ensure API calls use the freshly-issued token for this signed-in user.
+        try {
+          const token = await auth.currentUser?.getIdToken(true);
+          if (token) localStorage.setItem("authToken", token);
+        } catch (e) {
+          console.error("Token fetch error", e);
+        }
       // Sync user with backend to assign role if new
       try {
         await authApi.syncUser({ mode: "login" });
@@ -308,30 +315,30 @@ const Login = () => {
         canonicalPath="/login"
       />
       {redirecting && <Loader fullScreen />}
-      <div className="bg-gradient-to-br from-zoop-moss/20 via-white to-zoop-moss/10 p-3 sm:p-4 rounded-[1.75rem] sm:rounded-3xl">
+      <div className="min-h-screen bg-gradient-to-br from-zoop-moss/20 via-white to-zoop-moss/10 dark:from-zoop-obsidian dark:via-black dark:to-zoop-ink p-3 sm:p-4 rounded-[1.75rem] sm:rounded-3xl flex items-center justify-center transition-colors duration-500">
         <div className="w-full max-w-md">
-          <div className="bg-white dark:glass-card rounded-[1.75rem] sm:rounded-3xl shadow-2xl dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)] p-5 sm:p-8">
+          <div className="bg-white/90 dark:bg-zoop-obsidian/80 backdrop-blur-xl border border-white dark:border-white/10 rounded-[1.75rem] sm:rounded-3xl shadow-2xl dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)] p-5 sm:p-8">
             {/* Header */}
             <div className="text-center mb-8">
               <Link
                 to="/"
-                className="inline-block text-3xl font-black text-zoop-moss mb-4"
+                className="inline-block text-3xl font-black text-zoop-moss mb-4 transition-transform hover:scale-105"
               >
                 {brandName}
-                <span className="text-zoop-obsidian dark:text-white text-xs italic">.in</span>
+                <span className="text-zoop-obsidian dark:text-white text-xs italic ml-1">.in</span>
               </Link>
-              <h1 className="text-2xl font-black text-zoop-obsidian dark:text-white mb-1">
+              <h1 className="text-3xl font-black text-zoop-obsidian dark:text-white mb-2">
                 Welcome Back
               </h1>
-              <p className="text-gray-500 text-sm">
+              <p className="text-gray-600 dark:text-gray-400 text-sm font-medium">
                 Login to continue shopping locally
               </p>
             </div>
 
             {/* Success */}
             {successMsg && (
-              <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-xl">
-                <p className="text-green-700 text-sm font-bold text-center">
+              <div className="mb-4 p-4 bg-green-500/10 border border-green-500/20 rounded-xl">
+                <p className="text-green-600 dark:text-green-400 text-sm font-bold text-center">
                   {successMsg}
                 </p>
               </div>
@@ -339,8 +346,8 @@ const Login = () => {
 
             {/* Error */}
             {generalError && (
-              <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-xl">
-                <p className="text-red-600 text-sm font-bold">{generalError}</p>
+              <div className="mb-4 p-4 bg-red-500/10 border border-red-500/20 rounded-xl">
+                <p className="text-red-600 dark:text-red-400 text-sm font-bold">{generalError}</p>
               </div>
             )}
 
@@ -348,9 +355,9 @@ const Login = () => {
             <button
               onClick={handleGoogleLogin}
               disabled={loading}
-              className="w-full flex items-center justify-center gap-3 py-3.5 bg-white dark:glass-card border-2 border-gray-200 dark:border-white/10 rounded-xl font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] mb-6"
+              className="w-full flex items-center justify-center gap-3 py-3.5 bg-white dark:bg-white/5 border-2 border-gray-100 dark:border-white/10 rounded-xl font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-white/10 hover:border-gray-200 transition-all shadow-sm mb-6 disabled:opacity-50"
             >
-              <svg width="20" height="20" viewBox="0 0 24 24">
+              <svg width="20" height="20" viewBox="0 0 24 24" className="no-dark-svg">
                 <path
                   d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
                   fill="#4285F4"
@@ -371,19 +378,15 @@ const Login = () => {
               Continue with Google
             </button>
 
-            <p className="text-[11px] text-gray-500 text-center mt-2">
-              If Google sign-in loops back, finish by setting a password on the Profile Completion page—accounts often need a password before social login sticks.
-            </p>
-
             <div className="relative flex items-center justify-center mb-6">
-              <div className="absolute inset-0 bg-gray-200 dark:bg-white/20 h-px w-full top-1/2" />
-              <span className="relative bg-white dark:glass-card px-4 text-xs font-bold text-gray-400 uppercase tracking-widest">
+              <div className="absolute inset-0 bg-gray-200 dark:bg-white/10 h-px w-full top-1/2" />
+              <span className="relative bg-white dark:bg-[#1a1a1a] px-4 text-xs font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap">
                 {replaceBrandText("Or login with Zoop")}
               </span>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
-              <div className="grid grid-cols-2 gap-2 p-1 bg-gray-100 dark:bg-white/10 rounded-xl">
+              <div className="grid grid-cols-2 gap-2 p-1 bg-gray-100 dark:bg-white/5 rounded-xl">
                 <button
                   type="button"
                   onClick={() => {
@@ -393,8 +396,8 @@ const Login = () => {
                   }}
                   className={`py-2 rounded-lg text-xs font-black uppercase tracking-wider transition-all ${
                     loginMode === "password"
-                      ? "bg-white dark:glass-card text-zoop-obsidian dark:text-white shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]"
-                      : "text-gray-500"
+                      ? "bg-white dark:bg-white/10 text-zoop-obsidian dark:text-white shadow-sm"
+                      : "text-gray-500 dark:text-gray-400"
                   }`}
                 >
                   Password
@@ -407,8 +410,8 @@ const Login = () => {
                   }}
                   className={`py-2 rounded-lg text-xs font-black uppercase tracking-wider transition-all ${
                     loginMode === "otp"
-                      ? "bg-white dark:glass-card text-zoop-obsidian dark:text-white shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]"
-                      : "text-gray-500"
+                      ? "bg-white dark:bg-white/10 text-zoop-obsidian dark:text-white shadow-sm"
+                      : "text-gray-500 dark:text-gray-400"
                   }`}
                 >
                   OTP Login
@@ -422,7 +425,7 @@ const Login = () => {
                 </label>
                 <div className="relative">
                   <Mail
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-zoop-obsidian/60 dark:text-gray-400"
                     width={18}
                     height={18}
                   />
@@ -434,7 +437,7 @@ const Login = () => {
                       setGeneralError("");
                     }}
                     disabled={loading}
-                    className={`w-full pl-11 pr-4 py-3 rounded-xl border-2 ${errors.email ? "border-red-500" : loading ? "border-zoop-moss bg-zoop-moss/5 animate-pulse" : "border-gray-200 dark:border-white/10"} focus:border-zoop-moss focus:ring-2 focus:ring-zoop-moss/20 transition-all outline-none`}
+                    className={`w-full pl-11 pr-4 py-3.5 rounded-xl border-2 dark:bg-transparent ${errors.email ? "border-red-500" : loading ? "border-zoop-moss bg-zoop-moss/5 animate-pulse" : "border-gray-200 dark:border-white/10"} focus:border-zoop-moss focus:ring-4 focus:ring-zoop-moss/10 transition-all outline-none dark:text-white text-zoop-obsidian font-bold`}
                     placeholder="you@example.com"
                   />
                 </div>
@@ -453,7 +456,7 @@ const Login = () => {
                   </label>
                   <div className="relative">
                     <Lock
-                      className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                      className="absolute left-4 top-1/2 -translate-y-1/2 text-zoop-obsidian/60 dark:text-gray-400"
                       width={18}
                       height={18}
                     />
@@ -465,13 +468,13 @@ const Login = () => {
                         setGeneralError("");
                       }}
                       disabled={loading}
-                      className={`w-full pl-11 pr-12 py-3 rounded-xl border-2 ${errors.password ? "border-red-500" : loading ? "border-zoop-moss bg-zoop-moss/5 animate-pulse" : "border-gray-200 dark:border-white/10"} focus:border-zoop-moss focus:ring-2 focus:ring-zoop-moss/20 transition-all outline-none`}
+                      className={`w-full pl-11 pr-12 py-3.5 rounded-xl border-2 dark:bg-transparent ${errors.password ? "border-red-500" : loading ? "border-zoop-moss bg-zoop-moss/5 animate-pulse" : "border-gray-200 dark:border-white/10"} focus:border-zoop-moss focus:ring-4 focus:ring-zoop-moss/10 transition-all outline-none dark:text-white text-zoop-obsidian font-bold`}
                       placeholder="••••••••"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
                     >
                       {showPassword ? (
                         <EyeOff width={18} height={18} />
@@ -499,8 +502,8 @@ const Login = () => {
               )}
 
               {loginMode === "otp" && (
-                <div className="bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-4">
-                  <div className="mb-3 grid grid-cols-2 gap-2 rounded-xl bg-white dark:glass-card p-1">
+                <div className="bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-xl p-4">
+                  <div className="mb-3 grid grid-cols-2 gap-2 rounded-xl bg-white dark:bg-white/5 p-1">
                     <button
                       type="button"
                       onClick={() => {
@@ -509,7 +512,7 @@ const Login = () => {
                         setPhoneConfirmation(null);
                         setErrors((prev) => ({ ...prev, phone: "" }));
                       }}
-                      className={`rounded-lg py-2 text-xs font-black uppercase ${otpChannel === "email" ? "bg-zoop-obsidian text-white" : "text-gray-500"}`}
+                      className={`rounded-lg py-2 text-xs font-black uppercase ${otpChannel === "email" ? "bg-zoop-obsidian dark:bg-zoop-moss text-white dark:text-zoop-obsidian" : "text-gray-500 dark:text-gray-400"}`}
                     >
                       Email OTP
                     </button>
@@ -519,7 +522,7 @@ const Login = () => {
                         setOtpChannel("phone");
                         setOtpStep(false);
                       }}
-                      className={`rounded-lg py-2 text-xs font-black uppercase ${otpChannel === "phone" ? "bg-zoop-obsidian text-white" : "text-gray-500"}`}
+                      className={`rounded-lg py-2 text-xs font-black uppercase ${otpChannel === "phone" ? "bg-zoop-obsidian dark:bg-zoop-moss text-white dark:text-zoop-obsidian" : "text-gray-500 dark:text-gray-400"}`}
                     >
                       Mobile OTP
                     </button>
@@ -532,16 +535,10 @@ const Login = () => {
                         onChange={(value, countryData) => {
                           setPhoneValue(value);
                           setPhoneMeta(countryData || phoneMeta);
+                          const isValid = value && isValidInternationalPhone(value, countryData || phoneMeta);
                           setErrors((prev) => ({
                             ...prev,
-                            phone:
-                              value &&
-                              !isValidInternationalPhone(
-                                value,
-                                countryData || phoneMeta,
-                              )
-                                ? "Please enter a valid mobile number"
-                                : "",
+                            phone: value && !isValid ? "Please enter a valid mobile number" : "",
                           }));
                           setGeneralError("");
                         }}
@@ -562,7 +559,7 @@ const Login = () => {
                         onComplete={handleVerifyOTP}
                         disabled={loading}
                       />
-                      <p className="text-xs text-gray-500 mt-3">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-3">
                         OTP expires in {formatMMSS(otpSecondsLeft)}
                       </p>
                       <button
@@ -578,30 +575,16 @@ const Login = () => {
                     </>
                   ) : (
                     <div className="space-y-2">
-                      <p></p>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
                         Choose where the OTP should be delivered, then send it.
                       </p>
-                  {otpChannel === "phone" && (
-                        <p className="text-xs text-gray-500">
-                          Use the email of the same account and its registered
-                          mobile number.
+                      {otpChannel === "phone" && (
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          Use the email of the same account and its registered mobile number.
                         </p>
                       )}
                     </div>
                   )}
-                </div>
-              )}
-
-              {(generalError || successMsg) && (
-                <div
-                  className={`rounded-xl px-4 py-3 border text-sm font-bold ${
-                    generalError
-                      ? "border-red-300 bg-red-50 text-red-700"
-                      : "border-green-300 bg-green-50 text-green-700"
-                  }`}
-                >
-                  {generalError || successMsg}
                 </div>
               )}
 
@@ -613,7 +596,7 @@ const Login = () => {
                   className={`w-full py-3.5 text-white rounded-xl font-black text-sm uppercase tracking-wider transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
                     generalError
                       ? "bg-red-600 hover:bg-red-700"
-                      : "bg-zoop-obsidian hover:bg-zoop-moss hover:text-zoop-obsidian"
+                      : "bg-zoop-obsidian hover:bg-zoop-moss hover:text-zoop-obsidian dark:bg-zoop-moss dark:text-zoop-obsidian dark:hover:bg-white"
                   }`}
                 >
                   {loading ? "Logging in..." : "Login"}
@@ -626,7 +609,7 @@ const Login = () => {
                   className={`w-full py-3.5 text-white rounded-xl font-black text-sm uppercase tracking-wider transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
                     generalError
                       ? "bg-red-600 hover:bg-red-700"
-                      : "bg-zoop-obsidian hover:bg-zoop-moss hover:text-zoop-obsidian"
+                      : "bg-zoop-obsidian hover:bg-zoop-moss hover:text-zoop-obsidian dark:bg-zoop-moss dark:text-zoop-obsidian dark:hover:bg-white"
                   }`}
                 >
                   {loading
@@ -646,7 +629,6 @@ const Login = () => {
                   Sign up
                 </Link>
               </p>
-              {/* Removed Admin login link as requested */}
             </form>
           </div>
         </div>

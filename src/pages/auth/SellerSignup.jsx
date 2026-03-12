@@ -57,7 +57,6 @@ const SellerSignup = () => {
   });
   const [errors, setErrors] = useState({});
   const [generalError, setGeneralError] = useState("");
-  const [submitStatus, setSubmitStatus] = useState({ type: "", message: "" });
   const [otpExpiresAt, setOtpExpiresAt] = useState("");
   const [resendAvailableAt, setResendAvailableAt] = useState("");
   const [nowTs, setNowTs] = useState(Date.now());
@@ -119,19 +118,12 @@ const SellerSignup = () => {
   const validateForm = () => {
     const newErrors = {};
     ["displayName", "email", "phone", "password"].forEach((field) => {
-      const message = validateField(
-        field,
-        nextValue(field, formData),
-        formData,
-      );
+      const message = validateField(field, formData[field], formData);
       if (message) newErrors[field] = message;
     });
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
-  const nextValue = (field, data) => data?.[field] || "";
 
   const updateFormField = (field, value) => {
     const nextData = { ...formData, [field]: value, phoneMeta };
@@ -147,39 +139,33 @@ const SellerSignup = () => {
       const provider = new GoogleAuthProvider();
       setLoading(true);
       await signInWithPopup(auth, provider);
+      try {
+        const token = await auth.currentUser?.getIdToken(true);
+        if (token) localStorage.setItem("authToken", token);
+      } catch (e) {
+        console.error("Failed to get ID token after Google signup:", e);
+      }
 
-      // Register as seller then go to onboarding
-      const syncResponse = await apiClient.post("/auth/sync", {
-        role: "seller",
-        mode: "signup",
-      });
-      const syncedUser = syncResponse?.user || {};
-      const sellerPath =
-        syncedUser?.verificationStatus === "approved"
-          ? "/seller/dashboard"
-          : syncedUser?.verificationStatus === "pending" ||
-              syncedUser?.verificationStatus === "rejected"
-            ? "/seller/waiting"
-            : "/seller/onboarding";
+      let syncedUser = {};
+      try {
+        const syncResponse = await authApi.syncUser({ role: "seller", mode: "signup" });
+        syncedUser = syncResponse?.data?.user || {};
+      } catch (e) {
+        console.error("Seller user sync error after Google signup:", e);
+      }
+      const sellerPath = syncedUser?.verificationStatus === "approved" ? "/seller/dashboard" : (syncedUser?.verificationStatus === "pending" || syncedUser?.verificationStatus === "rejected") ? "/seller/waiting" : "/seller/onboarding";
 
-      showToast(
-        sellerPath === "/seller/dashboard"
-          ? "Seller account ready."
-          : "Seller account ready. Continue your setup.",
-        "success",
-      );
+      showToast("Seller account ready. Continue setup.", "success");
       confetti({
         particleCount: 150,
         spread: 70,
         origin: { y: 0.6 },
         colors: ["#a3e635", "#000000"],
       });
-
       setTimeout(() => navigate(sellerPath), 1200);
     } catch (error) {
-      console.error("Google Signup error:", error);
-      const friendly = getFriendlyError(error);
-      if (friendly) setGeneralError(friendly);
+      console.error("Google error:", error);
+      setGeneralError(getFriendlyError(error));
       setLoading(false);
     }
   };
@@ -187,12 +173,7 @@ const SellerSignup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setGeneralError("");
-    setSubmitStatus({ type: "", message: "" });
-
-    if (!validateForm()) {
-      return;
-    }
-
+    if (!validateForm()) return;
     setLoading(true);
     try {
       const response = await apiClient.post("/auth/signup", {
@@ -200,39 +181,23 @@ const SellerSignup = () => {
         email: formData.email.trim().toLowerCase(),
         otpChannel,
       });
-      setOtpRecipient(response?.otpRecipient || formData.email);
+      setOtpRecipient(response?.data?.otpRecipient || formData.email);
       if (otpChannel === "phone") {
         resetPhoneRecaptcha();
-        const confirmation = await sendFirebasePhoneOtp(
-          response?.otpRecipient || formData.phone,
-        );
+        const confirmation = await sendFirebasePhoneOtp(response?.data?.otpRecipient || formData.phone);
         setPhoneConfirmation(confirmation);
         setOtpExpiresAt(new Date(Date.now() + 5 * 60 * 1000).toISOString());
         setResendAvailableAt(new Date(Date.now() + 60 * 1000).toISOString());
       } else {
-        const expiresAt =
-          response?.expiresAt ||
-          new Date(Date.now() + 5 * 60 * 1000).toISOString();
-        const resendAfterSec = Number(response?.resendAfterSec || 60);
+        const expiresAt = response?.data?.expiresAt || new Date(Date.now() + 5 * 60 * 1000).toISOString();
+        const resendAfterSec = Number(response?.data?.resendAfterSec || 60);
         setOtpExpiresAt(expiresAt);
-        setResendAvailableAt(
-          new Date(Date.now() + resendAfterSec * 1000).toISOString(),
-        );
+        setResendAvailableAt(new Date(Date.now() + resendAfterSec * 1000).toISOString());
       }
-      showToast(
-        `OTP sent to your ${otpChannel === "phone" ? "mobile" : "email"}!`,
-        "success",
-      );
-      setSubmitStatus({
-        type: "success",
-        message: `OTP sent. Verify your ${otpChannel === "phone" ? "mobile number" : "email"} to continue.`,
-      });
+      showToast(`OTP sent to your ${otpChannel}!`, "success");
       setStep(2);
     } catch (error) {
-      console.error("Signup error:", error);
-      const msg = getFriendlyError(error);
-      setGeneralError(msg);
-      setSubmitStatus({ type: "error", message: msg });
+      setGeneralError(getFriendlyError(error));
     } finally {
       setLoading(false);
     }
@@ -240,22 +205,15 @@ const SellerSignup = () => {
 
   const handleOTPComplete = async (otp) => {
     if (loading) return;
-    setLoading(true);
     setGeneralError("");
+    setLoading(true);
     try {
       let response;
       if (otpChannel === "phone") {
-        if (!phoneConfirmation) {
-          throw new Error(
-            "Mobile OTP session expired. Please request a new OTP.",
-          );
-        }
+        if (!phoneConfirmation) throw new Error("Session expired.");
         const phoneResult = await phoneConfirmation.confirm(otp);
         const idToken = await phoneResult.user.getIdToken();
-        response = await authApi.verifyPhoneSignup({
-          email: formData.email,
-          idToken,
-        });
+        response = await authApi.verifyPhoneSignup({ email: formData.email, idToken });
       } else {
         response = await apiClient.post("/auth/verify-otp", {
           email: formData.email.trim().toLowerCase(),
@@ -264,32 +222,21 @@ const SellerSignup = () => {
           otpRecipient,
         });
       }
-
-      showToast(
-        `${otpChannel === "phone" ? "Mobile" : "Email"} verified! Setting up your seller profile...`,
-        "success",
-      );
-
+      showToast("Verified! Onboarding...", "success");
       confetti({
         particleCount: 150,
         spread: 70,
         origin: { y: 0.6 },
         colors: ["#a3e635", "#000000"],
       });
-
-      if (response.token) {
+      if (response.data?.token) {
         await signOut(auth).catch(() => {});
-        await signInWithCustomToken(auth, response.token);
+        await signInWithCustomToken(auth, response.data.token);
       }
-
-      setTimeout(() => {
-        navigate("/seller/onboarding");
-      }, 1500);
+      setTimeout(() => navigate("/seller/onboarding"), 1500);
     } catch (error) {
-      console.error("OTP verification error:", error);
-      const msg = getFriendlyError(error);
-      setGeneralError(msg);
-      showToast(msg, "error");
+      setGeneralError(getFriendlyError(error));
+      showToast(getFriendlyError(error), "error");
     } finally {
       setLoading(false);
     }
@@ -298,38 +245,24 @@ const SellerSignup = () => {
   const handleResendOTP = async () => {
     setLoading(true);
     setGeneralError("");
-    setSubmitStatus({ type: "", message: "" });
     try {
       const response = await authApi.resendOTP(formData.email, otpChannel);
-      setOtpRecipient(response?.otpRecipient || formData.email);
+      setOtpRecipient(response?.data?.otpRecipient || formData.email);
       if (otpChannel === "phone") {
         resetPhoneRecaptcha();
-        const confirmation = await sendFirebasePhoneOtp(
-          response?.otpRecipient || formData.phone,
-        );
+        const confirmation = await sendFirebasePhoneOtp(response?.data?.otpRecipient || formData.phone);
         setPhoneConfirmation(confirmation);
         setOtpExpiresAt(new Date(Date.now() + 5 * 60 * 1000).toISOString());
         setResendAvailableAt(new Date(Date.now() + 60 * 1000).toISOString());
       } else {
-        const expiresAt =
-          response?.expiresAt ||
-          new Date(Date.now() + 5 * 60 * 1000).toISOString();
-        const resendAfterSec = Number(response?.resendAfterSec || 60);
+        const expiresAt = response?.data?.expiresAt || new Date(Date.now() + 5 * 60 * 1000).toISOString();
+        const resendAfterSec = Number(response?.data?.resendAfterSec || 60);
         setOtpExpiresAt(expiresAt);
-        setResendAvailableAt(
-          new Date(Date.now() + resendAfterSec * 1000).toISOString(),
-        );
+        setResendAvailableAt(new Date(Date.now() + resendAfterSec * 1000).toISOString());
       }
-      showToast(
-        `New OTP sent to your ${otpChannel === "phone" ? "mobile" : "email"}!`,
-        "success",
-      );
-      setSubmitStatus({ type: "success", message: "A new OTP has been sent." });
+      showToast(`New OTP sent to your ${otpChannel}!`, "success");
     } catch (error) {
-      console.error("Resend OTP error:", error);
-      const msg = getFriendlyError(error);
-      setGeneralError(msg);
-      setSubmitStatus({ type: "error", message: msg });
+      setGeneralError(getFriendlyError(error));
     } finally {
       setLoading(false);
     }
@@ -338,305 +271,115 @@ const SellerSignup = () => {
   useEffect(() => () => resetPhoneRecaptcha(), []);
 
   return (
-    <div className="rounded-[1.75rem] bg-gradient-to-br from-zoop-moss/20 via-white to-zoop-moss/10 p-3 sm:rounded-3xl sm:p-4">
-      <Seo
-        title="Seller Signup | Zoop"
-        description="Create your Zoop seller account."
-        robots="noindex,nofollow"
-        canonicalPath="/seller/signup"
-      />
-      {toast.show && (
-        <Toast message={toast.message} type={toast.type} onClose={hideToast} />
-      )}
-      <div className="w-full max-w-md">
-        <div className="bg-white dark:glass-card rounded-[1.75rem] sm:rounded-3xl shadow-2xl dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)] p-5 sm:p-8">
-          <div className="text-center mb-8">
-            <Link
-              to="/"
-              className="inline-block text-3xl font-black text-zoop-moss mb-4"
-            >
-              ZOOP
-              <span className="text-zoop-obsidian dark:text-white text-xs italic">.in</span>
-            </Link>
-            <h1 className="text-2xl font-black text-zoop-obsidian dark:text-white mb-1">
-              {step === 1 ? "Create Seller Account" : "Verify Email"}
-            </h1>
-            <p className="text-gray-500 text-sm">
-              {step === 1
-                ? "Start selling on Zoop and continue to onboarding"
-                : `Enter the OTP sent to your ${otpChannel === "phone" ? "phone number" : "email"}`}
-            </p>
-          </div>
+    <>
+      <Seo title="Seller Signup | Zoop" description="Create your Zoop seller account." robots="noindex,nofollow" canonicalPath="/seller/signup" />
+      {toast.show && <Toast message={toast.message} type={toast.type} onClose={hideToast} />}
 
-          {generalError && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
-              <p className="text-red-600 text-sm font-bold">{generalError}</p>
+      <div className="min-h-screen bg-gradient-to-br from-zoop-moss/20 via-white to-zoop-moss/10 dark:from-zoop-obsidian dark:via-black dark:to-zoop-ink p-3 sm:p-4 flex items-center justify-center transition-colors duration-500">
+        <div className="w-full max-w-md">
+          <div className="bg-white/90 dark:bg-zoop-obsidian/80 backdrop-blur-xl border border-white dark:border-white/10 rounded-[1.75rem] sm:rounded-3xl shadow-2xl p-5 sm:p-8">
+            <div className="text-center mb-8">
+              <Link to="/" className="inline-block text-3xl font-black text-zoop-moss mb-4 transition-transform hover:scale-105">
+                ZOOP<span className="text-zoop-obsidian dark:text-white text-xs italic ml-1">.in</span>
+              </Link>
+              <h1 className="text-2xl font-black text-zoop-obsidian dark:text-white mb-1">
+                {step === 1 ? "Seller Signup" : "Verify Account"}
+              </h1>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">
+                Start selling locally on Zoop
+              </p>
             </div>
-          )}
 
-          {step === 1 ? (
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
-                  Full Name
-                </label>
-                <div className="relative">
-                  <User
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-                    width={20}
-                    height={20}
-                  />
-                  <input
-                    type="text"
-                    value={formData.displayName}
-                    onChange={(e) =>
-                      updateFormField("displayName", e.target.value)
-                    }
-                    disabled={loading}
-                    className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 transition-all outline-none ${errors.displayName ? "border-red-500 bg-red-50 focus:border-red-500 focus:ring-2 focus:ring-red-500/20" : loading ? "border-zoop-moss bg-zoop-moss/5 animate-pulse" : "border-gray-200 dark:border-white/10 focus:border-zoop-moss focus:ring-2 focus:ring-zoop-moss/20"}`}
-                    placeholder="John Doe"
-                  />
-                </div>
-                {errors.displayName && (
-                  <p className="text-red-500 text-xs mt-1 font-bold">
-                    {errors.displayName}
-                  </p>
-                )}
+            {generalError && (
+              <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl">
+                <p className="text-red-600 dark:text-red-400 text-sm font-bold">{generalError}</p>
               </div>
+            )}
 
-              <div>
-                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
-                  Email Address
-                </label>
-                <div className="relative">
-                  <Mail
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-                    width={20}
-                    height={20}
-                  />
-                  <input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => updateFormField("email", e.target.value)}
-                    disabled={loading}
-                    className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 transition-all outline-none ${errors.email ? "border-red-500 bg-red-50 focus:border-red-500 focus:ring-2 focus:ring-red-500/20" : loading ? "border-zoop-moss bg-zoop-moss/5 animate-pulse" : "border-gray-200 dark:border-white/10 focus:border-zoop-moss focus:ring-2 focus:ring-zoop-moss/20"}`}
-                    placeholder="you@example.com"
-                  />
+            {step === 1 ? (
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Full Name</label>
+                  <div className="relative">
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" width={18} height={18} />
+                    <input type="text" value={formData.displayName} onChange={(e) => updateFormField("displayName", e.target.value)}
+                      className={`w-full pl-11 pr-4 py-3 rounded-xl border-2 dark:bg-transparent transition-all outline-none dark:text-white ${errors.displayName ? "border-red-500" : "border-gray-100 dark:border-white/10 focus:border-zoop-moss"}`}
+                      placeholder="John Doe" />
+                  </div>
                 </div>
-                {errors.email && (
-                  <p className="text-red-500 text-xs mt-1 font-bold">
-                    {errors.email}
-                  </p>
-                )}
-              </div>
 
-              <div>
-                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
-                  OTP Delivery
-                </label>
-                <div className="grid grid-cols-2 gap-2 rounded-xl bg-gray-100 dark:bg-white/10 p-1">
-                  <button
-                    type="button"
-                    onClick={() => setOtpChannel("email")}
-                    className={`rounded-lg py-2 text-xs font-black uppercase ${otpChannel === "email" ? "bg-white dark:glass-card text-zoop-obsidian dark:text-white shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]" : "text-gray-500"}`}
-                  >
-                    Email OTP
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setOtpChannel("phone")}
-                    className={`rounded-lg py-2 text-xs font-black uppercase ${otpChannel === "phone" ? "bg-white dark:glass-card text-zoop-obsidian dark:text-white shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]" : "text-gray-500"}`}
-                  >
-                    Mobile OTP
-                  </button>
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Email Address</label>
+                  <div className="relative">
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" width={18} height={18} />
+                    <input type="email" value={formData.email} onChange={(e) => updateFormField("email", e.target.value)}
+                      className={`w-full pl-11 pr-4 py-3 rounded-xl border-2 dark:bg-transparent transition-all outline-none dark:text-white ${errors.email ? "border-red-500" : "border-gray-100 dark:border-white/10 focus:border-zoop-moss"}`}
+                      placeholder="you@example.com" />
+                  </div>
                 </div>
-                {otpChannel === "phone" && (
-                  <p className="mt-2 text-xs leading-5 text-gray-500">
-                    Enter your mobile number in international format. Example:
-                    {" "}
-                    <span className="font-bold text-zoop-obsidian dark:text-white">
-                      +91 9876543210
-                    </span>
-                  </p>
-                )}
-              </div>
 
-              <CountryPhoneField
-                label="Phone Number"
-                required
-                value={formData.phone}
-                onChange={(value, countryData) => {
-                  const nextPhoneMeta = countryData || phoneMeta;
-                  setPhoneMeta(nextPhoneMeta);
-                  const nextData = { ...formData, phoneMeta: nextPhoneMeta };
-                  setFormData((prev) => ({
-                    ...prev,
-                    phone: value,
-                    phoneMeta: nextPhoneMeta,
-                  }));
-                  setErrors((prev) => ({
-                    ...prev,
-                    phone: validateField("phone", value, nextData),
-                  }));
-                }}
-                onMetaChange={(meta) => setPhoneMeta(meta || phoneMeta)}
-                error={errors.phone}
-                disabled={loading}
-                defaultCountry="in"
-              />
-
-              <div>
-                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
-                  Password
-                </label>
-                <div className="relative">
-                  <Lock
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-                    width={20}
-                    height={20}
-                  />
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    value={formData.password}
-                    onChange={(e) =>
-                      updateFormField("password", e.target.value)
-                    }
-                    disabled={loading}
-                    className={`w-full pl-12 pr-12 py-3 rounded-xl border-2 transition-all outline-none ${errors.password ? "border-red-500 bg-red-50 focus:border-red-500 focus:ring-2 focus:ring-red-500/20" : loading ? "border-zoop-moss bg-zoop-moss/5 animate-pulse" : "border-gray-200 dark:border-white/10 focus:border-zoop-moss focus:ring-2 focus:ring-zoop-moss/20"}`}
-                    placeholder="••••••••"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  >
-                    {showPassword ? (
-                      <EyeOff width={20} height={20} />
-                    ) : (
-                      <Eye width={20} height={20} />
-                    )}
-                  </button>
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">OTP Delivery</label>
+                  <div className="grid grid-cols-2 gap-2 rounded-xl bg-gray-100 dark:bg-white/5 p-1">
+                    <button type="button" onClick={() => setOtpChannel("email")} className={`rounded-lg py-2 text-xs font-black uppercase ${otpChannel === "email" ? "bg-white dark:bg-white/10 text-zoop-obsidian dark:text-white" : "text-gray-500"}`}>Email</button>
+                    <button type="button" onClick={() => setOtpChannel("phone")} className={`rounded-lg py-2 text-xs font-black uppercase ${otpChannel === "phone" ? "bg-white dark:bg-white/10 text-zoop-obsidian dark:text-white" : "text-gray-500"}`}>Mobile</button>
+                  </div>
                 </div>
-                {errors.password && (
-                  <p className="text-red-500 text-xs mt-1 font-bold">
-                    {errors.password}
-                  </p>
-                )}
-                <PasswordStrength password={formData.password} />
-              </div>
 
-              {submitStatus.message && (
-                <div
-                  className={`rounded-xl border px-4 py-3 text-sm font-bold ${
-                    submitStatus.type === "error"
-                      ? "border-red-300 bg-red-50 text-red-700"
-                      : "border-green-300 bg-green-50 text-green-700"
-                  }`}
-                >
-                  {submitStatus.message}
+                <CountryPhoneField label="Phone Number" required value={formData.phone} defaultCountry="in"
+                  onChange={(val, meta) => { setPhoneMeta(meta); updateFormField("phone", val); }}
+                  error={errors.phone} />
+
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Password</label>
+                  <div className="relative">
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" width={18} height={18} />
+                    <input type={showPassword ? "text" : "password"} value={formData.password} onChange={(e) => updateFormField("password", e.target.value)}
+                      className={`w-full pl-11 pr-12 py-3 rounded-xl border-2 dark:bg-transparent transition-all outline-none dark:text-white ${errors.password ? "border-red-500" : "border-gray-100 dark:border-white/10 focus:border-zoop-moss"}`}
+                      placeholder="••••••••" />
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
+                      {showPassword ? <EyeOff width={18} height={18} /> : <Eye width={18} height={18} />}
+                    </button>
+                  </div>
+                  <PasswordStrength password={formData.password} />
                 </div>
-              )}
 
-              <button
-                type="submit"
-                disabled={loading}
-                className={`w-full py-4 rounded-xl font-black text-lg transition-all disabled:cursor-not-allowed disabled:opacity-50 ${
-                  submitStatus.type === "error"
-                    ? "bg-red-600 text-white hover:bg-red-700"
-                    : "bg-zoop-obsidian text-white hover:bg-zoop-moss hover:text-zoop-obsidian"
-                }`}
-              >
-                {loading ? "Creating Account..." : "Create Seller Account"}
-              </button>
-
-              <div className="relative flex items-center justify-center my-4">
-                <div className="absolute inset-0 bg-gray-200 dark:bg-white/20 h-px w-full"></div>
-                <span className="relative bg-white dark:glass-card px-4 text-xs font-bold text-gray-400 uppercase tracking-widest">
-                  Or
-                </span>
-              </div>
-
-              <button
-                type="button"
-                onClick={handleGoogleSignup}
-                disabled={loading}
-                className="w-full flex items-center justify-center gap-3 py-4 bg-white dark:glass-card border-2 border-gray-100 dark:border-white/10 rounded-xl font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 hover:border-gray-200 transition-all shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] disabled:opacity-50"
-              >
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                    fill="#4285F4"
-                  />
-                  <path
-                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                    fill="#34A853"
-                  />
-                  <path
-                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                    fill="#FBBC05"
-                  />
-                  <path
-                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                    fill="#EA4335"
-                  />
-                </svg>
-                Sign up with Google
-              </button>
-              <p className="text-[11px] text-gray-500 text-center mt-2">
-                If Google sign-in loops back, finish by setting a password on the Profile Completion page—accounts often need a password before social login sticks.
-              </p>
-
-              <p className="text-center text-gray-600 dark:text-gray-400 text-sm">
-                Already have a seller account?{" "}
-                <Link
-                  to="/login?redirect=/seller/dashboard"
-                  className="text-zoop-moss font-bold hover:underline"
-                >
-                  Login
-                </Link>
-              </p>
-            </form>
-          ) : (
-            <div className="space-y-6">
-              <OTPInput
-                length={6}
-                onComplete={handleOTPComplete}
-                disabled={loading}
-              />
-              <div className="text-center">
-                <p className="text-gray-600 dark:text-gray-400 mb-2">Didn't receive the code?</p>
-                <p className="text-xs text-gray-500 mb-2">
-                  OTP expires in {formatMMSS(otpSecondsLeft)}
-                </p>
-                <button
-                  onClick={handleResendOTP}
-                  disabled={loading || resendSecondsLeft > 0}
-                  className="text-zoop-moss font-bold hover:underline disabled:opacity-50"
-                >
-                  {resendSecondsLeft > 0
-                    ? `Resend in ${formatMMSS(resendSecondsLeft)}`
-                    : "Resend OTP"}
+                <button type="submit" disabled={loading}
+                  className="w-full py-4 bg-zoop-obsidian dark:bg-zoop-moss text-white dark:text-zoop-obsidian rounded-xl font-black text-lg hover:opacity-90 transition-all">
+                  {loading ? "Creating..." : "Create Seller Account"}
                 </button>
+
+                <div className="relative flex items-center justify-center my-4">
+                  <div className="absolute inset-0 bg-gray-200 dark:bg-white/10 h-px w-full" />
+                  <span className="relative bg-white dark:bg-[#1a1a1a] px-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Or</span>
+                </div>
+
+                <button type="button" onClick={handleGoogleSignup} disabled={loading}
+                  className="w-full flex items-center justify-center gap-3 py-4 border-2 border-gray-100 dark:border-white/10 rounded-xl font-bold dark:text-white hover:bg-gray-50 dark:hover:bg-white/5 transition-all">
+                  <svg width="24" height="24" viewBox="0 0 24 24" className="no-dark-svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+                  Signup with Google
+                </button>
+
+                <p className="text-center text-gray-600 dark:text-gray-400 text-sm">
+                  Already a seller? <Link to="/login?redirect=/seller/dashboard" className="text-zoop-moss font-bold hover:underline">Login</Link>
+                </p>
+              </form>
+            ) : (
+              <div className="space-y-6">
+                <OTPInput length={6} onComplete={handleOTPComplete} disabled={loading} />
+                <div className="text-center">
+                  <p className="text-xs text-gray-500 mb-4">Expires in {formatMMSS(otpSecondsLeft)}</p>
+                  <button onClick={handleResendOTP} disabled={loading || resendSecondsLeft > 0} className="text-zoop-moss font-bold hover:underline disabled:opacity-50">
+                    {resendSecondsLeft > 0 ? `Resend in ${formatMMSS(resendSecondsLeft)}` : "Resend OTP"}
+                  </button>
+                </div>
+                <button onClick={() => setStep(1)} className="w-full py-3 bg-gray-100 dark:bg-white/10 text-gray-700 dark:text-gray-300 rounded-xl font-bold">Back</button>
               </div>
-              <button
-                onClick={() => {
-                  setStep(1);
-                  setGeneralError("");
-                }}
-                className="w-full py-3 bg-gray-100 dark:bg-white/10 text-gray-700 dark:text-gray-300 rounded-xl font-bold hover:bg-gray-200 transition-all"
-              >
-                Back to Signup
-              </button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

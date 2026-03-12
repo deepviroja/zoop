@@ -9,19 +9,18 @@ const API_URL = API_BASE_URL;
 
 // ─── Auth Token ───────────────────────────────────────────────────────────────
 const getAuthToken = async (): Promise<string | null> => {
-  const cachedToken = localStorage.getItem("authToken");
-  if (cachedToken) return cachedToken;
-
   const currentUser = auth.currentUser;
-  if (!currentUser) return null;
-
-  try {
-    const freshToken = await currentUser.getIdToken();
-    if (freshToken) localStorage.setItem("authToken", freshToken);
-    return freshToken;
-  } catch {
-    return null;
+  if (currentUser) {
+    try {
+      const freshToken = await currentUser.getIdToken();
+      if (freshToken) localStorage.setItem("authToken", freshToken);
+      return freshToken;
+    } catch {
+      // fall through to cached token
+    }
   }
+
+  return localStorage.getItem("authToken");
 };
 
 // ─── Base Fetcher ─────────────────────────────────────────────────────────────

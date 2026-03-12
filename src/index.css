@@ -36,9 +36,9 @@
 
 /* Custom internal scrollbars for components */
 .custom-scrollbar {
-  -ms-overflow-style: auto;
   scrollbar-width: thin;
   scrollbar-color: rgba(163, 230, 53, 0.4) transparent;
+  overflow-y: auto;
 }
 .custom-scrollbar::-webkit-scrollbar {
   display: block;
@@ -62,23 +62,51 @@
 body {
   @apply bg-zoop-canvas text-zoop-obsidian transition-colors duration-500;
   font-family: var(--font-sans);
-  overflow-x: hidden;
-  position: relative;
 }
 
-/* Dark Mode Overrides for Body */
+/* Perfect Dark Mode Contrast & Consistency */
 .dark body {
-  background-color: #050505; /* Deeper, richer black */
-  color: #ffffff; /* pure white for maximum contrast */
+  background-color: #050505;
+  color: #ffffff;
 }
 
-.dark p, .dark span {
-  color: #d1d5db; /* gray-300 for readable secondary text */
+/* Ensure global readability */
+.text-secondary { @apply text-gray-600 dark:text-gray-300; }
+.text-tertiary { @apply text-gray-500 dark:text-gray-400; }
+
+/* Global overrides for standard Tailwind classes to ensure contrast */
+.text-gray-400 { color: #6b7280; } /* Darker in light mode */
+.text-gray-500 { color: #4b5563; } /* Even darker in light mode */
+
+.dark .text-gray-400 { color: #d1d5db !important; }
+.dark .text-gray-500 { color: #9ca3af !important; }
+.dark .text-gray-300 { color: #e5e7eb !important; }
+
+/* Interactive States: Hover & Focus */
+.hover-lift {
+  @apply transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg active:scale-95;
 }
 
-.dark .text-gray-500 {
-  color: #9ca3af !important; /* gray-400 for better visibility than gray-500 in dark mode */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-zoop-moss/50 focus:border-zoop-moss;
 }
+
+/* Visibility Fixes: Icons & Borders */
+svg {
+  @apply transition-colors;
+}
+
+.dark svg:not(.no-dark-svg) {
+  @apply stroke-white transition-colors;
+}
+
+/* Explicitly handle fill-based icons in dark mode */
+.dark svg[fill="currentColor"] {
+  @apply fill-white;
+}
+
+.dark .border-gray-100 { border-color: rgba(255, 255, 255, 0.08) !important; }
+.dark .border-gray-200 { border-color: rgba(255, 255, 255, 0.12) !important; }
 
 /* Noise overlay visible strictly in dark mode */
 .dark body::after {
@@ -102,30 +130,46 @@ body,
 #root {
   min-height: 100vh;
   max-width: 100%;
-  overflow-x: clip; /* clip preserves position: sticky but hides horizontal scroll */
+  overflow-x: clip; 
 }
 
-/* Define as Tailwind Utilities so variant prefixes like 'dark:glass-card' work seamlessly */
+/* Premium Component Utilities */
 @utility glass {
-  background: rgba(26, 26, 26, 0.4) !important;
+  background: rgba(255, 255, 255, 0.7) !important;
   backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.dark .glass {
+  background: rgba(26, 26, 26, 0.4) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
 }
 
 @utility glass-card {
-  background: rgba(20, 20, 20, 0.6) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8) !important;
+  background: #ffffff !important;
+  border: 1px solid #f3f4f6 !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
   border-radius: var(--radius-zoop) !important;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
   &:hover {
     border-color: rgba(163, 230, 53, 0.4) !important;
     transform: translateY(-4px);
-    box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.9) !important;
+    box-shadow: 0 12px 24px -4px rgba(0, 0, 0, 0.05) !important;
+  }
+}
+
+.dark .glass-card {
+  background: rgba(20, 20, 20, 0.6) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6) !important;
+
+  &:hover {
+    border-color: rgba(163, 230, 53, 0.4) !important;
+    box-shadow: 0 12px 48px 0 rgba(0, 0, 0, 0.8) !important;
   }
 }
 
@@ -134,9 +178,10 @@ body,
 }
 
 .dark .bg-white {
-  background-color: rgba(30, 30, 30, 0.8) !important;
-  backdrop-filter: blur(10px);
+  background-color: #121212 !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
 }
+
 
 /* Header Animation Utilities */
 .header-compact-logo {
@@ -171,6 +216,15 @@ textarea,
 select,
 button {
   min-width: 0;
+  @apply transition-colors;
+}
+
+select {
+  @apply bg-white dark:bg-zoop-obsidian text-zoop-obsidian dark:text-white border-gray-200 dark:border-white/10;
+}
+
+option {
+  @apply bg-white dark:bg-zoop-ink text-zoop-obsidian dark:text-white;
 }
 
 /* Prevent layout jump */
