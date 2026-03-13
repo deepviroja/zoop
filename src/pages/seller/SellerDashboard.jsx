@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { sellerApi, productsApi } from "../../services/api";
 import { useUser } from "../../context/UserContext";
 import { formatInrWithSymbol } from "../../utils/currency";
+import { Wallet } from "../../assets/icons/Wallet";
 
 const Skeleton = ({ className = "" }) => (
   <div className={`bg-gray-200 dark:bg-white/10 animate-pulse rounded-xl ${className}`} />
@@ -34,6 +35,7 @@ const SellerDashboard = () => {
   const [salesSeries, setSalesSeries] = useState([]);
   const [tabLoading, setTabLoading] = useState(false);
   const [timeRange, setTimeRange] = useState("week");
+  const [activeBarIndex, setActiveBarIndex] = useState(-1);
 
   useEffect(() => {
     if (!user) {
@@ -165,7 +167,7 @@ const SellerDashboard = () => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto p-6 lg:p-10 space-y-12 -mt-10 relative z-20">
+      <div className="max-w-7xl mx-auto p-6 lg:p-10 space-y-12 relative z-20">
         {/* Modern Stats Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
           {[
@@ -196,7 +198,7 @@ const SellerDashboard = () => {
             <div className="flex gap-1 bg-gray-100 dark:bg-black/20 p-1.5 rounded-2xl border border-gray-100 dark:border-white/5">
               {["week", "month", "year"].map((range) => (
                 <button key={range} onClick={() => setTimeRange(range)}
-                  className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${timeRange === range ? "bg-zoop-obsidian text-white dark:bg-zoop-moss dark:text-zoop-obsidian shadow-xl" : "text-gray-400 hover:text-zoop-obsidian dark:hover:text-white"}`}>
+                  className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all hover:bg-gray-50 dark:hover:bg-gray-50/10 ${timeRange === range ? "bg-zoop-obsidian text-white dark:bg-zoop-moss dark:text-zoop-obsidian shadow-xl" : "text-gray-400 hover:text-zoop-obsidian dark:hover:text-white"}`}>
                   {range}
                 </button>
               ))}
@@ -207,34 +209,78 @@ const SellerDashboard = () => {
             {/* Grid Lines */}
             <div className="absolute inset-0 flex flex-col justify-between pointer-events-none pb-14 pt-10">
               {[0, 1, 2, 3, 4].map(i => (
-                <div key={i} className="w-full h-px bg-gray-100 dark:bg-white/5 relative" />
+                <div key={i} className="w-full h-px bg-gray-100 dark:bg-white/5 relative">
+                  <span className="absolute -top-2 left-0 text-[9px] font-black text-gray-400 tabular-nums">
+                    {formatInrWithSymbol(Math.round((maxSales * (4 - i)) / 4), { compact: true, maximumFractionDigits: 0 })}
+                  </span>
+                </div>
               ))}
             </div>
 
-            {salesData.map((point, i) => (
-              <div key={i} className="flex-1 min-w-[40px] flex flex-col items-center gap-4 group relative z-10">
-                {/* Tooltip */}
-                <div className="absolute -top-6 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:-translate-y-4 pointer-events-none">
-                  <div className="bg-zoop-obsidian text-white text-[10px] font-black px-3 py-2 rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.3)] flex flex-col items-center gap-0.5">
-                    <span className="text-zoop-moss">{formatInrWithSymbol(point.value)}</span>
-                    <span className="text-[8px] opacity-60 uppercase">{point.label}</span>
+            {salesData.map((point, i) => {
+              const isActive = activeBarIndex === i;
+              return (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() =>
+                    setActiveBarIndex((prev) => (prev === i ? -1 : i))
+                  }
+                  onFocus={() => setActiveBarIndex(i)}
+                  onBlur={() => setActiveBarIndex(-1)}
+                  className="flex-1 min-w-[40px] flex flex-col items-center gap-4 group relative z-10 outline-none"
+                  aria-label={`Sales ${point.label}: ${formatInrWithSymbol(point.value)}`}
+                >
+                  {/* Tooltip */}
+                  <div
+                    className={`absolute -top-6 transition-all duration-300 transform pointer-events-none ${
+                      isActive
+                        ? "opacity-100 -translate-y-4"
+                        : "opacity-0 translate-y-2 group-hover:opacity-100 group-hover:-translate-y-4"
+                    }`}
+                  >
+                    <div className="bg-zoop-obsidian text-white text-[10px] font-black px-3 py-2 rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.3)] flex flex-col items-center gap-0.5">
+                      <span className="text-zoop-moss">
+                        {formatInrWithSymbol(point.value)}
+                      </span>
+                      <span className="text-[8px] opacity-60 uppercase">
+                        {point.label}
+                      </span>
+                    </div>
                   </div>
-                </div>
 
-                {/* Bar */}
-                <div className="w-full relative flex items-end justify-center h-56">
-                  <div className="w-full max-w-[24px] bg-gradient-to-t from-zoop-moss/20 via-zoop-moss/60 to-zoop-moss rounded-full group-hover:scale-x-110 group-hover:shadow-[0_0_30px_rgba(163,230,53,0.4)] transition-all duration-700 ease-out relative group/bar"
-                    style={{ height: `${Math.max(8, (point.value / (maxSales || 1)) * 100)}%` }}>
-                    <div className="absolute inset-x-0 top-0 h-1/2 bg-white/20 blur-sm rounded-t-full opacity-0 group-hover/bar:opacity-100 transition-opacity" />
+                  {/* Bar */}
+                  <div className="w-full relative flex items-end justify-center h-56">
+                    <div
+                      className={`w-full max-w-[24px] bg-gradient-to-t from-zoop-moss/20 via-zoop-moss/60 to-zoop-moss rounded-full group-hover:scale-x-110 group-hover:shadow-[0_0_30px_rgba(163,230,53,0.4)] transition-all duration-700 ease-out relative group/bar ${
+                        isActive
+                          ? "ring-2 ring-zoop-moss/60 shadow-[0_0_30px_rgba(163,230,53,0.35)]"
+                          : ""
+                      }`}
+                      style={{
+                        height: `${Math.max(
+                          8,
+                          (point.value / (maxSales || 1)) * 100,
+                        )}%`,
+                      }}
+                    >
+                      <div className="absolute inset-x-0 top-0 h-1/2 bg-white/20 blur-sm rounded-t-full opacity-0 group-hover/bar:opacity-100 transition-opacity" />
+                    </div>
                   </div>
-                </div>
 
-                {/* Label */}
-                <span className="text-[9px] font-black uppercase tracking-widest text-gray-400 group-hover:text-zoop-obsidian dark:group-hover:text-white transition-colors">
-                  {point.label}
-                </span>
-              </div>
-            ))}
+                  {/* Label */}
+                  <span
+                    className={`text-[9px] font-black uppercase tracking-widest transition-colors ${
+                      isActive
+                        ? "text-zoop-obsidian dark:text-white"
+                        : "text-gray-400 group-hover:text-zoop-obsidian dark:group-hover:text-white"
+                    }`}
+                  >
+                    {point.label}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </div>
 
@@ -243,7 +289,7 @@ const SellerDashboard = () => {
           <div className="flex gap-1 bg-white/50 dark:bg-white/5 p-1.5 rounded-[1.5rem] border border-white dark:border-white/10 backdrop-blur-xl w-fit">
             {["overview", "products", "orders"].map((tab) => (
               <button key={tab} onClick={() => handleTabChange(tab)}
-                className={`px-8 py-3.5 rounded-xl font-black text-xs uppercase tracking-[0.1em] transition-all ${activeTab === tab ? "bg-white dark:bg-zoop-moss text-zoop-obsidian shadow-xl" : "text-gray-400 hover:text-zoop-obsidian dark:hover:text-white"}`}>
+                className={`px-8 py-3.5 rounded-xl font-black text-xs uppercase tracking-[0.1em] transition-all hover:bg-gray-50 dark:hover:bg-gray-50/10 ${activeTab === tab ? "bg-white dark:bg-zoop-moss text-zoop-obsidian shadow-xl" : "text-gray-400 hover:text-zoop-obsidian dark:hover:text-white"}`}>
                 {tab}
               </button>
             ))}
@@ -278,7 +324,9 @@ const SellerDashboard = () => {
                   {(data?.recentOrders || []).slice(0, 4).map(o => (
                     <div key={o.id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 rounded-3xl hover:bg-white dark:hover:bg-white/10 transition-all border border-transparent hover:border-zoop-moss/20">
                       <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 bg-gray-100 dark:bg-white/10 rounded-2xl flex items-center justify-center text-lg">💰</div>
+                        <div className="w-10 h-10 bg-gray-100 dark:bg-white/10 rounded-2xl flex items-center justify-center text-zoop-obsidian dark:text-white">
+                          <Wallet width={18} height={18} className="stroke-current" />
+                        </div>
                         <div>
                           <p className="font-black text-[10px] font-mono tracking-tight uppercase">ORD-{o.id.slice(-6)}</p>
                           <p className="text-[10px] font-bold text-gray-500">{new Date(o.createdAt).toLocaleDateString()}</p>

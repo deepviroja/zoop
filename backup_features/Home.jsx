@@ -132,7 +132,8 @@ const Home = () => {
   const newArrivalProducts = [...products]
     .sort(
       (a, b) =>
-        new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime(),
+        new Date(b.createdAt || 0).getTime() -
+        new Date(a.createdAt || 0).getTime(),
     )
     .slice(0, 8);
 
@@ -250,7 +251,8 @@ const Home = () => {
 
   const activeSlide = heroSlides[currentSlide] || {};
   const sameDayCutoffText =
-    siteConfig?.homeSameDayCutoffText || "Order before 6 PM for same-day delivery";
+    siteConfig?.homeSameDayCutoffText ||
+    "Order before 6 PM for same-day delivery";
   if (error) {
     return (
       <div className="min-h-[50vh] flex flex-col items-center justify-center p-8 text-center">
@@ -362,14 +364,16 @@ const Home = () => {
                       </span>
                     </h1>
                     <p className="text-sm sm:text-xl md:text-3xl font-bold text-white/90 max-w-xl leading-tight">
-                      {activeSlide.title || siteConfig?.homeHeroHeadline || "Discover Local Gems"}
+                      {activeSlide.title ||
+                        siteConfig?.homeHeroHeadline ||
+                        "Discover Local Gems"}
                     </p>
                   </div>
                 )}
 
                 <p className="text-center text-xs sm:text-sm md:text-lg text-white/70 max-w-md leading-relaxed md:text-left">
                   {activeSlide.desc ||
-                      "Curated by local experts and national stylists"}
+                    "Curated by local experts and national stylists"}
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-3 md:gap-4 pt-3 justify-center md:justify-start">
@@ -431,7 +435,9 @@ const Home = () => {
                     <div className="relative bg-white/10 backdrop-blur-2xl border border-white/20 rounded-3xl p-8 hover:scale-105 transition-all duration-500 hover:rotate-2">
                       <div className="aspect-4-5 bg-gradient-to-br from-white/5 to-white/10 rounded-2xl overflow-hidden mb-6">
                         <img
-                          src={optimizeCloudinaryUrl(activeSlide.img, { width: 900 })}
+                          src={optimizeCloudinaryUrl(activeSlide.img, {
+                            width: 900,
+                          })}
                           alt={activeSlide.title}
                           className="w-full h-full object-cover"
                         />
@@ -512,7 +518,7 @@ const Home = () => {
               <Zap width={24} height={24} fill="black" />
             </div>
             <div>
-                <h3 className="text-2xl font-black text-white italic uppercase tracking-tighter">
+              <h3 className="text-2xl font-black text-white italic uppercase tracking-tighter">
                 Same-Day in {localCity}
               </h3>
               <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">
@@ -530,7 +536,9 @@ const Home = () => {
                 <div className="aspect-4-5 bg-white/10 rounded-lg mb-4 overflow-hidden relative">
                   <img
                     src={
-                      optimizeCloudinaryUrl(product.thumbnailUrl, { width: 700 }) ||
+                      optimizeCloudinaryUrl(product.thumbnailUrl, {
+                        width: 700,
+                      }) ||
                       (product.imageUrls && product.imageUrls[0]) ||
                       "/brand-mark.svg"
                     }
@@ -557,7 +565,9 @@ const Home = () => {
                 </p>
                 <div className="flex justify-between items-center mt-3">
                   <div className="flex items-center gap-2">
-                    <span className="font-black text-lg">Rs. {Number(product.price || 0).toLocaleString("en-IN")}</span>
+                    <span className="font-black text-lg">
+                      Rs. {Number(product.price || 0).toLocaleString("en-IN")}
+                    </span>
                     {product.mrp && product.mrp > product.price && (
                       <span className="text-xs text-gray-400 line-through">
                         {formatInrWithSymbol(product.mrp, {
@@ -617,9 +627,7 @@ const Home = () => {
       {!productsLoading && newArrivalProducts.length > 0 && (
         <section className="glass-card p-5 shadow-[0_4px_12px_rgba(0,0,0,0.5)] border border-white/10 rounded-xl">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-xl font-bold text-white">
-              New Arrivals
-            </h3>
+            <h3 className="text-xl font-bold text-white">New Arrivals</h3>
             <Link
               to="/products"
               className="text-white text-sm font-bold hover:underline"
@@ -695,152 +703,159 @@ const Home = () => {
 
       {/* BRAND SHOWCASE */}
       {featuredBrands.length > 0 && (
-      <section className="bg-zoop-canvas rounded-[3rem] p-8 md:p-20 text-center overflow-hidden relative">
-        <div className="absolute -top-20 -left-20 w-64 h-64 bg-zoop-clay blur-3xl rounded-full opacity-50" />
-        <h2 className="text-3xl md:text-5xl font-black text-black italic relative z-10">
-          Brands You Can Shop Now.
-          <span className="text-zoop-moss"> Ready to deliver.</span>
-        </h2>
-        <p className="relative z-10 mt-3 text-sm md:text-base text-gray-400">
-          Brands that are actually available.
-        </p>
-        {productsLoading ? (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12">
-            {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
-              <Skeleton key={i} className="h-24" />
-            ))}
-          </div>
-        ) : (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12 relative z-10">
-                {featuredBrands.map((brand, idx) => (
-                  <Link
-                to={`/search?q=${encodeURIComponent(brand.name)}`}
-                key={brand.id || idx}
-                className="glass-card border border-black/10 rounded-2xl p-5 md:p-6 flex flex-col items-center justify-center text-center hover:-translate-y-1 transition-all cursor-pointer group shadow-[0_4px_12px_rgba(0,0,0,0.5)] hover:shadow-lg"
-              >
-                <div className="h-20 w-full rounded-2xl overflow-hidden bg-white/5 flex items-center justify-center">
-                  {brand.image ? (
-                    <img
-                      src={optimizeCloudinaryUrl(brand.image, { width: 500 })}
-                      className="h-full w-full object-cover group-hover:scale-105 transition-transform"
-                      alt={brand.name}
-                    />
-                  ) : (
-                    <span className="font-black text-lg text-white">{brand.name}</span>
-                  )}
-                </div>
-                <p className="mt-4 font-black text-white">{brand.name}</p>
-                <p className="mt-1 text-[11px] font-bold uppercase tracking-[0.18em] text-gray-500">
-                  {brand.tier}
-                </p>
-              </Link>
-            ))}
-          </div>
-        )}
-      </section>
+        <section className="bg-zoop-canvas rounded-[3rem] p-8 md:p-20 text-center overflow-hidden relative">
+          <div className="absolute -top-20 -left-20 w-64 h-64 bg-zoop-clay blur-3xl rounded-full opacity-50" />
+          <h2 className="text-3xl md:text-5xl font-black text-black italic relative z-10">
+            Brands You Can Shop Now.
+            <span className="text-zoop-moss"> Ready to deliver.</span>
+          </h2>
+          <p className="relative z-10 mt-3 text-sm md:text-base text-gray-400">
+            Shop the products of latest Brands.
+          </p>
+          {productsLoading ? (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12">
+              {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
+                <Skeleton key={i} className="h-24" />
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12 relative z-10">
+              {featuredBrands.map((brand, idx) => (
+                <Link
+                  to={`/search?q=${encodeURIComponent(brand.name)}`}
+                  key={brand.id || idx}
+                  className="glass-card border border-black/10 rounded-2xl p-5 md:p-6 flex flex-col items-center justify-center text-center hover:-translate-y-1 transition-all cursor-pointer group shadow-[0_4px_12px_rgba(0,0,0,0.5)] hover:shadow-lg"
+                >
+                  <div className="h-20 w-full rounded-2xl overflow-hidden bg-white/5 flex items-center justify-center">
+                    {brand.image ? (
+                      <img
+                        src={optimizeCloudinaryUrl(brand.image, { width: 500 })}
+                        className="h-full w-full object-cover group-hover:scale-105 transition-transform"
+                        alt={brand.name}
+                      />
+                    ) : (
+                      <span className="font-black text-lg text-white">
+                        {brand.name}
+                      </span>
+                    )}
+                  </div>
+                  <p className="mt-4 font-black text-white">{brand.name}</p>
+                  <p className="mt-1 text-[11px] font-bold uppercase tracking-[0.18em] text-gray-500">
+                    {brand.tier}
+                  </p>
+                </Link>
+              ))}
+            </div>
+          )}
+        </section>
       )}
 
       {/* CATEGORY GRID */}
       {collectionCategories.length > 0 && (
-      <section className="relative rounded-3xl border border-white/10 bg-gradient-to-br from-[#fcfaf7] via-[#fffefc] to-[#f7f4ee] p-6 md:p-10 shadow-[0_16px_40px_rgba(36,32,24,0.08)] overflow-hidden">
-        <div
-          className="absolute inset-0 opacity-[0.05]"
-          style={{
-            backgroundImage:
-              "linear-gradient(45deg, #8b5e3c 1px, transparent 1px), linear-gradient(-45deg, #8b5e3c 1px, transparent 1px)",
-            backgroundSize: "26px 26px",
-          }}
-        />
-        <div className="relative z-10">
-          <div className="flex items-end justify-between gap-4 mb-8">
-            <div>
-              <h3 className="text-3xl md:text-5xl font-black tracking-tight text-white">
-                Explore Our Collections
-              </h3>
-              <p className="text-base text-gray-300 mt-2 max-w-3xl">
-                Discover curated products across all categories — from local artisans to global brands
-              </p>
+        <section className="relative rounded-3xl border border-white/10 bg-gradient-to-br from-[#fcfaf7] via-[#fffefc] to-[#f7f4ee] p-6 md:p-10 shadow-[0_16px_40px_rgba(36,32,24,0.08)] overflow-hidden">
+          <div
+            className="absolute inset-0 opacity-[0.05]"
+            style={{
+              backgroundImage:
+                "linear-gradient(45deg, #8b5e3c 1px, transparent 1px), linear-gradient(-45deg, #8b5e3c 1px, transparent 1px)",
+              backgroundSize: "26px 26px",
+            }}
+          />
+          <div className="relative z-10">
+            <div className="flex items-end justify-between gap-4 mb-8">
+              <div>
+                <h3 className="text-3xl md:text-5xl font-black tracking-tight text-white">
+                  Explore Our Collections
+                </h3>
+                <p className="text-base text-gray-300 mt-2 max-w-3xl">
+                  Discover curated products across all categories — from local
+                  artisans to global brands
+                </p>
+              </div>
+              <Link
+                to="/products"
+                className="hidden md:inline-flex text-sm font-bold text-gray-400 hover:text-zoop-obsidian underline underline-offset-4"
+              >
+                View all products
+              </Link>
             </div>
-            <Link
-              to="/products"
-              className="hidden md:inline-flex text-sm font-bold text-gray-400 hover:text-zoop-obsidian underline underline-offset-4"
-            >
-              View all products
-            </Link>
-          </div>
 
-          {contentLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {[0, 1, 2, 3, 4].map((i) => (
-                <Skeleton key={i} className="h-72" />
-              ))}
-            </div>
-          ) : (
-            <>
-              <div className="md:hidden -mx-2 px-2 flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2 scrollbar-gap">
-                {collectionCategories.map((cat, idx) => (
-                  <Link
-                    key={cat.id || idx}
-                    to={cat.path || `/category/${cat.id}`}
-                    className="snap-start min-w-[84%] h-72 rounded-2xl overflow-hidden border border-white/10 glass-card shadow-[0_4px_12px_rgba(0,0,0,0.5)] active:scale-[0.98] transition-transform"
-                  >
-                    <div className="relative h-full">
-                      <img
-                        src={getCategoryVisual(cat.id, cat.name, cat.image)}
-                        alt={cat.name}
-                        className="absolute inset-0 w-full h-full object-cover"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-black/10" />
-                      <div className="absolute inset-x-0 bottom-0 p-5 text-white">
-                        <p className="text-2xl font-black">{cat.name}</p>
-                        <p className="text-base opacity-90 mt-1 line-clamp-1">
-                          {cat.desc || "Curated for local-first shoppers"}
-                        </p>
-                        <p className="mt-3 text-sm font-bold">Explore {cat.name} →</p>
-                      </div>
-                    </div>
-                  </Link>
+            {contentLoading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {[0, 1, 2, 3, 4].map((i) => (
+                  <Skeleton key={i} className="h-72" />
                 ))}
               </div>
-
-              <div className="hidden md:grid bento-grid mt-4">
-                {collectionCategories.map((cat, idx) => (
-                  <Link
-                    key={cat.id || idx}
-                    to={cat.path || `/category/${cat.id}`}
-                    className={`group ${idx === 0 ? 'col-span-12 md:col-span-8 md:row-span-2 min-h-[440px]' : idx === 1 || idx === 2 ? 'col-span-12 md:col-span-4 min-h-[210px]' : 'col-span-12 md:col-span-4 min-h-[280px]'} rounded-[24px] overflow-hidden border border-white/10 glass-card shadow-[0_4px_12px_rgba(0,0,0,0.5)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.5)] hover:-translate-y-1 transition-all duration-500 focus:outline-none focus:ring-2 focus:ring-zoop-moss bento-item`}
-                  >
-                    <div className="relative h-full">
-                      <img
-                        src={getCategoryVisual(cat.id, cat.name, cat.image)}
-                        alt={cat.name}
-                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/10 group-hover:from-black/85" />
-                      <div className="absolute inset-x-0 bottom-0 p-5 text-white">
-                        <p className="text-2xl font-black">{cat.name}</p>
-                        <p className="text-base opacity-90 mt-1 line-clamp-1">
-                          {cat.desc || "Curated for local-first shoppers"}
-                        </p>
-                        <p className="mt-3 text-sm font-bold">Explore {cat.name}</p>
+            ) : (
+              <>
+                <div className="md:hidden -mx-2 px-2 flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2 scrollbar-gap">
+                  {collectionCategories.map((cat, idx) => (
+                    <Link
+                      key={cat.id || idx}
+                      to={cat.path || `/category/${cat.id}`}
+                      className="snap-start min-w-[84%] h-72 rounded-2xl overflow-hidden border border-white/10 glass-card shadow-[0_4px_12px_rgba(0,0,0,0.5)] active:scale-[0.98] transition-transform"
+                    >
+                      <div className="relative h-full">
+                        <img
+                          src={getCategoryVisual(cat.id, cat.name, cat.image)}
+                          alt={cat.name}
+                          className="absolute inset-0 w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-black/10" />
+                        <div className="absolute inset-x-0 bottom-0 p-5 text-white">
+                          <p className="text-2xl font-black">{cat.name}</p>
+                          <p className="text-base opacity-90 mt-1 line-clamp-1">
+                            {cat.desc || "Curated for local-first shoppers"}
+                          </p>
+                          <p className="mt-3 text-sm font-bold">
+                            Explore {cat.name} →
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </>
-          )}
+                    </Link>
+                  ))}
+                </div>
 
-          <div className="md:hidden mt-5 text-center">
-            <Link
-              to="/products"
-              className="text-sm font-bold text-gray-400 hover:text-zoop-obsidian underline underline-offset-4"
-            >
-              View all products
-            </Link>
+                <div className="hidden md:grid bento-grid mt-4">
+                  {collectionCategories.map((cat, idx) => (
+                    <Link
+                      key={cat.id || idx}
+                      to={cat.path || `/category/${cat.id}`}
+                      className={`group ${idx === 0 ? "col-span-12 md:col-span-8 md:row-span-2 min-h-[440px]" : idx === 1 || idx === 2 ? "col-span-12 md:col-span-4 min-h-[210px]" : "col-span-12 md:col-span-4 min-h-[280px]"} rounded-[24px] overflow-hidden border border-white/10 glass-card shadow-[0_4px_12px_rgba(0,0,0,0.5)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.5)] hover:-translate-y-1 transition-all duration-500 focus:outline-none focus:ring-2 focus:ring-zoop-moss bento-item`}
+                    >
+                      <div className="relative h-full">
+                        <img
+                          src={getCategoryVisual(cat.id, cat.name, cat.image)}
+                          alt={cat.name}
+                          className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/10 group-hover:from-black/85" />
+                        <div className="absolute inset-x-0 bottom-0 p-5 text-white">
+                          <p className="text-2xl font-black">{cat.name}</p>
+                          <p className="text-base opacity-90 mt-1 line-clamp-1">
+                            {cat.desc || "Curated for local-first shoppers"}
+                          </p>
+                          <p className="mt-3 text-sm font-bold">
+                            Explore {cat.name}
+                          </p>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </>
+            )}
+
+            <div className="md:hidden mt-5 text-center">
+              <Link
+                to="/products"
+                className="text-sm font-bold text-gray-400 hover:text-zoop-obsidian underline underline-offset-4"
+              >
+                View all products
+              </Link>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
       )}
 
       {/* FEATURED COLLECTIONS */}

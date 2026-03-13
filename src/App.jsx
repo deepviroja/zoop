@@ -220,6 +220,7 @@ function App() {
               <Route path="ads" element={<SellerAds />} />
               <Route path="payouts" element={<SellerPayouts />} />
               <Route path="subscription" element={<SellerSubscription />} />
+              <Route path="notifications" element={<Notifications />} />
               <Route path="instructions" element={<SellerInstructions />} />
               <Route path="settings" element={<StoreSettings />} />
               <Route path="profile" element={<SellerProfile />} />
@@ -244,6 +245,7 @@ function App() {
                 path="subscriptions"
                 element={<AdminSubscriptionManagement />}
               />
+              <Route path="notifications" element={<Notifications />} />
               <Route path="guide" element={<AdminGuide />} />
               <Route path="supporttickets" element={<SupportTickets />} />
               <Route path="monetization" element={<Monetization />} />

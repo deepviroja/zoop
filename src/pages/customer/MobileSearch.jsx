@@ -4,6 +4,12 @@ import { SearchIcon } from "../../assets/icons/SearchIcon";
 import { X } from "../../assets/icons/X";
 import { ChevronLeft } from "../../assets/icons/ChevronLeft";
 import { ChevronRight } from "../../assets/icons/ChevronRight";
+import { TrendingUp } from "../../assets/icons/TrendingUp";
+import { Zap } from "../../assets/icons/Zap";
+import { Dress } from "../../assets/icons/Dress";
+import { Home } from "../../assets/icons/Home";
+import { Store } from "../../assets/icons/Store";
+import { Star } from "../../assets/icons/Star";
 import { apiClient } from "../../api/client";
 
 const RECENT_SEARCHES_KEY = "zoop_recent_searches";
@@ -191,7 +197,7 @@ const MobileSearch = () => {
                     className="px-4 py-2 bg-white dark:glass-card border border-gray-200 dark:border-white/10 rounded-lg text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2 hover:border-zoop-moss hover:bg-zoop-moss/5 transition-colors"
                   >
                     <span className="w-4 h-4 flex items-center justify-center bg-red-100 text-red-500 text-[10px] rounded font-black">
-                      ↗
+                      <TrendingUp width={12} height={12} className="text-red-500" />
                     </span>
                     {term}
                   </button>
@@ -206,19 +212,21 @@ const MobileSearch = () => {
               </h3>
               <div className="grid grid-cols-3 gap-2">
                 {[
-                  { name: "Electronics", emoji: "📱" },
-                  { name: "Fashion", emoji: "👗" },
-                  { name: "Home", emoji: "🏠" },
-                  { name: "Food", emoji: "🍜" },
-                  { name: "Artisans", emoji: "🎨" },
-                  { name: "Sports", emoji: "⚽" },
+                  { name: "Electronics", Icon: Zap },
+                  { name: "Fashion", Icon: Dress },
+                  { name: "Home", Icon: Home },
+                  { name: "Food", Icon: Store },
+                  { name: "Artisans", Icon: Star },
+                  { name: "Sports", Icon: TrendingUp },
                 ].map((cat) => (
                   <Link
                     key={cat.name}
                     to={`/category/${cat.name.toLowerCase()}`}
                     className="flex flex-col items-center py-4 bg-white dark:glass-card border border-gray-200 dark:border-white/10 rounded-xl text-xs font-bold text-gray-700 dark:text-gray-300 hover:border-zoop-moss hover:bg-zoop-moss/5 transition-colors"
                   >
-                    <span className="text-2xl mb-1">{cat.emoji}</span>
+                    <span className="mb-1 text-zoop-moss">
+                      <cat.Icon width={28} height={28} stroke="currentColor" />
+                    </span>
                     {cat.name}
                   </Link>
                 ))}

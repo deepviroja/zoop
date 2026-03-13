@@ -54,7 +54,7 @@ export const SellerProductList = () => {
     if (loading) return <div className="p-8 text-center">Loading your products...</div>;
 
     return (
-        <div className="min-h-screen bg-gray-50 p-6">
+        <div className="min-h-screen bg-gray-50 dark:bg-[#121212] p-6">
             <div className="max-w-7xl mx-auto space-y-6">
                 <div className="flex justify-between items-center">
                     <div>
@@ -63,26 +63,26 @@ export const SellerProductList = () => {
                     </div>
                     <Link 
                         to="/seller/add-product" 
-                        className="flex items-center gap-2 px-6 py-3 bg-zoop-obsidian text-white rounded-xl font-bold hover:bg-zoop-moss hover:text-zoop-obsidian transition-all shadow-lg"
+                        className="flex items-center gap-2 px-6 py-3 bg-zoop-obsidian text-white rounded-xl font-bold hover:bg-zoop-moss  hover:text-zoop-obsidian transition-all shadow-lg"
                     >
                         <Plus width={20} height={20} />
                         Add New
                     </Link>
                 </div>
 
-                <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
+                <div className="bg-white dark:bg-[#121212] rounded-2xl shadow-sm overflow-hidden border border-gray-100">
                     <div className="overflow-x-auto scrollbar-gap">
                         <table className="w-full text-left">
-                            <thead className="bg-gray-50 border-b border-gray-200">
+                            <thead className="bg-gray-50 dark:bg-[#121212] border-b border-gray-200">
                                 <tr>
-                                    <th className="px-6 py-4 font-black text-gray-600 uppercase text-xs tracking-wider">Product</th>
-                                    <th className="px-6 py-4 font-black text-gray-600 uppercase text-xs tracking-wider">Price</th>
-                                    <th className="px-6 py-4 font-black text-gray-600 uppercase text-xs tracking-wider">Stock</th>
-                                    <th className="px-6 py-4 font-black text-gray-600 uppercase text-xs tracking-wider">Category</th>
-                                    <th className="px-6 py-4 font-black text-gray-600 uppercase text-xs tracking-wider text-right">Actions</th>
+                                    <th className="px-6 py-4 font-black text-gray-600 dark:text-white/70 uppercase text-xs tracking-wider">Product</th>
+                                    <th className="px-6 py-4 font-black text-gray-600 dark:text-white/70 uppercase text-xs tracking-wider">Price</th>
+                                    <th className="px-6 py-4 font-black text-gray-600 dark:text-white/70 uppercase text-xs tracking-wider">Stock</th>
+                                    <th className="px-6 py-4 font-black text-gray-600 dark:text-white/70 uppercase text-xs tracking-wider">Category</th>
+                                    <th className="px-6 py-4 font-black text-gray-600 dark:text-white/70 uppercase text-xs tracking-wider text-right">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-100">
+                            <tbody className="divide-y divide-gray-100 dark:divide-gray-100/10">
                                 {products.length === 0 ? (
                                     <tr>
                                         <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
@@ -91,7 +91,7 @@ export const SellerProductList = () => {
                                     </tr>
                                 ) : (
                                     products.map((product) => (
-                                        <tr key={product.id} className="hover:bg-gray-50 transition-colors">
+                                        <tr key={product.id} className=" hover:bg-gray-50/ dark:hover:bg-gray-50/10 transition-colors">
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-3">
                                                     <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 border border-gray-200">
@@ -102,12 +102,12 @@ export const SellerProductList = () => {
                                                         />
                                                     </div>
                                                     <div>
-                                                        <p className="font-bold text-gray-900 line-clamp-1">{product.title}</p>
-                                                        <p className="text-xs text-gray-500">{product.brand || 'No Brand'}</p>
+                                                        <p className="font-bold text-gray-900 dark:text-white line-clamp-1">{product.title}</p>
+                                                        <p className="text-xs text-gray-500 dark:text-gray-400">{product.brand || 'No Brand'}</p>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 font-medium text-gray-900">
+                                            <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
                                                 Rs. {product.price}
                                             </td>
                                             <td className="px-6 py-4">
@@ -119,20 +119,20 @@ export const SellerProductList = () => {
                                                     {product.stock > 0 ? `${product.stock} in stock` : 'Out of Stock'}
                                                 </span>
                                             </td>
-                                            <td className="px-6 py-4 text-sm text-gray-600 capitalize">
+                                            <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400 capitalize">
                                                 {product.categoryId}
                                             </td>
                                             <td className="px-6 py-4 text-right">
                                                 <div className="flex items-center justify-end gap-2">
                                                     <button 
                                                         onClick={() => navigate(`/seller/edit-product/${product.id}`)}
-                                                        className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                                        className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-lg transition-colors"
                                                     >
                                                         <Edit width={18} height={18} />
                                                     </button>
                                                     <button 
                                                         onClick={() => handleDelete(product.id)}
-                                                        className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                        className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors"
                                                     >
                                                         <Trash width={18} height={18} />
                                                     </button>

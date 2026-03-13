@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { sellerApi } from "../../services/api";
+import { Box } from "../../assets/icons/Box";
+import { MapPin } from "../../assets/icons/MapPin";
 
 const statusColors = {
   pending: "bg-amber-100 text-amber-700",
@@ -62,7 +64,7 @@ const Orders = () => {
           </p>
         </div>
 
-        <div className="flex bg-zoop-canvas p-1 rounded-2xl border border-gray-100 dark:border-white/10">
+        <div className="flex bg-zoop-canvas p-1 rounded-2xl border border-gray-100  dark:border-white/10">
           {[
             { key: "active", label: `Active (${activeOrders.length})` },
             {
@@ -149,7 +151,7 @@ const Orders = () => {
                         <p className="text-xs font-medium text-gray-400">
                           Customer:{" "}
                           <span className="text-zoop-obsidian dark:text-white font-bold">
-                            {order.customer?.name || order.customerName || "—"}
+                            {order.customer?.name || order.customerName || "N/A"}
                           </span>
                           {order.createdAt && (
                             <>
@@ -166,7 +168,7 @@ const Orders = () => {
                       {/* Delivery address */}
                       {order.deliveryAddress && (
                         <p className="text-xs text-gray-400">
-                          📍{" "}
+                          <MapPin width={14} height={14} className="inline-block mr-1 text-gray-400" />{" "}
                           {[
                             order.deliveryAddress.line1,
                             order.deliveryAddress.city,
@@ -201,7 +203,9 @@ const Orders = () => {
             })
           ) : (
             <div className="py-20 text-center bg-zoop-canvas rounded-[3rem] border-2 border-dashed border-gray-200 dark:border-white/10">
-              <span className="text-5xl">📦</span>
+              <span className="inline-flex items-center justify-center text-zoop-obsidian dark:text-white">
+                <Box width={48} height={48} />
+              </span>
               <h3 className="mt-4 font-black text-zoop-obsidian dark:text-white uppercase tracking-widest">
                 No {filter} orders
               </h3>

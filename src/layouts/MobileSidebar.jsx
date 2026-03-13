@@ -33,7 +33,7 @@ const MobileSidebar = ({ isOpen, onClose, categories = [], quickLinks = [] }) =>
 
       {/* --- SIDEBAR PANEL --- */}
       <aside
-        className={`fixed top-0 left-0 h-screen w-[320px] max-w-[88vw] bg-white dark:glass-card z-[201] shadow-2xl dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)] transform transition-transform duration-500 ease-in-out flex flex-col overflow-hidden ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
+        className={`fixed top-0 left-0 h-[98%] mt-1 mb-1 w-[320px] max-w-[88vw] bg-white dark:glass-card z-[201] shadow-2xl dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)] transform transition-transform duration-500 ease-in-out flex flex-col overflow-hidden ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
         {/* 1. USER HEADER SECTION */}
         <div className="bg-zoop-obsidian p-8 flex items-center justify-between">

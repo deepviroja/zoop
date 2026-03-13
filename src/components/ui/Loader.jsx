@@ -18,7 +18,7 @@ const Loader = ({ fullScreen = false }) => {
                     {brandName}
                 </h3>
                 <p className="text-xs font-bold text-gray-400 mt-2 tracking-widest uppercase">
-                    Fetching inventory...
+                    Loading...
                 </p>
             </div>
         );

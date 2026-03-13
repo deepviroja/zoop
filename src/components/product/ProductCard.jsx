@@ -93,7 +93,7 @@ const ProductCard = ({ product, view = "grid" }) => {
       if (isLiked) {
         showToast("Removed from wishlist", "info");
       } else {
-        showToast("Added to wishlist ❤️", "success");
+        showToast("Added to wishlist", "success");
       }
     } else {
       showToast("Please login to add to wishlist", "info", {
@@ -174,7 +174,7 @@ const ProductCard = ({ product, view = "grid" }) => {
                     width={20}
                     height={20}
                     className={
-                      isLiked ? "fill-red-500 text-red-500" : "text-gray-400"
+                      isLiked ? " fill-red-500 text-red-500 " : "text-gray-400"
                     }
                   />
                 </button>

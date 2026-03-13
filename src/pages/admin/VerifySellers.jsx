@@ -257,7 +257,7 @@ const VerifySellers = () => {
               className={`flex-1 py-4 px-6 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${
                 filter === tab
                   ? "bg-zoop-obsidian text-white shadow-lg dark:shadow-[0_12px_32px_rgba(0,0,0,0.5)]"
-                  : "text-gray-400 hover:bg-gray-50 hover:text-gray-600"
+                  : "text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-50/5 hover:text-gray-600"
               }`}
             >
               {tab} ({sellers.filter((s) => s.status === tab).length})

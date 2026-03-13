@@ -15,11 +15,11 @@ const SEED_CITIES = [
 ];
 
 const SEED_MARKET_NODES = [
-  { id: 'mens-fashion',     label: "Men's Fashion",    icon: '👔', categoryPath: '/category/men' },
-  { id: 'artisan-jewelry',  label: 'Artisan Jewelry',  icon: '💍', categoryPath: '/category/artisans' },
-  { id: 'home-decor',       label: 'Home Decor',       icon: '🏠', categoryPath: '/category/home' },
-  { id: 'organic-wellness', label: 'Organic Wellness',  icon: '🌿', categoryPath: '/products?category=wellness' },
-  { id: 'local-footwear',   label: 'Local Footwear',   icon: '👟', categoryPath: '/products?category=footwear' },
+  { id: 'mens-fashion',     label: "Men's Fashion",    icon: 'tie', categoryPath: '/category/men' },
+  { id: 'artisan-jewelry',  label: 'Artisan Jewelry',  icon: 'ring', categoryPath: '/category/artisans' },
+  { id: 'home-decor',       label: 'Home Decor',       icon: 'home', categoryPath: '/category/home' },
+  { id: 'organic-wellness', label: 'Organic Wellness', icon: 'leaf', categoryPath: '/products?category=wellness' },
+  { id: 'local-footwear',   label: 'Local Footwear',   icon: 'shoe', categoryPath: '/products?category=footwear' },
 ];
 
 const SEED_BRANDS = [
@@ -1583,6 +1583,58 @@ export const markNotificationRead = async (req: Request, res: Response) => {
   }
 };
 
+export const markAllNotificationsRead = async (req: Request, res: Response) => {
+  try {
+    const user = (req as any).user;
+    const now = new Date().toISOString();
+    let updated = 0;
+
+    // Firestore batch write limit is 500 ops.
+    // Loop until no unread notifications remain.
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      const snap = await db
+        .collection('notifications')
+        .where('userId', '==', user.uid)
+        .where('read', '==', false)
+        .limit(500)
+        .get();
+      if (snap.empty) break;
+
+      const batch = db.batch();
+      snap.docs.forEach((doc) => {
+        batch.set(doc.ref, { read: true, updatedAt: now }, { merge: true });
+      });
+      await batch.commit();
+      updated += snap.size;
+
+      if (snap.size < 500) break;
+    }
+
+    res.json({ message: 'All notifications marked as read', updated });
+  } catch (e: any) {
+    res.status(500).json({ error: e.message });
+  }
+};
+
+export const deleteNotification = async (req: Request, res: Response) => {
+  try {
+    const user = (req as any).user;
+    const { id } = req.params;
+    const ref = db.collection('notifications').doc(id);
+    const doc = await ref.get();
+    if (!doc.exists) return res.status(404).json({ error: 'Notification not found' });
+    const data = doc.data() as any;
+    if (data.userId !== user.uid && user.role !== 'admin') {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
+    await ref.delete();
+    res.json({ message: 'Notification deleted' });
+  } catch (e: any) {
+    res.status(500).json({ error: e.message });
+  }
+};
+
 export const getMyReviews = async (req: Request, res: Response) => {
   try {
     const user = (req as any).user;
@@ -1810,6 +1862,20 @@ export const upsertAdSlot = async (req: Request, res: Response) => {
   }
 };
 
+export const deleteAdSlot = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    if (!id) return res.status(400).json({ error: 'Slot id is required' });
+    const ref = db.collection('adSlots').doc(id);
+    const doc = await ref.get();
+    if (!doc.exists) return res.status(404).json({ error: 'Ad slot not found' });
+    await ref.delete();
+    res.json({ message: 'Ad slot deleted', id });
+  } catch (e: any) {
+    res.status(500).json({ error: e.message });
+  }
+};
+
 export const upsertAd = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -1834,6 +1900,20 @@ export const upsertAd = async (req: Request, res: Response) => {
       { merge: true },
     );
     res.json({ message: 'Ad saved', id: ref.id });
+  } catch (e: any) {
+    res.status(500).json({ error: e.message });
+  }
+};
+
+export const deleteAd = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    if (!id) return res.status(400).json({ error: 'Ad id is required' });
+    const ref = db.collection('ads').doc(id);
+    const doc = await ref.get();
+    if (!doc.exists) return res.status(404).json({ error: 'Ad not found' });
+    await ref.delete();
+    res.json({ message: 'Ad deleted', id });
   } catch (e: any) {
     res.status(500).json({ error: e.message });
   }
@@ -2177,6 +2257,20 @@ export const upsertSubscriptionPlan = async (req: Request, res: Response) => {
       { merge: true },
     );
     res.json({ message: 'Plan saved', id: ref.id });
+  } catch (e: any) {
+    res.status(500).json({ error: e.message });
+  }
+};
+
+export const deleteSubscriptionPlan = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    if (!id) return res.status(400).json({ error: 'Plan id is required' });
+    const ref = db.collection('subscriptionPlans').doc(String(id));
+    const doc = await ref.get();
+    if (!doc.exists) return res.status(404).json({ error: 'Plan not found' });
+    await ref.delete();
+    res.json({ message: 'Plan deleted', id });
   } catch (e: any) {
     res.status(500).json({ error: e.message });
   }

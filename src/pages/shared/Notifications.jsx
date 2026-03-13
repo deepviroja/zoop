@@ -3,8 +3,9 @@ import { useUser } from "../../context/UserContext";
 import { apiClient } from "../../api/client";
 
 import { Box } from "../../assets/icons/Box";
-import { SearchIcon } from "../../assets/icons/SearchIcon";
 import { X } from "../../assets/icons/X";
+import { Eye } from "../../assets/icons/Eye";
+import { Delete } from "../../assets/icons/Trash";
 import { useNavigate } from "react-router-dom";
 import Loader from "../../components/ui/Loader";
 import ScrollToTop from "../../components/shared/ScrollToTop";
@@ -15,6 +16,7 @@ const Notifications = () => {
   const [notifications, setNotifications] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState("all"); // 'all', 'unread'
+  const [isMarkingAllRead, setIsMarkingAllRead] = useState(false);
 
   useEffect(() => {
     fetchNotifications();
@@ -35,7 +37,7 @@ const Notifications = () => {
 
   const handleMarkAsRead = async (id) => {
     try {
-      await apiClient.put(`/content/notifications/${id}/read`);
+      await apiClient.put(`/content/notifications/${id}/read`, {});
       setNotifications((prev) =>
         prev.map((n) => (n.id === id ? { ...n, read: true } : n)),
       );
@@ -44,9 +46,13 @@ const Notifications = () => {
 
   const handleMarkAllRead = async () => {
     try {
-      await apiClient.put("/content/notifications/read-all");
-      setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+      setIsMarkingAllRead(true);
+      await apiClient.put("/content/notifications/read-all", {});
+      await fetchNotifications();
     } catch (e) {}
+    finally {
+      setIsMarkingAllRead(false);
+    }
   };
 
   const handleDelete = async (id) => {
@@ -98,7 +104,7 @@ const Notifications = () => {
             className={`flex-1 sm:flex-none px-6 py-2 rounded-lg text-sm font-bold transition-all ${
               filter === "all"
                 ? "bg-white dark:glass-card text-zoop-obsidian dark:text-white shadow"
-                : "text-gray-500 hover:text-gray-700"
+                : "text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-white"
             }`}
           >
             All
@@ -108,7 +114,7 @@ const Notifications = () => {
             className={`flex-1 sm:flex-none px-6 py-2 rounded-lg text-sm font-bold transition-all ${
               filter === "unread"
                 ? "bg-white dark:glass-card text-zoop-obsidian dark:text-white shadow"
-                : "text-gray-500 hover:text-gray-700"
+                : "text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-white"
             }`}
           >
             Unread
@@ -117,9 +123,11 @@ const Notifications = () => {
 
         <button
           onClick={handleMarkAllRead}
-          className="text-sm font-bold text-zoop-moss hover:opacity-80 transition-opacity w-full sm:w-auto text-right"
+          disabled={isMarkingAllRead || notifications.length === 0}
+          className="text-sm font-bold text-zoop-moss hover:opacity-80 transition-opacity w-full sm:w-auto text-right inline-flex items-center justify-end gap-2 disabled:opacity-60"
         >
-          Mark all as read
+          <Eye width={16} height={16} className="text-zoop-moss" />
+          {isMarkingAllRead ? "Marking..." : "Mark all as read"}
         </button>
       </div>
 
@@ -167,11 +175,10 @@ const Notifications = () => {
                   {!n.read && (
                     <button
                       onClick={() => handleMarkAsRead(n.id)}
-                      className="p-2 bg-white dark:glass-card rounded-full shadow hover:bg-zoop-moss hover:text-zoop-obsidian transition-colors text-gray-500"
+                      className="p-2 bg-white dark:glass-card rounded-full shadow hover:bg-zoop-moss hover:text-zoop-obsidian transition-colors text-gray-500 dark:text-gray-300"
                       title="Mark as read"
                     >
-                      <X width={16} height={16} />{" "}
-                      {/* Using X as check temporary, will fix icons if available */}
+                      <Eye width={16} height={16} />
                     </button>
                   )}
                   <button
@@ -179,8 +186,7 @@ const Notifications = () => {
                     className="p-2 bg-white dark:glass-card rounded-full shadow hover:bg-red-500 hover:text-white transition-colors text-red-500"
                     title="Delete"
                   >
-                    <Box width={16} height={16} />{" "}
-                    {/* Using box as trash, fix later */}
+                    <Delete width={16} height={16} />
                   </button>
                 </div>
               </div>

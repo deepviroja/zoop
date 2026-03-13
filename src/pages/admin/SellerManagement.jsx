@@ -147,7 +147,7 @@ const SellerManagement = () => {
                   </tr>
                 ) : (
                   filtered.map((seller) => (
-                    <tr key={seller.id} className="hover:bg-gray-50 transition-colors">
+                    <tr key={seller.id} className="hover:bg-gray-50 dark:hover:bg-gray-50/10 transition-colors">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
                           <div className="w-11 h-11 rounded-full bg-zoop-canvas flex items-center justify-center">

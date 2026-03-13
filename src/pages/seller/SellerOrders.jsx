@@ -8,6 +8,7 @@ import { Truck } from "../../assets/icons/Truck";
 import { Package } from "../../assets/icons/Package";
 import { X } from "../../assets/icons/X";
 import { ClipboardList } from "../../assets/icons/ClipboardList";
+import { ChevronDown } from "../../assets/icons/ChevronDown";
 
 const statusConfig = {
   pending: {
@@ -303,7 +304,7 @@ const SellerOrders = () => {
                 >
                   {/* Order Header */}
                   <div
-                    className="p-5 cursor-pointer hover:bg-gray-50 transition-colors"
+                    className="p-5 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-50/10 transition-colors"
                     onClick={() =>
                       setExpandedOrder(isExpanded ? null : order.id)
                     }
@@ -342,13 +343,16 @@ const SellerOrders = () => {
                         <span
                           className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black uppercase border ${cfg.color}`}
                         >
-                          <cfg.icon width={14} height={14} /> {cfg.label}
+                          <cfg.icon width={14} height={14} stroke="currentColor" /> {cfg.label}
                         </span>
                         <p className="font-black text-xl text-zoop-obsidian dark:text-white">
                           Rs. {(order.totalAmount || 0).toLocaleString()}
                         </p>
-                        <span className="text-gray-400 text-sm">
-                          {isExpanded ? "▲" : "▼"}
+                        <span
+                          className={`text-gray-400 transition-transform ${isExpanded ? "rotate-180" : ""}`}
+                          aria-hidden="true"
+                        >
+                          <ChevronDown width={18} height={18} stroke="currentColor" />
                         </span>
                       </div>
                     </div>

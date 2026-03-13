@@ -4,12 +4,16 @@ import { User } from '../../assets/icons/User';
 import { Mail } from '../../assets/icons/Mail';
 import { Shield } from '../../assets/icons/Shield';
 import { BellRing } from '../../assets/icons/BellRing';
+import { useTheme } from "../../context/ThemeContext";
+import { Moon } from "../../assets/icons/Moon";
+import { Sun } from "../../assets/icons/Sun";
 import { authApi, contentApi, adminApi } from '../../services/api';
 import { useToast } from '../../context/ToastContext';
 
 const AdminProfile = () => {
   const location = useLocation();
   const { showToast } = useToast();
+  const { isDarkMode, toggleTheme } = useTheme();
   const [activeTab, setActiveTab] = useState('profile');
   const [notifications, setNotifications] = useState([]);
   const [admins, setAdmins] = useState([]);
@@ -19,7 +23,6 @@ const AdminProfile = () => {
     name: 'Admin User',
     email: 'admin@zoop.com',
     role: 'Super Admin',
-    avatar: '👨‍💼',
     bio: 'Platform administrator',
   });
 
@@ -108,14 +111,32 @@ const AdminProfile = () => {
               Manage your account and preferences
             </p>
           </div>
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="flex items-center gap-3 px-5 py-3 bg-white dark:bg-white/10 rounded-2xl border border-gray-100 dark:border-white/10 shadow-sm hover:scale-105 transition-all"
+            aria-label="Toggle theme"
+          >
+            {isDarkMode ? (
+              <>
+                <Sun width={18} height={18} className="text-zoop-moss" />
+                <span className="text-xs font-black uppercase text-zoop-moss">Light</span>
+              </>
+            ) : (
+              <>
+                <Moon width={18} height={18} className="text-zoop-obsidian" />
+                <span className="text-xs font-black uppercase text-zoop-obsidian">Dark</span>
+              </>
+            )}
+          </button>
         </div>
 
         {/* Profile Card */}
         <div className="bg-gradient-to-br from-zoop-obsidian via-gray-900 to-zoop-obsidian text-white rounded-3xl p-10 shadow-2xl dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)] relative overflow-hidden">
           <div className="relative z-10">
             <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-              <div className="w-32 h-32 bg-zoop-moss rounded-full flex items-center justify-center text-6xl">
-                {profileData.avatar}
+              <div className="w-32 h-32 bg-zoop-moss rounded-full flex items-center justify-center text-zoop-obsidian">
+                <User width={64} height={64} className="stroke-current" />
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
@@ -182,7 +203,7 @@ const AdminProfile = () => {
                   className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold text-sm transition-all ${
                     activeTab === tab.key
                       ? 'bg-zoop-moss text-zoop-obsidian dark:text-white shadow'
-                      : 'bg-gray-50 dark:bg-white/5 text-gray-600 dark:text-gray-400 hover:bg-gray-100'
+                      : 'bg-gray-50 dark:bg-white/5 text-gray-600 dark:text-gray-400  hover:bg-gray-100 dark:hover:bg-gray-100/20'
                   }`}
                 >
                   <Icon width={18} height={18} />
@@ -247,7 +268,7 @@ const AdminProfile = () => {
               
               <div className="space-y-4">
                 {notifications.map((activity, idx) => (
-                  <div key={idx} className="flex items-start gap-4 p-4 bg-gray-50 dark:bg-white/5 rounded-xl hover:bg-gray-100 transition-all">
+                  <div key={idx} className="flex items-start gap-4 p-4 bg-gray-50 dark:bg-white/5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-100/20 transition-all">
                     <div className="w-10 h-10 rounded-full flex items-center justify-center bg-zoop-moss/20 text-zoop-obsidian dark:text-white">
                       <Shield width={18} height={18} />
                     </div>

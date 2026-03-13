@@ -54,6 +54,8 @@ import {
   subscribeProductAvailability,
   getMyNotifications,
   markNotificationRead,
+  markAllNotificationsRead,
+  deleteNotification,
   getMyReviews,
   getCommissionStructureConfig,
   updateCommissionStructureConfig,
@@ -63,13 +65,16 @@ import {
   updateReturnRequestStatus,
   getAdminAds,
   upsertAdSlot,
+  deleteAdSlot,
   upsertAd,
+  deleteAd,
   getMyAds,
   createMyAd,
   getPublicAdsBySlot,
   getSellerAdSlots,
   getSubscriptionPlans,
   upsertSubscriptionPlan,
+  deleteSubscriptionPlan,
   subscribeSellerToPlan,
   removeAdminUser,
   clearAdminActivities,
@@ -77,6 +82,12 @@ import {
   superAdminDeleteUsersByRole,
   superAdminResetWeb,
 } from '../controllers/contentController';
+import {
+  createSellerSubscriptionRazorpayOrder,
+  verifySellerSubscriptionRazorpayPayment,
+  createSellerAdRazorpayOrder,
+  verifySellerAdRazorpayPayment,
+} from '../controllers/sellerPaymentController';
 
 const router = express.Router();
 
@@ -143,8 +154,10 @@ router.get('/seller/payouts', authenticate, authorize(['seller', 'admin']), requ
 
 router.get('/admin/ads', authenticate, authorize(['admin']), requireCompletedProfile, getAdminAds);
 router.put('/admin/ad-slots/:id', authenticate, authorize(['admin']), requireCompletedProfile, upsertAdSlot);
+router.delete('/admin/ad-slots/:id', authenticate, authorize(['admin']), requireCompletedProfile, deleteAdSlot);
 router.post('/admin/ads', authenticate, authorize(['admin']), requireCompletedProfile, upsertAd);
 router.put('/admin/ads/:id', authenticate, authorize(['admin']), requireCompletedProfile, upsertAd);
+router.delete('/admin/ads/:id', authenticate, authorize(['admin']), requireCompletedProfile, deleteAd);
 router.get('/seller/ads', authenticate, authorize(['seller', 'admin']), requireCompletedProfile, getMyAds);
 router.post('/seller/ads', authenticate, authorize(['seller', 'admin']), requireCompletedProfile, createMyAd);
 router.get('/seller/ad-slots', authenticate, authorize(['seller', 'admin']), requireCompletedProfile, getSellerAdSlots);
@@ -157,8 +170,13 @@ router.post('/admin/reset/web', authenticate, authorize(['admin']), requireCompl
 router.get('/admin/subscription-plans', authenticate, authorize(['admin']), requireCompletedProfile, getSubscriptionPlans);
 router.post('/admin/subscription-plans', authenticate, authorize(['admin']), requireCompletedProfile, upsertSubscriptionPlan);
 router.put('/admin/subscription-plans/:id', authenticate, authorize(['admin']), requireCompletedProfile, upsertSubscriptionPlan);
+router.delete('/admin/subscription-plans/:id', authenticate, authorize(['admin']), requireCompletedProfile, deleteSubscriptionPlan);
 router.get('/subscription-plans', getSubscriptionPlans);
 router.post('/seller/subscription/select', authenticate, authorize(['seller', 'admin']), requireCompletedProfile, subscribeSellerToPlan);
+router.post('/seller/subscription/razorpay/order', authenticate, authorize(['seller', 'admin']), requireCompletedProfile, createSellerSubscriptionRazorpayOrder);
+router.post('/seller/subscription/razorpay/verify', authenticate, authorize(['seller', 'admin']), requireCompletedProfile, verifySellerSubscriptionRazorpayPayment);
+router.post('/seller/ads/razorpay/order', authenticate, authorize(['seller', 'admin']), requireCompletedProfile, createSellerAdRazorpayOrder);
+router.post('/seller/ads/razorpay/verify', authenticate, authorize(['seller', 'admin']), requireCompletedProfile, verifySellerAdRazorpayPayment);
 
 // ─── SUPPORT TICKETS ────────────────────────────────────────────────────────
 router.post('/support-tickets', authenticate, requireCompletedProfile, createSupportTicket);
@@ -168,6 +186,8 @@ router.put('/admin/support-tickets/:id/status', authenticate, authorize(['admin'
 router.post('/stock-alerts', authenticate, requireCompletedProfile, subscribeProductAvailability);
 router.get('/notifications/my', authenticate, requireCompletedProfile, getMyNotifications);
 router.put('/notifications/:id/read', authenticate, requireCompletedProfile, markNotificationRead);
+router.put('/notifications/read-all', authenticate, requireCompletedProfile, markAllNotificationsRead);
+router.delete('/notifications/:id', authenticate, requireCompletedProfile, deleteNotification);
 router.get('/reviews/my', authenticate, requireCompletedProfile, getMyReviews);
 
 export default router;

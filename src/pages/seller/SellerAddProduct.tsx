@@ -479,6 +479,17 @@ export const SellerAddProduct = () => {
             }, 1500);
         } catch (err: any) {
             console.error('Product save error:', err);
+            const code = err?.code || err?.data?.code || err?.raw?.code;
+            if (code === "SUBSCRIPTION_REQUIRED") {
+                showToast(err.message || "Select a subscription plan to publish products", "warning");
+                setTimeout(() => navigate("/seller/subscription"), 900);
+                return;
+            }
+            if (code === "PRODUCT_LIMIT_REACHED") {
+                showToast(err.message || "Product limit reached for your plan", "warning");
+                setTimeout(() => navigate("/seller/subscription"), 1200);
+                return;
+            }
             if (Array.isArray(err?.missingFields) || Array.isArray(err?.data?.missingFields)) {
                 const missing = err?.missingFields || err?.data?.missingFields;
                 showToast(`Complete seller profile first: ${missing.join(", ")}`, 'warning');
@@ -513,7 +524,7 @@ export const SellerAddProduct = () => {
 
     if (!profileChecked) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+            <div className="min-h-screen bg-gray-50 dark:bg-[#121212] flex items-center justify-center">
                 <div className="text-center">
                     <div className="w-14 h-14 border-4 border-zoop-moss border-t-transparent rounded-full animate-spin mx-auto mb-4" />
                     <p className="text-gray-600 font-bold">Validating seller profile...</p>
@@ -523,7 +534,7 @@ export const SellerAddProduct = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 pb-12">
+        <div className="min-h-screen bg-gray-50 dark:bg-[#121212] pb-12">
             {toast.show && (
                 <Toast
                     message={toast.message}
@@ -532,9 +543,9 @@ export const SellerAddProduct = () => {
                 />
             )}
 
-            <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+            <div className="dark:bg-[#121212] border-b border-gray-200 sticky top-0 z-10">
                 <div className="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
-                    <button onClick={() => navigate(-1)} className="flex items-center text-gray-600 hover:text-zoop-obsidian">
+                    <button onClick={() => navigate(-1)} className="flex items-center text-gray-600 hover:text-zoop-obsidian dark:hover:text-white">
                         <ChevronLeft width={20} height={20} />
                         <span className="ml-1 font-bold">Back</span>
                     </button>
@@ -543,21 +554,21 @@ export const SellerAddProduct = () => {
                 </div>
             </div>
 
-            <div className="max-w-4xl mx-auto px-4 py-8">
+            <div className="dark:bg-[#121212] max-w-4xl mx-auto px-4 py-8">
                 <form onSubmit={handleSubmit} className="space-y-8">
-                    
+                
                     {/* Basic Info */}
                     <div className="bg-white p-6 rounded-2xl shadow-sm space-y-6">
                         <div className="flex items-center gap-3 border-b border-gray-100 pb-4">
                             <div className="bg-blue-100 p-2 rounded-lg text-blue-600">
                                 <Package width={20} height={20} />
                             </div>
-                            <h2 className="text-lg font-black text-gray-800">Basic Information</h2>
+                            <h2 className="text-lg font-black text-gray-800 dark:text-white/70">Basic Information</h2>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="col-span-2">
-                                <label className="block text-sm font-bold text-gray-700 mb-2">Product Title *</label>
+                                <label className="block text-sm font-bold text-gray-700 dark:text-white/70 mb-2">Product Title *</label>
                                 <input
                                     type="text"
                                     name="title"
@@ -571,7 +582,7 @@ export const SellerAddProduct = () => {
                             </div>
 
                             <div className="col-span-2">
-                                <label className="block text-sm font-bold text-gray-700 mb-2">Description *</label>
+                                <label className="block text-sm font-bold text-gray-700 dark:text-white/70 mb-2">Description *</label>
                                 <textarea
                                     name="description"
                                     required
@@ -586,7 +597,7 @@ export const SellerAddProduct = () => {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">Category *</label>
+                                <label className="block text-sm font-bold text-gray-700 dark:text-white/70 mb-2">Category *</label>
                                 <input
                                     type="text"
                                     list="category-options"
@@ -626,7 +637,7 @@ export const SellerAddProduct = () => {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">Subcategory *</label>
+                                <label className="block text-sm font-bold text-gray-700 dark:text-white/70 mb-2">Subcategory *</label>
                                 <input
                                     type="text"
                                     list="subcategory-options"
@@ -651,7 +662,7 @@ export const SellerAddProduct = () => {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">Brand (Optional)</label>
+                                <label className="block text-sm font-bold text-gray-700 dark:text-white/70 mb-2">Brand (Optional)</label>
                                 <input
                                     type="text"
                                     name="brand"
@@ -665,15 +676,15 @@ export const SellerAddProduct = () => {
                             <div className="col-span-2 rounded-2xl border border-zoop-moss/25 bg-zoop-moss/5 p-4">
                                 <p className="text-sm font-black text-zoop-obsidian mb-2">Where These Details Appear</p>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs text-gray-700">
-                                    <p><span className="font-black text-gray-900">About Item:</span> Under product name and Description tab.</p>
-                                    <p><span className="font-black text-gray-900">Color & Size:</span> Next to product images as selectable options.</p>
-                                    <p><span className="font-black text-gray-900">RAM/Storage/Dimensions:</span> Specifications tab.</p>
-                                    <p><span className="font-black text-gray-900">Custom Attributes:</span> Additional Details section.</p>
+                                    <p><span className="font-black text-gray-900 dark:text-white/50">About Item:</span> Under product name and Description tab.</p>
+                                    <p><span className="font-black text-gray-900 dark:text-white/50">Color & Size:</span> Next to product images as selectable options.</p>
+                                    <p><span className="font-black text-gray-900 dark:text-white/50">RAM/Storage/Dimensions:</span> Specifications tab.</p>
+                                    <p><span className="font-black text-gray-900 dark:text-white/50">Custom Attributes:</span> Additional Details section.</p>
                                 </div>
                             </div>
 
                             <div className="col-span-2">
-                                <label className="block text-sm font-bold text-gray-700 mb-2">About This Item</label>
+                                <label className="block text-sm font-bold text-gray-700 dark:text-white/70 mb-2">About This Item</label>
                                 <textarea
                                     name="aboutItem"
                                     rows={3}
@@ -688,7 +699,7 @@ export const SellerAddProduct = () => {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">SKU (Optional)</label>
+                                <label className="block text-sm font-bold text-gray-700 dark:text-white/70 mb-2">SKU (Optional)</label>
                                 <input
                                     type="text"
                                     name="sku"
@@ -701,7 +712,7 @@ export const SellerAddProduct = () => {
 
                             {showMaterialField && (
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">Material (Optional)</label>
+                                <label className="block text-sm font-bold text-gray-700 dark:text-white/70 mb-2">Material (Optional)</label>
                                 <input
                                     type="text"
                                     name="material"
@@ -716,10 +727,10 @@ export const SellerAddProduct = () => {
 
                             {showTechSpecs && (
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">RAM (Optional)</label>
+                                <label className="block text-sm font-bold text-gray-700 dark:text-white/70 mb-2">RAM (Optional)</label>
                                 <input
                                     type="text"
-                                    name="ram"
+                                    name="ram" 
                                     value={formData.ram}
                                     onChange={handleChange}
                                     className={`w-full px-4 py-3 rounded-xl border ${fieldErrors.ram ? 'border-red-400 bg-red-50' : 'border-gray-200'} focus:border-zoop-moss focus:ring-2 focus:ring-zoop-moss/20 transition-all font-medium`}
@@ -731,7 +742,7 @@ export const SellerAddProduct = () => {
 
                             {showTechSpecs && (
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">Storage (Optional)</label>
+                                <label className="block text-sm font-bold text-gray-700 dark:text-white/70 mb-2">Storage (Optional)</label>
                                 <input
                                     type="text"
                                     name="storage"
@@ -744,7 +755,7 @@ export const SellerAddProduct = () => {
                             )}
 
                             <div className="col-span-2">
-                                <label className="block text-sm font-bold text-gray-700 mb-2">Highlights (One per line)</label>
+                                <label className="block text-sm font-bold text-gray-700 dark:text-white/70 mb-2">Highlights (One per line)</label>
                                 <textarea
                                     name="highlights"
                                     rows={3}
@@ -760,12 +771,12 @@ export const SellerAddProduct = () => {
                     {/* Media */}
                     <div className="bg-white p-6 rounded-2xl shadow-sm space-y-6">
                         <div className="flex items-center gap-3 border-b border-gray-100 pb-4">
-                             <h2 className="text-lg font-black text-gray-800">Product Images</h2>
+                             <h2 className="text-lg font-black text-gray-800 dark:text-white/70">Product Images</h2>
                         </div>
-                        <p className="text-sm text-gray-500">Upload high-quality images. The first image will be the thumbnail.</p>
+                        <p className="text-sm text-gray-500 dark:text-white/70">Upload high-quality images. The first image will be the thumbnail.</p>
                         
                         <ImageUpload onUpload={handleImageUpload} maxFiles={20} initialUrls={[...(formData.imageUrls || []), ...(formData.videoUrls || [])]} />
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-gray-500 dark:text-white/70">
                             You can upload images and videos. First image is used as thumbnail, and uploaded media is also shown inside the product description gallery.
                         </p>
                     </div>
@@ -773,12 +784,12 @@ export const SellerAddProduct = () => {
                     {/* Pricing & Inventory */}
                     <div className="bg-white p-6 rounded-2xl shadow-sm space-y-6">
                         <div className="flex items-center gap-3 border-b border-gray-100 pb-4">
-                             <h2 className="text-lg font-black text-gray-800">Pricing & Inventory</h2>
+                             <h2 className="text-lg font-black text-gray-800 dark:text-white/70">Pricing & Inventory</h2>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">Selling Price (Rs.) (Auto)</label>
+                                <label className="block text-sm font-bold text-gray-700 dark:text-white/70 mb-2">Selling Price (Rs.) (Auto)</label>
                                 <input
                                     type="number"
                                     name="price"
@@ -790,7 +801,7 @@ export const SellerAddProduct = () => {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">MRP (Rs.) *</label>
+                                <label className="block text-sm font-bold text-gray-700 dark:text-white/70 mb-2">MRP (Rs.) *</label>
                                 <input
                                     type="number"
                                     name="mrp"
@@ -803,7 +814,7 @@ export const SellerAddProduct = () => {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">Discount %</label>
+                                <label className="block text-sm font-bold text-gray-700 dark:text-white/70 mb-2">Discount %</label>
                                 <input
                                     type="number"
                                     name="discountPercent"
@@ -816,7 +827,7 @@ export const SellerAddProduct = () => {
                             </div>
                             
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">Stock Quantity *</label>
+                                <label className="block text-sm font-bold text-gray-700 dark:text-white/70 mb-2">Stock Quantity *</label>
                                 <input
                                     type="number"
                                     name="stock"
@@ -831,8 +842,8 @@ export const SellerAddProduct = () => {
                             <div className="md:col-span-3 rounded-2xl border border-dashed border-zoop-moss/40 bg-zoop-moss/5 p-4">
                                 <div className="flex items-center justify-between gap-3">
                                     <div>
-                                        <h3 className="text-sm font-black text-zoop-obsidian">Variant Pricing & Media</h3>
-                                        <p className="text-xs text-gray-500">Add separate prices, stock, and image/video links for sizes, colors, RAM, storage, or other options.</p>
+                                        <h3 className="text-sm font-black text-zoop-obsidian dark:text-white/70">Variant Pricing & Media</h3>
+                                        <p className="text-xs text-gray-500 dark:text-white/70">Add separate prices, stock, and image/video links for sizes, colors, RAM, storage, or other options.</p>
                                     </div>
                                 </div>
                                 <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-3">
@@ -854,8 +865,8 @@ export const SellerAddProduct = () => {
                                         {formData.variantOptions.map((variant) => (
                                             <div key={variant.id} className="flex flex-col gap-2 rounded-xl border border-gray-100 bg-white p-3 md:flex-row md:items-center md:justify-between">
                                                 <div>
-                                                    <p className="font-black text-zoop-obsidian">{variant.label}</p>
-                                                    <p className="text-xs text-gray-500">{variant.type}: {variant.value} • Rs. {variant.price || formData.price || 0} • Stock {variant.stock || formData.stock || 0}</p>
+                                                    <p className="font-black text-zoop-obsidian dark:text-white/70">{variant.label}</p>
+                                                    <p className="text-xs text-gray-500 dark:text-white/70">{variant.type}: {variant.value} • Rs. {variant.price || formData.price || 0} • Stock {variant.stock || formData.stock || 0}</p>
                                                 </div>
                                                 <button type="button" onClick={() => removeVariantOption(variant.id)} className="text-xs font-black text-red-600">Remove</button>
                                             </div>
@@ -865,7 +876,7 @@ export const SellerAddProduct = () => {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">Weight (grams)</label>
+                                <label className="block text-sm font-bold text-gray-700 dark:text-white/70 mb-2">Weight (grams)</label>
                                 <input
                                     type="number"
                                     name="weightGrams"
@@ -877,7 +888,7 @@ export const SellerAddProduct = () => {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">Country of Origin</label>
+                                <label className="block text-sm font-bold text-gray-700 dark:text-white/70 mb-2">Country of Origin</label>
                                 <input
                                     type="text"
                                     name="countryOfOrigin"
@@ -889,7 +900,7 @@ export const SellerAddProduct = () => {
 
                             <div className="md:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-2">Color Options</label>
+                                    <label className="block text-sm font-bold text-gray-700 dark:text-white/70 mb-2">Color Options</label>
                                     <div className="flex gap-2">
                                         <input
                                             type="text"
@@ -926,7 +937,7 @@ export const SellerAddProduct = () => {
                                     </p>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-2">Size Options</label>
+                                    <label className="block text-sm font-bold text-gray-700 dark:text-white/70 mb-2">Size Options</label>
                                     <div className="flex gap-2">
                                         <input
                                             type="text"
@@ -966,7 +977,7 @@ export const SellerAddProduct = () => {
 
                             <div className="md:col-span-3 grid grid-cols-1 md:grid-cols-4 gap-6">
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-2">Width</label>
+                                    <label className="block text-sm font-bold text-gray-700 dark:text-white/70 mb-2">Width</label>
                                     <input
                                         type="number"
                                         min="0"
@@ -978,7 +989,7 @@ export const SellerAddProduct = () => {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-2">Height</label>
+                                    <label className="block text-sm font-bold text-gray-700 dark:text-white/70 mb-2">Height</label>
                                     <input
                                         type="number"
                                         min="0"
@@ -990,7 +1001,7 @@ export const SellerAddProduct = () => {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-2">Depth</label>
+                                    <label className="block text-sm font-bold text-gray-700 dark:text-white/70 mb-2">Depth</label>
                                     <input
                                         type="number"
                                         min="0"
@@ -1002,7 +1013,7 @@ export const SellerAddProduct = () => {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-2">Unit</label>
+                                    <label className="block text-sm font-bold text-gray-700 dark:text-white/70 mb-2">Unit</label>
                                     <select
                                         name="dimensionUnit"
                                         value={formData.dimensionUnit}
@@ -1021,7 +1032,7 @@ export const SellerAddProduct = () => {
                             </div>
 
                             <div className="md:col-span-3">
-                                <label className="block text-sm font-bold text-gray-700 mb-2">Custom Attributes</label>
+                                <label className="block text-sm font-bold text-gray-700 dark:text-white/70 mb-2">Custom Attributes</label>
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                                     <input
                                         type="text"
@@ -1040,7 +1051,7 @@ export const SellerAddProduct = () => {
                                     <button
                                         type="button"
                                         onClick={addAttributePair}
-                                        className="px-4 py-3 rounded-xl bg-gray-900 text-white text-xs font-black uppercase"
+                                        className="px-4 py-3 rounded-xl bg-gray-900 text-white text-xs font-black uppercase dark:bg-white dark:text-black"
                                     >
                                         Add Attribute
                                     </button>
@@ -1069,7 +1080,7 @@ export const SellerAddProduct = () => {
 
                             <div className="md:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-2">Return Policy</label>
+                                    <label className="block text-sm font-bold text-gray-700 dark:text-white/70 mb-2">Return Policy</label>
                                     <input
                                         type="text"
                                         name="returnPolicy"
@@ -1079,7 +1090,7 @@ export const SellerAddProduct = () => {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-2">Delivery Time</label>
+                                    <label className="block text-sm font-bold text-gray-700 dark:text-white/70 mb-2">Delivery Time</label>
                                     <input
                                         type="text"
                                         name="deliveryTime"
@@ -1091,7 +1102,7 @@ export const SellerAddProduct = () => {
                             </div>
 
                             <div className="md:col-span-3">
-                                <label className="block text-sm font-bold text-gray-700 mb-2">Warranty Info</label>
+                                <label className="block text-sm font-bold text-gray-700 dark:text-white/70 mb-2">Warranty Info</label>
                                 <textarea
                                     name="warrantyInfo"
                                     rows={2}
@@ -1107,7 +1118,7 @@ export const SellerAddProduct = () => {
                     {/* Delivery Options */}
                     <div className="bg-white p-6 rounded-2xl shadow-sm space-y-6">
                         <div className="flex items-center gap-3 border-b border-gray-100 pb-4">
-                             <h2 className="text-lg font-black text-gray-800">Delivery Options</h2>
+                             <h2 className="text-lg font-black text-gray-800 dark:text-white/70">Delivery Options</h2>
                         </div>
 
                         <div className="flex items-center gap-4 bg-zoop-moss/10 p-4 rounded-xl border border-zoop-moss/20">
@@ -1120,16 +1131,16 @@ export const SellerAddProduct = () => {
                                 className="w-6 h-6 text-zoop-moss border-gray-300 rounded focus:ring-zoop-moss"
                             />
                             <div>
-                                <label htmlFor="isSameDayEligible" className="block text-sm font-black text-gray-800 cursor-pointer">
+                                <label htmlFor="isSameDayEligible" className="block text-sm font-black text-gray-800 dark:text-white/70 cursor-pointer">
                                     Same-Day Delivery Eligible
                                 </label>
-                                <p className="text-xs text-gray-600">Check this if you can deliver this product within 4 hours in your city.</p>
+                                <p className="text-xs text-gray-600 dark:text-white/70">Check this if you can deliver this product within 4 hours in your city.</p>
                             </div>
                         </div>
 
                         {formData.isSameDayEligible && (
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">Available Cities (comma separated)</label>
+                                <label className="block text-sm font-bold text-gray-700 dark:text-white/70 mb-2">Available Cities (comma separated)</label>
                                 <input
                                     type="text"
                                     name="cityAvailability"
@@ -1142,7 +1153,7 @@ export const SellerAddProduct = () => {
                         )}
                         
                         <div>
-                             <label className="block text-sm font-bold text-gray-700 mb-2">Tags (Comma separated)</label>
+                             <label className="block text-sm font-bold text-gray-700 dark:text-white/70 mb-2">Tags (Comma separated)</label>
                                 <input
                                     type="text"
                                     name="tags"

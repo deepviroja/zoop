@@ -201,7 +201,7 @@ const AdminOrders = () => {
                     {filteredOrders.map((order) => (
                       <tr
                         key={order.id}
-                        className="cursor-pointer hover:bg-gray-50"
+                        className="cursor-pointer  dark:hover:bg-gray-50/10 hover:bg-gray-50"
                         onClick={() => setSelectedOrder(order)}
                       >
                         <td className="px-6 py-4">
@@ -307,18 +307,18 @@ const AdminOrders = () => {
                 </div>
 
                 <div className="grid gap-4 md:grid-cols-2">
-                  <div className="rounded-2xl bg-gray-50 dark:bg-white/5 p-4">
+                  <div className=" rounded-2xl bg-gray-50 dark:bg-white/5 p-4">
                     <p className="text-xs font-black uppercase tracking-widest text-gray-400">
                       Customer
                     </p>
                     <p className="mt-2 font-black text-zoop-obsidian dark:text-white">
                       {selectedOrder.customer?.name || "-"}
                     </p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-sm text-gray-600 dark:text-gray-400 break-all leading-snug">
                       {selectedOrder.customer?.email || "-"}
                     </p>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {selectedOrder.customer?.phone || "-"}
+                      {selectedOrder.customer?.phone ? "+" + selectedOrder.customer?.phone.replace("+","")  : "-"}
                     </p>
                   </div>
                   <div className="rounded-2xl bg-gray-50 dark:bg-white/5 p-4">

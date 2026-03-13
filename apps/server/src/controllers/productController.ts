@@ -206,6 +206,36 @@ export const createProduct = async (req: Request, res: Response) => {
       });
     }
 
+    // Enforce subscription limits for sellers (admins bypass)
+    const subscription = profile?.subscription || null;
+    if (String(user?.role || '').toLowerCase() === 'seller') {
+      const expiresAt = subscription?.expiresAt ? new Date(subscription.expiresAt) : null;
+      const expired = expiresAt ? Date.now() > expiresAt.getTime() : false;
+      if (!subscription || subscription?.status !== 'active' || expired) {
+        return res.status(402).json({
+          error: 'An active subscription is required to publish products. Please select a plan.',
+          code: 'SUBSCRIPTION_REQUIRED',
+        });
+      }
+
+      const limit = Number(
+        subscription?.featureLimits?.productAddLimit ??
+          subscription?.featureLimits?.productLimit ??
+          0,
+      );
+      if (limit > 0) {
+        const existingSnap = await db.collection('products').where('sellerId', '==', user.uid).get();
+        if (existingSnap.size >= limit) {
+          return res.status(403).json({
+            error: `Your plan allows only ${limit} products. Upgrade your plan to add more.`,
+            code: 'PRODUCT_LIMIT_REACHED',
+            limit,
+            current: existingSnap.size,
+          });
+        }
+      }
+    }
+
     // We need to typecase somewhat loosely or ensure the schema strictly matches the type
     // Zod schema usually has everything except ID and timestamps
     const mrp = Number(productData.mrp ?? productData.price ?? 0);

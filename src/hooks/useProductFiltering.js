@@ -1,11 +1,11 @@
-import { useState, useMemo, useEffect } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 export const useProductFiltering = (allProducts, initialCategory = "all", initialType = "all") => {
   // View & UI State
   const [view, setView] = useState("grid"); // 'grid' or 'list'
   const [showFilters, setShowFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(20);
+  const itemsPerPage = 20;
 
   // Collapsible filter sections
   const [expandedSections, setExpandedSections] = useState({
@@ -76,6 +76,21 @@ export const useProductFiltering = (allProducts, initialCategory = "all", initia
     const prices = categoryFilteredProducts.map((p) => p.price);
     return Math.ceil(Math.max(...prices) / 1000) * 1000;
   }, [categoryFilteredProducts]);
+
+  const lastMaxPriceRef = useRef(maxPrice);
+
+  useEffect(() => {
+    const prevMax = lastMaxPriceRef.current;
+    if (prevMax === maxPrice) return;
+    lastMaxPriceRef.current = maxPrice;
+
+    setFilters((prev) => {
+      const [min, max] = prev.priceRange || [0, maxPrice];
+      const nextMax =
+        max >= prevMax || max > maxPrice ? maxPrice : Math.min(max, maxPrice);
+      return { ...prev, priceRange: [min, nextMax] };
+    });
+  }, [maxPrice]);
 
   // Main Filter Logic
   const filteredProducts = useMemo(() => {
@@ -160,6 +175,14 @@ export const useProductFiltering = (allProducts, initialCategory = "all", initia
     currentPage * itemsPerPage,
   ), [filteredProducts, currentPage, itemsPerPage]);
 
+  useEffect(() => {
+    if (!Number.isFinite(totalPages) || totalPages < 1) {
+      if (currentPage !== 1) setCurrentPage(1);
+      return;
+    }
+    if (currentPage > totalPages) setCurrentPage(totalPages);
+  }, [currentPage, totalPages]);
+
   // Handlers
   const handleFilterChange = (newFilters) => {
     setFilters(newFilters);
@@ -197,19 +220,6 @@ export const useProductFiltering = (allProducts, initialCategory = "all", initia
     (filters.rating > 0 ? 1 : 0) +
     (filters.inStock ? 1 : 0) +
     (filters.type !== "all" ? 1 : 0);
-
-  // Track previous maxPrice to detect changes
-  const [prevMaxPrice, setPrevMaxPrice] = useState(maxPrice);
-
-  // Render-phase state update (derived state sync)
-  // This runs during render, updates state, and restarts render immediately (no dom commit)
-  if (maxPrice !== prevMaxPrice) {
-    setPrevMaxPrice(maxPrice);
-    setFilters((prev) => ({
-      ...prev,
-      priceRange: [prev.priceRange[0], maxPrice],
-    }));
-  }
 
   // Scroll to top only on page change, not on filter change to prevent jumping
   useEffect(() => {

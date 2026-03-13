@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { NavLink, Outlet, Navigate, useNavigate, Link } from "react-router-dom";
 import { useUser } from "../context/UserContext";
 import { auth } from "../firebase";
@@ -20,43 +20,26 @@ import { Shield } from "../assets/icons/Shield";
 import { FileText } from "../assets/icons/FileText";
 import { apiClient } from "../api/client";
 import { useSiteConfig } from "../context/SiteConfigContext";
-import { useTheme } from "../context/ThemeContext";
-import { Moon } from "../assets/icons/Moon";
-import { Sun } from "../assets/icons/Sun";
+import { useQuery } from "../hooks/useQuery";
 
 const SellerLayout = () => {
   const { user } = useUser();
   const [isSidebarOpen, setSidebarOpen] = useState(false);
-  const [unreadNotifications, setUnreadNotifications] = useState(0);
   const navigate = useNavigate();
   const { siteConfig, replaceBrandText } = useSiteConfig();
-  const { isDarkMode, toggleTheme } = useTheme();
 
-  useEffect(() => {
-    let cancelled = false;
-    let intervalId = null;
-    const pullNotifications = async () => {
-      if (!user) {
-        setUnreadNotifications(0);
-        return;
-      }
-      try {
-        const list = await apiClient.get("/content/notifications/my");
-        if (!cancelled) {
-          const items = Array.isArray(list) ? list : [];
-          setUnreadNotifications(items.filter((n) => !n.read).length);
-        }
-      } catch {
-        if (!cancelled) setUnreadNotifications(0);
-      }
-    };
-    pullNotifications();
-    intervalId = window.setInterval(pullNotifications, 12000);
-    return () => {
-      cancelled = true;
-      if (intervalId) window.clearInterval(intervalId);
-    };
-  }, [user]);
+  const { data: notificationsData } = useQuery({
+    queryKey: ["notifications", "my", user?.uid || user?.id || user?.email || "anon"],
+    enabled: Boolean(user),
+    queryFn: () => apiClient.get("/content/notifications/my"),
+    staleTime: 10 * 1000,
+    refetchInterval: 12 * 1000,
+    initialData: [],
+  });
+
+  const unreadNotifications = user && Array.isArray(notificationsData)
+    ? notificationsData.filter((n) => !n.read).length
+    : 0;
 
   if (siteConfig?.maintenanceMode) {
     return (
@@ -114,7 +97,7 @@ const SellerLayout = () => {
   ];
 
   return (
-    <div className="flex h-screen max-h-screen overflow-hidden bg-zoop-canvas relative">
+    <div className="flex h-screen max-h-screen overflow-hidden bg-zoop-canvas dark:bg-[#050505] relative">
       {/* --- MOBILE HEADER TOGGLE --- */}
       <div className="md:hidden fixed top-0 left-0 right-0 p-4 z-50 pointer-events-none">
         <button
@@ -135,7 +118,7 @@ const SellerLayout = () => {
 
       {/* --- SIDEBAR --- */}
       <aside
-        className={`fixed top-0 left-0 h-screen w-72 bg-white dark:bg-zoop-obsidian text-zoop-obsidian dark:text-white border-r border-gray-100 dark:border-white/10 p-8 z-50 transition-transform duration-300 md:translate-x-0 md:sticky md:top-0 shadow-2xl dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)] md:shadow-none flex flex-col ${
+        className={`fixed top-0 left-0 h-[97%] my-auto lg:mx-2 w-72 bg-white dark:bg-zoop-obsidian text-zoop-obsidian dark:text-white border-r border-gray-100 dark:border-white/10 p-8 z-50 transition-transform duration-300 md:translate-x-0 md:sticky md:top-0 shadow-2xl dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)] md:shadow-none flex flex-col ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
         style={
@@ -196,9 +179,9 @@ const SellerLayout = () => {
               end={item.end}
               onClick={() => setSidebarOpen(false)}
               className={({ isActive }) =>
-                `px-5 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-3 shrink-0 ${
+                `px-5 py-4 m-1 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-3 shrink-0 ${
                   isActive
-                    ? "bg-zoop-moss text-zoop-obsidian dark:text-white shadow-[0_0_20px_rgba(183,232,75,0.3)] scale-105"
+                    ? "bg-zoop-moss text-zoop-obsidian dark:text-white shadow-[0_0_20px_rgba(183,232,75,0.3)] "
                     : "text-gray-500 dark:text-white/75 hover:text-zoop-obsidian dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5"
                 }`
               }
@@ -217,26 +200,6 @@ const SellerLayout = () => {
             </NavLink>
           ))}
         </nav>
-        
-        {/* THEME TOGGLE */}
-        <div className="mt-4 px-2">
-          <button
-            onClick={toggleTheme}
-            className="w-full flex items-center justify-between px-5 py-4 rounded-2xl bg-white/5 hover:bg-white/10 transition-all text-[10px] font-black uppercase tracking-widest text-white/75 group"
-          >
-            <div className="flex items-center gap-3">
-              <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-zoop-moss text-zoop-obsidian' : 'bg-zoop-obsidian text-white'}`}>
-                {isDarkMode ? <Moon width={16} height={16} /> : <Sun width={16} height={16} />}
-              </div>
-              <span className="group-hover:translate-x-1 transition-transform">
-                {isDarkMode ? "Dark Theme" : "Light Theme"}
-              </span>
-            </div>
-            <div className={`w-10 h-5 rounded-full p-1 transition-colors ${isDarkMode ? 'bg-zoop-moss' : 'bg-white/20'}`}>
-              <div className={`w-3 h-3 rounded-full transition-transform duration-300 ${isDarkMode ? 'translate-x-5 bg-zoop-obsidian' : 'translate-x-0 bg-white'}`} />
-            </div>
-          </button>
-        </div>
 
         {/* Logout button at bottom */}
         <div className="mt-6 pt-6 border-t border-white/10 shrink-0">
@@ -258,7 +221,7 @@ const SellerLayout = () => {
           </p>
           <Link
             to="/seller/notifications"
-            className="relative inline-flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-gray-100 text-sm font-bold text-zoop-obsidian dark:text-white"
+            className="relative inline-flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-100/10 text-sm font-bold text-zoop-obsidian dark:text-white"
             aria-label="Seller notifications"
           >
             <BellRing width={18} height={18} />

@@ -85,6 +85,8 @@ export const contentApi = {
   subscribeStockAlert: (productId: string) => post<any>('/content/stock-alerts', { productId }),
   getMyNotifications: () => get<any[]>('/content/notifications/my'),
   markNotificationRead: (id: string) => put<any>(`/content/notifications/${id}/read`, {}),
+  markAllNotificationsRead: () => put<any>('/content/notifications/read-all', {}),
+  deleteNotification: (id: string) => del<any>(`/content/notifications/${id}`),
   getMyReviews: () => get<any[]>('/content/reviews/my'),
 };
 
@@ -223,6 +225,7 @@ export const adminApi = {
   createSubscriptionPlan: (data: any) => post<any>('/content/admin/subscription-plans', data),
   updateSubscriptionPlan: (id: string, data: any) =>
     put<any>(`/content/admin/subscription-plans/${id}`, data),
+  deleteSubscriptionPlan: (id: string) => del<any>(`/content/admin/subscription-plans/${id}`),
   updateCity:       (id: string, data: unknown) => put<any>(`/content/cities/${id}`, data),
   updateSiteConfig: (data: unknown) => put<any>('/content/site-config', data),
   createHeroSlide:  (data: unknown) => post<any>('/content/hero-slides', data),
@@ -244,6 +247,20 @@ export const sellerApi = {
   getSubscriptionPlans: () => get<any[]>('/content/subscription-plans'),
   chooseSubscriptionPlan: (planId: string) =>
     post<any>('/content/seller/subscription/select', { planId }),
+  createSubscriptionRazorpayOrder: (planId: string) =>
+    post<any>('/content/seller/subscription/razorpay/order', { planId }),
+  verifySubscriptionRazorpayPayment: (data: {
+    razorpayOrderId: string;
+    razorpayPaymentId: string;
+    razorpaySignature: string;
+  }) => post<any>('/content/seller/subscription/razorpay/verify', data),
+  createAdRazorpayOrder: (data: any) =>
+    post<any>('/content/seller/ads/razorpay/order', data),
+  verifyAdRazorpayPayment: (data: {
+    razorpayOrderId: string;
+    razorpayPaymentId: string;
+    razorpaySignature: string;
+  }) => post<any>('/content/seller/ads/razorpay/verify', data),
 };
 
 export const adsApi = {

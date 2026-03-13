@@ -124,9 +124,9 @@ const Monetization = () => {
           <div className="h-px flex-1 bg-gray-200 dark:bg-white/10" />
         </div>
 
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
           {/* Creator View */}
-          <div className="xl:col-span-1 bg-white dark:bg-white/5 rounded-[2.5rem] p-8 border border-white dark:border-white/10 shadow-2xl relative overflow-hidden">
+          <div className="xl:col-span-3 bg-white dark:bg-white/5 rounded-[2.5rem] p-8 border border-white dark:border-white/10 shadow-2xl relative overflow-hidden">
              <div className="absolute top-0 right-0 w-32 h-32 bg-zoop-moss/10 rounded-full blur-3xl" />
              <h3 className="text-xl font-black text-zoop-obsidian dark:text-white mb-6">Create Campaign</h3>
              <div className="space-y-4">
@@ -198,7 +198,7 @@ const Monetization = () => {
                         <span className="text-[9px] font-black uppercase text-gray-400 tracking-[0.2em]">Platform Benefit</span>
                         <div className="flex items-baseline gap-1">
                           <span className="text-4xl font-black text-zoop-obsidian dark:text-white tracking-tighter">
-                            {offer.discountType === "flat" ? "₹" : ""}{offer.discountValue}{offer.discountType === "percent" ? "%" : ""}
+                            {offer.discountType === "flat" ? "Rs. " : ""}{offer.discountValue}{offer.discountType === "percent" ? "%" : ""}
                           </span>
                           <span className="text-[10px] font-black text-zoop-moss uppercase">OFF</span>
                         </div>
@@ -252,7 +252,7 @@ const Monetization = () => {
               </thead>
               <tbody className="divide-y divide-gray-50 dark:divide-white/5">
                 {visiblePayouts.map(p => (
-                  <tr key={p.id} className="group hover:bg-gray-50/50 dark:hover:bg-white/5 transition-colors">
+                  <tr key={p.id} className="group hover:bg-gray-100 dark:hover:bg-white/5 transition-colors">
                     <td className="px-6 py-6">
                       <p className="font-black text-sm text-zoop-obsidian dark:text-white">{p.sellerName || "Merchant"}</p>
                       <p className="text-[10px] text-gray-400 font-bold uppercase">{p.sellerId.slice(0, 12)}...</p>

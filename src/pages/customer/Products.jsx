@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useSearchParams, useOutletContext } from "react-router-dom";
 import { apiClient } from "../../api/client";
 import ProductCard from "../../components/product/ProductCard";
@@ -17,10 +17,15 @@ import { normalizeCityName } from "../../utils/cityMapping";
 
 const Products = () => {
   const { location } = useUser();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { scrollDir } = useOutletContext() || { scrollDir: "up" };
   const categoryParam = searchParams.get("category");
   const typeParam = searchParams.get("type");
+  const pageFromUrl = useMemo(() => {
+    const raw = searchParams.get("page");
+    const parsed = Number.parseInt(String(raw || "1"), 10);
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
+  }, [searchParams]);
   const seoTitle = categoryParam
     ? `${categoryParam} Products | Zoop Marketplace`
     : typeParam
@@ -98,8 +103,31 @@ const Products = () => {
     typeParam || "all",
   );
 
+  useEffect(() => {
+    if (pageFromUrl !== currentPage) setCurrentPage(pageFromUrl);
+  }, [currentPage, pageFromUrl, setCurrentPage]);
+
+  useEffect(() => {
+    const current = searchParams.get("page");
+    const desired = currentPage > 1 ? String(currentPage) : null;
+    if ((current || null) === (desired || null)) return;
+
+    const next = new URLSearchParams(searchParams);
+    if (desired) next.set("page", desired);
+    else next.delete("page");
+    setSearchParams(next, { replace: true });
+  }, [currentPage, searchParams, setSearchParams]);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    const next = new URLSearchParams(searchParams);
+    if (page > 1) next.set("page", String(page));
+    else next.delete("page");
+    setSearchParams(next, { replace: true });
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-white/5">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#050505]">
       <Seo
         title={seoTitle}
         description={seoDescription}
@@ -267,7 +295,7 @@ const Products = () => {
                 <Pagination
                   currentPage={currentPage}
                   totalPages={totalPages}
-                  onPageChange={setCurrentPage}
+                  onPageChange={handlePageChange}
                 />
               </>
             ) : (

@@ -287,7 +287,7 @@ const SellerProfile = () => {
         </div>
 
         {/* Tabs */}
-        <div className="bg-white dark:glass-card rounded-2xl p-2 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
+        <div className="bg-white dark:glass-card  rounded-2xl p-2 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
           <div className="flex gap-2">
             {[
               { key: "profile", label: "Business Info", icon: Store },
@@ -301,7 +301,7 @@ const SellerProfile = () => {
                   className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold text-sm transition-all ${
                     activeTab === tab.key
                       ? "bg-zoop-moss text-zoop-obsidian dark:text-white shadow"
-                      : "bg-gray-50 dark:bg-white/5 text-gray-600 dark:text-gray-400 hover:bg-gray-100"
+                      : "bg-gray-50 dark:bg-white/5 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-100/10"
                   }`}
                 >
                   <Icon width={18} height={18} />
@@ -384,7 +384,7 @@ const SellerProfile = () => {
                             : "border-gray-100 dark:border-white/10 bg-gray-50 dark:bg-white/5 text-gray-600 dark:text-gray-400"
                         }`}
                         placeholder={
-                          isEditing ? `Enter ${field.label.toLowerCase()}` : "—"
+                          isEditing ? `Enter ${field.label.toLowerCase()}` : "N/A"
                         }
                       />
                     )}
@@ -433,7 +433,7 @@ const SellerProfile = () => {
                       ? "border-gray-200 dark:border-white/10 focus:border-zoop-moss outline-none"
                       : "border-gray-100 dark:border-white/10 bg-gray-50 dark:bg-white/5 text-gray-600 dark:text-gray-400"
                   }`}
-                  placeholder={isEditing ? "Describe your business..." : "—"}
+                  placeholder={isEditing ? "Describe your business..." : "N/A"}
                 />
               </div>
 

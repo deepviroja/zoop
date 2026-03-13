@@ -1,8 +1,13 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ordersApi } from "../../services/api";
 import { useUser } from "../../context/UserContext";
 import { useToast } from "../../context/ToastContext";
+import { AlertCircle } from "../../assets/icons/AlertCircle";
+import { CheckCircle } from "../../assets/icons/CheckCircle";
+import { Clock } from "../../assets/icons/Clock";
+import { Truck } from "../../assets/icons/Truck";
+import { Box } from "../../assets/icons/Box";
 
 const statusColor = (s) =>
   s === "delivered"
@@ -15,16 +20,14 @@ const statusColor = (s) =>
           ? "bg-red-100 text-red-700 border-red-200"
           : "bg-yellow-100 text-yellow-700 border-yellow-200";
 
-const statusIcon = (s) =>
-  s === "delivered"
-    ? "✅"
-    : s === "shipped"
-      ? "🚚"
-      : s === "processing"
-        ? "⚙️"
-        : s === "cancelled"
-          ? "❌"
-          : "⏳";
+const StatusIcon = ({ status }) => {
+  const base = "w-4 h-4";
+  if (status === "delivered") return <CheckCircle width={16} height={16} className={base} />;
+  if (status === "shipped") return <Truck width={16} height={16} className={base} />;
+  if (status === "processing") return <Clock width={16} height={16} className={base} />;
+  if (status === "cancelled") return <AlertCircle width={16} height={16} className={base} />;
+  return <Clock width={16} height={16} className={base} />;
+};
 
 const Skeleton = ({ className = "" }) => (
   <div className={`bg-gray-200 dark:bg-white/20 animate-pulse rounded-xl ${className}`} />
@@ -144,7 +147,9 @@ const OrderHistory = () => {
     return (
       <div className="min-h-screen bg-zoop-canvas flex items-center justify-center p-6">
         <div className="bg-white dark:glass-card rounded-2xl p-8 text-center max-w-lg shadow-lg dark:shadow-[0_12px_32px_rgba(0,0,0,0.5)]">
-          <div className="text-5xl mb-4">📦</div>
+          <div className="text-5xl mb-4 text-zoop-obsidian dark:text-white inline-flex items-center justify-center">
+            <Box width={46} height={46} />
+          </div>
           <h2 className="text-xl font-black text-zoop-obsidian dark:text-white mb-2">
             Couldn't load your orders
           </h2>
@@ -197,7 +202,9 @@ const OrderHistory = () => {
 
         {filtered.length === 0 ? (
           <div className="bg-white dark:glass-card rounded-[3rem] py-32 px-12 text-center border-2 border-dashed border-zoop-clay/30">
-            <div className="text-8xl mb-6">📦</div>
+            <div className="text-8xl mb-6 text-zoop-obsidian dark:text-white inline-flex items-center justify-center">
+              <Box width={80} height={80} />
+            </div>
             <h2 className="text-3xl font-black text-zoop-obsidian dark:text-white">
               {filterStatus === "all"
                 ? "No Orders Yet"
@@ -247,7 +254,8 @@ const OrderHistory = () => {
                     <span
                       className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black uppercase border ${statusColor(order.status)}`}
                     >
-                      {statusIcon(order.status)} {order.status}
+                      <StatusIcon status={order.status} />
+                      {order.status}
                     </span>
                     <p className="mt-2 font-black text-xl text-zoop-obsidian dark:text-white">
                       Rs. {(order.totalAmount || 0).toLocaleString()}

@@ -106,7 +106,7 @@ const SupportTickets = () => {
                 <p className="text-3xl font-black text-green-500">{stats.resolved}</p>
               </div>
               <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                <Check width={24} height={24} stroke="#22c55e" />
+                <Check width={24} height={24} />
               </div>
             </div>
           </div>
@@ -118,7 +118,7 @@ const SupportTickets = () => {
                 <p className="text-3xl font-black text-zoop-obsidian dark:text-white">{stats.total}</p>
               </div>
               <div className="w-12 h-12 bg-gray-100 dark:bg-white/10 rounded-xl flex items-center justify-center">
-                <MessageCircle width={24} height={24} stroke="#1f2937" />
+                <MessageCircle width={24} height={24}  />
               </div>
             </div>
           </div>
@@ -133,7 +133,7 @@ const SupportTickets = () => {
               className={`flex-1 py-3 px-4 rounded-xl font-bold text-sm transition-all ${
                 filter === tab
                   ? 'bg-zoop-moss text-zoop-obsidian dark:text-white'
-                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100'
+                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-100/10'
               }`}
             >
               {tab === 'in-progress' ? 'In Progress' : tab.charAt(0).toUpperCase() + tab.slice(1)}

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Heart } from "../../assets/icons/Heart";
 import { ShoppingCart } from "../../assets/icons/ShoppingCart";
+import { Zap } from "../../assets/icons/Zap";
 import { useCart } from "../../hooks/useCart";
 import StarRating from "../../components/product/StarRating";
 import { useWishlist } from "../../context/WishlistContext";
@@ -36,7 +37,7 @@ const Wishlist = () => {
       return;
     }
     addToCart(product, 1);
-    showToast("Added to cart 🛒", "success");
+    showToast("Added to cart", "success");
   };
 
   const handleRemoveFromWishlist = (productId) => {
@@ -174,8 +175,9 @@ const Wishlist = () => {
                   {/* Same Day Delivery Badge */}
                   {product.sameDayDelivery && (
                     <div className="flex items-center gap-2 mb-4 text-xs">
-                      <span className="bg-green-50 text-green-700 px-3 py-1 rounded-full font-bold border border-green-200">
-                        ⚡ Same Day Delivery
+                      <span className="bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 px-3 py-1 rounded-full font-bold border border-green-200 dark:border-green-500/20 inline-flex items-center gap-1">
+                        <Zap width={12} height={12} fill="currentColor" />
+                        Same Day Delivery
                       </span>
                     </div>
                   )}

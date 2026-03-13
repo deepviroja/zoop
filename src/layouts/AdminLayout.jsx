@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { LayoutDashboard } from "../assets/icons/LayoutDashboard";
 import { ShieldCheck } from "../assets/icons/ShieldCheck";
 import { FileText } from "../assets/icons/FileText";
@@ -21,38 +21,24 @@ import { Activity } from "../assets/icons/Activity";
 import { Zap } from "../assets/icons/Zap";
 import { apiClient } from "../api/client";
 import { useSiteConfig } from "../context/SiteConfigContext";
-import { useTheme } from "../context/ThemeContext";
-import { Moon } from "../assets/icons/Moon";
-import { Sun } from "../assets/icons/Sun";
+import { useQuery } from "../hooks/useQuery";
 
 const AdminLayout = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
-  const [unreadNotifications, setUnreadNotifications] = useState(0);
   const navigate = useNavigate();
   const { siteConfig } = useSiteConfig();
-  const { isDarkMode, toggleTheme } = useTheme();
 
-  useEffect(() => {
-    let cancelled = false;
-    let intervalId = null;
-    const pullNotifications = async () => {
-      try {
-        const list = await apiClient.get("/content/notifications/my");
-        if (!cancelled) {
-          const items = Array.isArray(list) ? list : [];
-          setUnreadNotifications(items.filter((n) => !n.read).length);
-        }
-      } catch {
-        if (!cancelled) setUnreadNotifications(0);
-      }
-    };
-    pullNotifications();
-    intervalId = window.setInterval(pullNotifications, 12000);
-    return () => {
-      cancelled = true;
-      if (intervalId) window.clearInterval(intervalId);
-    };
-  }, []);
+  const { data: notificationsData } = useQuery({
+    queryKey: ["notifications", "my", "admin"],
+    queryFn: () => apiClient.get("/content/notifications/my"),
+    staleTime: 10 * 1000,
+    refetchInterval: 12 * 1000,
+    initialData: [],
+  });
+
+  const unreadNotifications = Array.isArray(notificationsData)
+    ? notificationsData.filter((n) => !n.read).length
+    : 0;
 
   const handleLogout = async () => {
     try {
@@ -85,14 +71,14 @@ const AdminLayout = () => {
   ];
 
   return (
-    <div className="flex h-screen max-h-screen overflow-hidden bg-zoop-clay/10 relative">
+    <div className="flex h-screen max-h-screen overflow-hidden bg-zoop-canvas dark:bg-[#050505] relative">
       {/* --- MOBILE HEADER TOGGLE --- */}
       <div className="md:hidden fixed top-0 left-0 right-0 p-4 z-50 pointer-events-none">
         <button
           onClick={() => setSidebarOpen(true)}
           className="bg-white dark:glass-card text-zoop-obsidian dark:text-white p-2 rounded-xl pointer-events-auto border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]"
         >
-          <Menu width={24} height={24} stroke="black" />
+          <Menu width={24} height={24} className="stroke-current" />
         </button>
       </div>
 
@@ -106,7 +92,7 @@ const AdminLayout = () => {
 
       {/* --- SIDEBAR --- */}
       <aside
-        className={`fixed top-0 left-0 h-screen w-72 bg-white dark:glass-card border-r border-zoop-clay p-6 z-50 transition-transform duration-300 md:translate-x-0 md:sticky md:top-0 shadow-2xl dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)] md:shadow-none flex flex-col ${
+        className={`fixed top-0 left-0 h-[97%] my-auto lg:mx-2 w-72 bg-white dark:glass-card border-r border-zoop-clay p-6 z-50 transition-transform duration-300 md:translate-x-0 md:sticky md:top-0 shadow-2xl dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)] md:shadow-none flex flex-col ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -164,26 +150,6 @@ const AdminLayout = () => {
           ))}
         </nav>
 
-        {/* THEME TOGGLE */}
-        <div className="mt-4 px-2">
-          <button
-            onClick={toggleTheme}
-            className="w-full flex items-center justify-between px-5 py-4 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/10 transition-all text-[10px] font-black uppercase tracking-widest text-zoop-obsidian dark:text-white/75 group"
-          >
-            <div className="flex items-center gap-3">
-              <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-zoop-moss text-zoop-obsidian' : 'bg-zoop-obsidian text-white'}`}>
-                {isDarkMode ? <Moon width={16} height={16} /> : <Sun width={16} height={16} />}
-              </div>
-              <span className="group-hover:translate-x-1 transition-transform">
-                {isDarkMode ? "Dark Theme" : "Light Theme"}
-              </span>
-            </div>
-            <div className={`w-10 h-5 rounded-full p-1 transition-colors ${isDarkMode ? 'bg-zoop-moss' : 'bg-gray-200'}`}>
-              <div className={`w-3 h-3 rounded-full transition-transform duration-300 ${isDarkMode ? 'translate-x-5 bg-zoop-obsidian' : 'translate-x-0 bg-white'}`} />
-            </div>
-          </button>
-        </div>
-
         <div className="mt-auto pt-6 flex-shrink-0">
           <button
             onClick={handleLogout}
@@ -214,7 +180,7 @@ const AdminLayout = () => {
           </p>
           <Link
             to="/admin/notifications"
-            className="relative inline-flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-gray-100 text-sm font-bold text-zoop-obsidian dark:text-white"
+            className="relative inline-flex items-center gap-2 px-3 py-1.5 rounded-lg dark:hover:bg-gray-100 hover:bg-gray-100/10 text-sm font-bold text-zoop-obsidian dark:text-white"
             aria-label="Admin notifications"
           >
             <BellRing width={18} height={18} />

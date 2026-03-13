@@ -234,7 +234,7 @@ const UserManagement = () => {
                   </tr>
                 ) : (
                   filteredUsers.map((user) => (
-                    <tr key={user.id} className="hover:bg-gray-50 transition-colors">
+                    <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-50/10 transition-colors">
                       <td className="px-6 py-4">
                         <p className="font-bold text-zoop-obsidian dark:text-white">
                           {user.displayName || user.name || user.email}

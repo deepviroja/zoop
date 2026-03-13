@@ -1,7 +1,25 @@
 import React, { useEffect, useState } from "react";
 import { sellerApi, authApi } from "../../services/api";
+import { useSiteConfig } from "../../context/SiteConfigContext";
+
+const RAZORPAY_CHECKOUT_SRC = "https://checkout.razorpay.com/v1/checkout.js";
+
+const loadRazorpayCheckoutScript = () =>
+  new Promise((resolve) => {
+    if (window.Razorpay) {
+      resolve(true);
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = RAZORPAY_CHECKOUT_SRC;
+    script.async = true;
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
 
 const SellerSubscription = () => {
+  const { brandName } = useSiteConfig();
   const [plans, setPlans] = useState([]);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -52,10 +70,10 @@ const SellerSubscription = () => {
           {plans.map((plan) => (
             <div
               key={plan.id}
-              className={`relative rounded-[2rem] p-7 border-2 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] transition-all ${
+              className={`relative rounded-[2rem] hover:scale-102 p-7 border-2 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] transition-all ${
                 activePlanId === plan.id
                   ? "border-zoop-moss bg-zoop-moss/10"
-                  : "border-gray-200 dark:border-white/10 bg-white dark:glass-card"
+                  : "border-gray-200 dark:border-white/10 bg-white dark:glass-card "
               }`}
             >
               <h3 className="text-2xl font-black text-zoop-obsidian dark:text-white">{plan.name}</h3>
@@ -72,8 +90,68 @@ const SellerSubscription = () => {
                 onClick={async () => {
                   setSavingPlanId(plan.id);
                   try {
-                    await sellerApi.chooseSubscriptionPlan(plan.id);
-                    await load();
+                    const price = Number(plan.price || 0);
+                    if (price > 0) {
+                      const sdkLoaded = await loadRazorpayCheckoutScript();
+                      if (!sdkLoaded || !window.Razorpay) {
+                        throw new Error("Could not load Razorpay checkout. Please try again.");
+                      }
+
+                      const paymentOrderResponse =
+                        await sellerApi.createSubscriptionRazorpayOrder(plan.id);
+
+                      if (paymentOrderResponse?.free) {
+                        await load();
+                        return;
+                      }
+
+                      const keyId = paymentOrderResponse?.keyId;
+                      const razorpayOrder = paymentOrderResponse?.order;
+                      if (!keyId || !razorpayOrder?.id) {
+                        throw new Error("Could not start subscription payment.");
+                      }
+
+                      const paymentResult = await new Promise((resolve, reject) => {
+                        const rzp = new window.Razorpay({
+                          key: keyId,
+                          amount: razorpayOrder.amount,
+                          currency: razorpayOrder.currency || "INR",
+                          name: brandName || "Zoop",
+                          description: "Subscription Payment",
+                          order_id: razorpayOrder.id,
+                          prefill: {
+                            name: profile?.displayName || profile?.name || "",
+                            email: profile?.email || "",
+                            contact: profile?.phone || "",
+                          },
+                          notes: razorpayOrder.notes || {},
+                          theme: { color: "#a3e635" },
+                          handler: (payment) => resolve(payment),
+                          modal: {
+                            ondismiss: () => reject(new Error("Payment cancelled by user")),
+                          },
+                        });
+                        rzp.on("payment.failed", (resp) => {
+                          const reason =
+                            resp?.error?.description ||
+                            resp?.error?.reason ||
+                            "Payment failed";
+                          reject(new Error(reason));
+                        });
+                        rzp.open();
+                      });
+
+                      await sellerApi.verifySubscriptionRazorpayPayment({
+                        razorpayOrderId: paymentResult.razorpay_order_id,
+                        razorpayPaymentId: paymentResult.razorpay_payment_id,
+                        razorpaySignature: paymentResult.razorpay_signature,
+                      });
+
+                      await load();
+                    } else {
+                      await sellerApi.chooseSubscriptionPlan(plan.id);
+                      await load();
+                    }
                   } finally {
                     setSavingPlanId("");
                   }
@@ -89,7 +167,9 @@ const SellerSubscription = () => {
                   ? "Saving..."
                   : activePlanId === plan.id
                     ? "Current Plan"
-                    : "Select Plan"}
+                    : Number(plan.price || 0) > 0
+                      ? "Pay & Activate"
+                      : "Select Plan"}
               </button>
             </div>
           ))}

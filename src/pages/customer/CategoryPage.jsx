@@ -23,7 +23,7 @@ const CategoryPage = () => {
     () =>
       categoryConfig[categoryKey] || {
         name: categoryName,
-        icon: "📦",
+        icon: "box",
         subcategories: [],
       },
     [categoryKey, categoryName],
@@ -34,17 +34,27 @@ const CategoryPage = () => {
 
   // Fetch from backend API for this category
   useEffect(() => {
-    if (!apiLoading) setApiLoading(true);
+    let cancelled = false;
+    setApiLoading(true);
     const categoryQuery = encodeURIComponent(categoryKey || categoryName || "");
     apiClient
       .get(`/products?category=${categoryQuery}`)
-      .then((data) => setApiProducts(Array.isArray(data) ? data : []))
+      .then((data) => {
+        if (cancelled) return;
+        setApiProducts(Array.isArray(data) ? data : []);
+      })
       .catch((err) => {
         console.error("Failed to load category products:", err);
-        setApiProducts([]);
+        if (!cancelled) setApiProducts([]);
       })
-      .finally(() => setApiLoading(false));
-  }, [categoryName, categoryKey, apiLoading]);
+      .finally(() => {
+        if (!cancelled) setApiLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [categoryName, categoryKey]);
 
   // Initialize hook with API products and this category as the default filter
   const {

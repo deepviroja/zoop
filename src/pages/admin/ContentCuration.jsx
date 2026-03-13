@@ -133,7 +133,7 @@ const ContentCuration = () => {
               className={`flex-1 py-3 px-4 rounded-xl font-bold text-sm transition-all ${
                 filter === tab
                   ? 'bg-zoop-moss text-zoop-obsidian dark:text-white'
-                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100'
+                  : 'text-gray-600 dark:text-gray-400 dark:hover:bg-gray-100/10 hover:bg-gray-100'
               }`}
             >
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -150,6 +150,7 @@ const ContentCuration = () => {
                 <img
                   src={product.image || product.thumbnailUrl || "/brand-mark.svg"}
                   alt={product.name || product.title}
+                  
                   className="w-full h-full object-cover"
                   onError={(event) => {
                     event.currentTarget.src = "/brand-mark.svg";

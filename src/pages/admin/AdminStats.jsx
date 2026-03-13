@@ -136,7 +136,7 @@ const AdminStats = () => {
           ))}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-1 gap-8">
           <div className="lg:col-span-2 bg-white dark:bg-white/5 rounded-[2.5rem] p-8 md:p-10 border border-gray-100 dark:border-white/10 shadow-xl overflow-hidden relative group/chart">
             <div className="absolute top-0 right-0 w-96 h-96 bg-zoop-moss/5 rounded-full blur-[100px] pointer-events-none group-hover/chart:bg-zoop-moss/10 transition-colors duration-1000" />
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-12 relative z-10 gap-4">
@@ -158,6 +158,9 @@ const AdminStats = () => {
                 {[0, 1, 2, 3, 4].map(i => (
                   <div key={i} className="w-full h-px bg-gray-100 dark:bg-white/5 relative">
                     {i === 0 && <span className="absolute -top-3 left-0 text-[8px] font-black text-gray-400 uppercase tracking-widest">Growth Zone</span>}
+                    <span className="absolute -top-2 left-0 text-[9px] font-black text-gray-400 tabular-nums">
+                      {formatInrWithSymbol(Math.round((maxSales * (4 - i)) / 4), { compact: true, maximumFractionDigits: 0 })}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -217,13 +220,13 @@ const AdminStats = () => {
             <h2 className="text-center text-[10px] font-black uppercase tracking-[0.5em] text-gray-400">Inventory & Market IQ</h2>
             <div className="h-px flex-1 bg-gray-200 dark:bg-white/10" />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
             {productInsights.map((group) => (
-              <div key={group.id} className="bg-white dark:bg-white/5 rounded-[3rem] p-8 border border-gray-100 dark:border-white/10 shadow-2xl group/card relative overflow-hidden transition-all hover:bg-white/60 dark:hover:bg-white/10">
+              <div key={group.id} className="bg-white dark:bg-white/5 rounded-[2.5rem] p-6 xl:p-5 border border-gray-100 dark:border-white/10 shadow-2xl group/card relative overflow-hidden transition-all hover:bg-white/60 dark:hover:bg-white/10">
                 <div className="absolute -right-10 -top-10 w-40 h-40 bg-zoop-moss/5 rounded-full blur-[60px] group-hover/card:bg-zoop-moss/20 transition-all duration-700" />
                 
                 <div className="relative z-10">
-                  <div className="flex justify-between items-center mb-10">
+                  <div className="flex justify-between items-center mb-6">
                     <div className="flex items-center gap-3">
                       <div className="p-3 bg-zoop-moss/10 rounded-2xl">
                         <TrendingUp width={18} height={18} className="text-zoop-moss" />
@@ -232,14 +235,14 @@ const AdminStats = () => {
                     </div>
                   </div>
 
-                  <div className="space-y-8">
+                  <div className="space-y-6">
                     {group.items.length === 0 ? (
                       <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest text-center py-10 opacity-50">Discovery phase...</p>
                     ) : (
                       group.items.map((item, idx) => (
-                        <div key={item.id} className="group/item flex items-center gap-5 cursor-pointer">
+                        <div key={item.id} className="group/item flex items-center gap-4 cursor-pointer">
                           <div className="relative shrink-0">
-                            <img src={item.thumbnailUrl || item.image} alt="" className="w-16 h-16 rounded-[1.25rem] object-cover shadow-xl group-hover/item:scale-105 group-hover/item:-rotate-2 transition-all duration-500" />
+                            <img src={item.thumbnailUrl || item.image} alt="" className="w-14 h-14 rounded-[1.25rem] object-cover shadow-xl group-hover/item:scale-105 group-hover/item:-rotate-2 transition-all duration-500" />
                             <div className="absolute -top-2 -left-2 w-7 h-7 bg-zoop-obsidian dark:bg-zoop-moss text-white dark:text-zoop-obsidian text-[10px] font-black flex items-center justify-center rounded-xl border-2 border-white dark:border-zoop-obsidian shadow-lg">
                               #{idx + 1}
                             </div>
@@ -249,13 +252,19 @@ const AdminStats = () => {
                             <p className="font-black text-sm text-zoop-obsidian dark:text-white truncate group-hover/item:text-zoop-moss transition-colors uppercase tracking-tight">
                               {item.name || item.title}
                             </p>
-                            <div className="flex items-center justify-between mt-1.5">
-                              <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">
+                            <div className="flex items-center justify-between gap-3 mt-1.5">
+                              <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest truncate">
                                 {item.category || "General"}
                               </span>
                               <div className="flex items-center gap-1.5">
-                                <span className="text-[10px] font-black text-zoop-obsidian dark:text-white bg-gray-50 dark:bg-white/10 px-2 py-0.5 rounded-lg border border-gray-100 dark:border-white/10">
-                                  {group.type === "trend" ? `${idx * 4 + 70}%` : (item.quantitySold || item.ratingCount || 0)}
+                                <span className="text-[10px] font-black text-zoop-obsidian dark:text-white bg-gray-50 dark:bg-white/10 px-2 py-0.5 rounded-lg border border-gray-100 dark:border-white/10 whitespace-nowrap">
+                                  {group.type === "trend"
+                                    ? `Trend: ${idx * 4 + 70}%`
+                                    : group.type === "sales"
+                                      ? `Sold: ${Number(item.quantitySold || 0)}`
+                                      : group.type === "rating"
+                                        ? `Ratings: ${Number(item.ratingCount || 0)}`
+                                        : `Sold: ${Number(item.quantitySold || 0)}`}
                                 </span>
                               </div>
                             </div>

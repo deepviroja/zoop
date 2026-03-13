@@ -3017,46 +3017,46 @@
     "Filter coffee powder Bangalore",
   ];
 
-  // Category Icons mapping
+  // Category Icons mapping (icon keys match `src/assets/icons/*` exports)
   export const categoryConfig = {
     men: {
       name: "Men",
-      icon: "👔",
+      icon: "User",
       subcategories: ["Clothing", "Footwear", "Accessories", "Grooming"],
     },
     women: {
       name: "Women",
-      icon: "👗",
+      icon: "Dress",
       subcategories: ["Clothing", "Footwear", "Accessories", "Jewelry", "Ethnic Wear"],
     },
     kids: {
       name: "Kids",
-      icon: "🧸",
+      icon: "Box",
       subcategories: ["Clothing", "Footwear", "Toys", "Education"],
     },
     electronics: {
       name: "Electronics",
-      icon: "📱",
+      icon: "Zap",
       subcategories: ["Smartphones", "Laptops", "Audio", "Tablets", "Accessories"],
     },
     home: {
       name: "Home",
-      icon: "🏠",
+      icon: "Home",
       subcategories: ["Decor", "Bedding", "Kitchen", "Furniture"],
     },
     food: {
       name: "Food",
-      icon: "🍽️",
+      icon: "Store",
       subcategories: ["Sweets", "Snacks", "Beverages", "Homemade", "Groceries"],
     },
     artisans: {
       name: "Artisans",
-      icon: "🎨",
+      icon: "Star",
       subcategories: ["Handcrafted", "Traditional", "Art"],
     },
     beauty: {
       name: "Beauty",
-      icon: "💄",
+      icon: "Heart",
       subcategories: ["Makeup", "Fragrances", "Skincare", "Nails"],
     },
   };

@@ -39,6 +39,7 @@ import { ShoppingCart } from "../assets/icons/ShoppingCart";
 import { Moon } from "../assets/icons/Moon";
 import { Sun } from "../assets/icons/Sun";
 import { formatInrWithSymbol } from "../utils/currency";
+import { useQuery } from "../hooks/useQuery";
 
 const CustomerLayout = () => {
   const { isDarkMode, toggleTheme } = useTheme();
@@ -48,72 +49,47 @@ const CustomerLayout = () => {
   const qParam = searchSearchParams.get("q");
 
   const [searchQuery, setSearchQuery] = useState(qParam || ""); // Initialize with URL param
-  const [searchProducts, setSearchProducts] = useState([]);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
-  const [unreadNotifications, setUnreadNotifications] = useState(0);
-  const [notificationItems, setNotificationItems] = useState([]);
   const [showDesktopSuggestions, setShowDesktopSuggestions] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const navigate = useNavigate();
   const desktopSearchRef = useRef(null);
   const { siteConfig, brandName, replaceBrandText } = useSiteConfig();
 
-  // Update search query when URL param changes
-  // useEffect removed since qParam is used for init state and sync update is discouraged
   useEffect(() => {
-    let cancelled = false;
-    apiClient
-      .get("/products")
-      .then((items) => {
-        if (!cancelled) setSearchProducts(Array.isArray(items) ? items : []);
-      })
-      .catch(() => {
-        if (!cancelled) setSearchProducts([]);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+    setSearchQuery(qParam || "");
+  }, [qParam]);
+
+  const { data: searchProductsData } = useQuery({
+    queryKey: ["products", "search_suggestions"],
+    queryFn: () => apiClient.get("/products"),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const { data: notificationsData, refetch: refetchNotifications } = useQuery({
+    queryKey: ["notifications", "my", user?.uid || user?.id || user?.email || "anon"],
+    enabled: Boolean(user),
+    queryFn: () => apiClient.get("/content/notifications/my"),
+    staleTime: 10 * 1000,
+    refetchInterval: 12 * 1000,
+    initialData: [],
+  });
 
   useEffect(() => {
-    let cancelled = false;
-    let intervalId = null;
-
-    const pullNotifications = async () => {
-      if (!user) {
-        setUnreadNotifications(0);
-        setNotificationItems([]);
-        return;
-      }
-      try {
-        const list = await apiClient.get("/content/notifications/my");
-        if (cancelled) return;
-        const items = Array.isArray(list) ? list : [];
-        setUnreadNotifications(items.filter((n) => !n.read).length);
-        setNotificationItems(items.slice(0, 6));
-      } catch {
-        if (!cancelled) {
-          setUnreadNotifications(0);
-          setNotificationItems([]);
-        }
-      }
-    };
-
-    pullNotifications();
-    intervalId = window.setInterval(pullNotifications, 12000);
+    if (!user) return;
     const onVisible = () => {
-      if (document.visibilityState === "visible") pullNotifications();
+      if (document.visibilityState === "visible") refetchNotifications();
     };
     document.addEventListener("visibilitychange", onVisible);
+    return () => document.removeEventListener("visibilitychange", onVisible);
+  }, [refetchNotifications, user]);
 
-    return () => {
-      cancelled = true;
-      if (intervalId) window.clearInterval(intervalId);
-      document.removeEventListener("visibilitychange", onVisible);
-    };
-  }, [user]);
+  const searchProducts = Array.isArray(searchProductsData) ? searchProductsData : [];
+  const notifications = user && Array.isArray(notificationsData) ? notificationsData : [];
+  const unreadNotifications = user ? notifications.filter((n) => !n.read).length : 0;
+  const notificationItems = user ? notifications.slice(0, 6) : [];
 
   // Scroll direction logic
   // On mobile the header is always visible (like BottomNav).
@@ -296,7 +272,7 @@ const CustomerLayout = () => {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-zoop-canvas relative font-sans">
+    <div className="flex flex-col min-h-screen bg-zoop-canvas dark:bg-[#050505] relative font-sans">
       <AnimatePresence>
         {isLoggingOut && (
           <motion.div
@@ -320,7 +296,13 @@ const CustomerLayout = () => {
       />
 
       {/* --- TOP NOTIFICATION BAR (Not Sticky) --- */}
-      <div className="bg-gradient-to-r from-zoop-moss to-green-500 text-zoop-obsidian dark:text-white font-black text-center py-2.5 text-xs md:text-sm z-50 shadow-lg dark:shadow-[0_12px_32px_rgba(0,0,0,0.5)] animate-pulse flex items-center justify-center gap-2">
+      <div
+        className={`bg-gradient-to-r from-zoop-moss to-green-500 text-zoop-obsidian dark:text-white font-black text-center text-xs md:text-sm z-50 shadow-lg dark:shadow-[0_12px_32px_rgba(0,0,0,0.5)] animate-pulse flex items-center justify-center gap-2 transition-all duration-500 ${
+          scrollDir === "down"
+            ? "h-0 opacity-0 overflow-hidden pointer-events-none"
+            : "py-2.5 opacity-100"
+        }`}
+      >
         <Zap width={16} height={16} fill="black" />
         {announcementBanner}
         <Zap width={16} height={16} fill="black" />
@@ -329,12 +311,12 @@ const CustomerLayout = () => {
       {/* --- HEADER (Sticky Liquid) --- */}
       <header
         className={`supports-[backdrop-filter]:backdrop-blur-3xl bg-white/70 dark:bg-black/60 self-center text-zoop-obsidian dark:text-white sticky top-0 z-[60] transition-all duration-500 shadow-sm border-b border-gray-100 dark:border-white/10 ${
-          scrollDir === "down" ? "w-[96%] md:w-[94%] rounded-full mt-2 mx-auto" : "w-full"
+          scrollDir === "down" ? "w-[98%] md:w-[96%] px-[20%] rounded-full top-2 mx-auto" : "w-full"
         }`}
       >
         <div className="max-w-[1400px] mx-auto px-4 relative ">
           <div
-            className={`flex items-center gap-6 transition-all duration-500 overflow-visible ${
+            className={`flex items-center gap-3 transition-all duration-500 overflow-visible ${
               scrollDir === "down" 
                 ? "h-16 py-1 justify-between px-6" 
                 : "h-20 md:h-24 py-2 justify-between px-4"
@@ -351,53 +333,55 @@ const CustomerLayout = () => {
             >
               <span 
                 style={brandStyle}
-                className={`transition-transform duration-500 font-black tracking-tighter ${scrollDir === 'down' ? 'opacity-100' : ''}`}
+                className={`transition-transform duration-500 font-black tracking-tighter py-1 px-4 rounded-full  ${scrollDir === 'down' ? 'opacity-100 ' : ''}`}
               >
                 {brandName || "ZOOP"}
               </span>
             </Link>
 
-            {/* SPACER for compact mode centering */}
-            {scrollDir === "down" && <div className="w-8" />}
 
             {/* DESKTOP SEARCH BAR - SMART CAPSULE */}
             <form
               ref={desktopSearchRef}
               onSubmit={handleSearch}
               className={`hidden md:flex items-center bg-white/95 dark:bg-zoop-obsidian/90 backdrop-blur-2xl rounded-full shadow-lg dark:shadow-[0_12px_32px_rgba(0,0,0,0.5)] transition-all duration-700 ring-2 ${
-                scrollDir === "down" ? "flex-1 max-w-4xl mx-4" : "flex-1 mx-8 max-w-3xl"
+                scrollDir === "down"
+                  ? "w-[420px] max-w-[44vw] mx-4 py-1"
+                  : "flex-1 mx-8 max-w-3xl"
               } relative ${
                 searchQuery
                   ? "ring-zoop-moss/50 shadow-zoop-moss/20 shadow-2xl dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)]"
                   : "ring-transparent"
               } focus-within:ring-zoop-moss focus-within:shadow-[0_0_20px_rgba(163,230,53,0.3)]`}
             >
-              {/* Location Dropdown */}
-              <div
-                onClick={() => setIsLocationModalOpen(true)}
-                className="flex items-center pl-6 pr-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors rounded-l-full group"
-              >
-                <div className="relative mr-2 flex-shrink-0">
-                  <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-zoop-moss opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-zoop-moss"></span>
-                </div>
-                <span className="mr-2 text-xs font-black uppercase text-zoop-obsidian dark:text-white whitespace-nowrap">
-                  {location}
-                </span>
-                <div
-                  className={`transition-transform duration-300 text-gray-400 group-hover:text-zoop-obsidian ${
-                    isLocationModalOpen ? "rotate-180" : ""
-                  }`}
-                >
-                  <ChevronDown width={14} height={14} />
-                </div>
-              </div>
+              {/* Location Dropdown (desktop-only, hidden in compact header) */}
+              {scrollDir !== "down" && (
+                <>
+                  <div
+                    onClick={() => setIsLocationModalOpen(true)}
+                    className="flex items-center pl-6 pr-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors dark:hover:bg-gray-50/10 rounded-l-full group"
+                  >
+                    <div className="relative mr-2 flex-shrink-0">
+                      <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-zoop-moss opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-zoop-moss"></span>
+                    </div>
+                    <span className="mr-2 text-xs font-black uppercase text-zoop-obsidian dark:text-white whitespace-nowrap">
+                      {location}
+                    </span>
+                    <div
+                      className={`transition-transform duration-300 text-gray-400 group-hover:text-zoop-obsidian ${
+                        isLocationModalOpen ? "rotate-180" : ""
+                      }`}
+                    >
+                      <ChevronDown width={14} height={14} />
+                    </div>
+                  </div>
 
-              {/* Vertical Divider */}
-              <div className="h-6 w-px bg-gray-200 dark:bg-white/20"></div>
+                </>
+              )}
 
               {/* Search Input */}
-              <div className="flex-1 relative flex items-center">
+              <div className="px-1 flex-1 relative flex items-center">
                 <input
                   type="text"
                   value={searchQuery}
@@ -407,7 +391,7 @@ const CustomerLayout = () => {
                   }}
                   onFocus={() => setShowDesktopSuggestions(true)}
                   placeholder="Search products, brands, categories"
-                  className={`w-full pl-4 pr-12 ${
+                  className={`w-full pl-4 pr-12 rounded-full ${
                     isCompact ? "py-2.5 text-xs" : "py-3 text-sm"
                   } text-zoop-obsidian dark:text-white bg-transparent focus:outline-none font-medium placeholder:text-gray-400`}
                 />
@@ -494,7 +478,7 @@ const CustomerLayout = () => {
                   : "opacity-100 visible translate-x-0 scale-100"
               }`}
             >
-              {user && (
+              {user && scrollDir !== "down" && (
                 <div className="hidden md:block relative group">
                   <button
                     type="button"
@@ -536,7 +520,7 @@ const CustomerLayout = () => {
                             onClick={() => navigate("/notifications")}
                             className={`w-full text-left p-2 rounded-lg mb-1 ${
                               n.read
-                                ? "hover:bg-gray-50"
+                                ? "hover:bg-gray-50 dark:hover:bg-white/5"
                                 : "bg-zoop-moss/10 hover:bg-zoop-moss/20"
                             }`}
                           >
@@ -557,10 +541,10 @@ const CustomerLayout = () => {
                 <button
                   type="button"
                   onClick={() => navigate("/notifications")}
-                  className="md:hidden relative p-2 rounded-lg hover:bg-white/10 transition-colors"
+                  className="md:hidden relative p-3 rounded-xl bg-gray-50/50 dark:bg-white/5 hover:bg-zoop-moss/15 transition-all border border-gray-100 dark:border-white/10 text-zoop-obsidian dark:text-white"
                   aria-label="Notifications"
                 >
-                  <BellRing width={20} height={20} className="stroke-current" />
+                  <BellRing width={26} height={26} className="stroke-current" />
                   {unreadNotifications > 0 && (
                     <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-zoop-moss text-zoop-obsidian dark:text-white text-[10px] font-black flex items-center justify-center">
                       {unreadNotifications > 9 ? "9+" : unreadNotifications}
@@ -574,7 +558,7 @@ const CustomerLayout = () => {
               </div>
 
               {/* Admin / Seller Panel Quick Access Button */}
-              {user && user.role === "admin" && (
+              {user && user.role === "admin" && scrollDir !== "down" && (
                 <Link
                   to="/admin"
                   className="hidden md:flex items-center gap-2 px-3 py-2 bg-red-500 text-white rounded-lg text-xs font-black hover:bg-red-600 transition-all"
@@ -583,7 +567,7 @@ const CustomerLayout = () => {
                   Admin Panel
                 </Link>
               )}
-              {user && user.role === "seller" && (
+              {user && user.role === "seller" && scrollDir !== "down" && (
                 <Link
                   to={
                     user.verificationStatus === "approved"
@@ -607,20 +591,35 @@ const CustomerLayout = () => {
                   {/* Desktop Account Dropdown */}
                   <div className="hidden md:block relative group">
                     <button className="flex items-center gap-2 px-3 py-2 hover:bg-white/10 rounded-lg transition-all">
-                      <div className="text-right">
-                        <p className="text-[10px] text-gray-400 uppercase tracking-widest">
-                          Hello
-                        </p>
-                        <p className="text-xs font-bold text-zoop-moss leading-none flex items-center gap-1">
-                          {user.displayName || user.email?.split("@")[0]}
-                          <ChevronDown
-                            width={12}
-                            height={12}
-                            stroke="#121212"
-                            className="text-white group-hover:rotate-180 transition-transform"
-                          />
-                        </p>
-                      </div>
+                      {scrollDir !== "down" && (
+                        <div className="text-right">
+                          <p className="text-[10px] text-gray-400 uppercase tracking-widest">
+                            Hello
+                          </p>
+                          <p className="text-sm font-bold text-zoop-moss leading-none flex items-center gap-1">
+                            {user.displayName || user.email?.split("@")[0]}
+                            <ChevronDown
+                              width={12}
+                              height={12}
+                              stroke="currentColor"
+                              className="text-zoop-obsidian dark:text-white group-hover:rotate-180 transition-transform"
+                            />
+                          </p>
+                        </div>
+                      )}
+                      {scrollDir === "down" && (
+                        <div className="text-right ">
+                          <p className="text-sm font-bold text-zoop-moss leading-none flex items-center gap-1">
+                            {user.displayName || user.email?.split("@")[0]}
+                            <ChevronDown
+                              width={24}
+                              height={24}
+                              stroke="currentColor"
+                              className="text-zoop-obsidian dark:text-white group-hover:rotate-180 transition-transform"
+                            />
+                          </p>
+                        </div>
+                      )}
                       <div className="h-8 w-8 bg-white/10 dark:bg-zoop-moss/20 rounded-full flex items-center justify-center">
                         <User width={16} height={16} className="text-zoop-obsidian dark:text-zoop-moss" />
                       </div>
@@ -643,6 +642,7 @@ const CustomerLayout = () => {
                         {user.role === "admin" && (
                           <Link
                             to="/admin"
+                            activeClassName="bg-zoop-moss text-white"
                             className="flex items-center h-8 gap-2 py-1 px-2 rounded-md hover:bg-gray-100 transition-colors text-sm font-bold text-zoop-moss"
                           >
                             <Shield width={18} height={18} />
@@ -659,7 +659,7 @@ const CustomerLayout = () => {
                                   ? "/seller/waiting"
                                   : "/seller/onboarding"
                             }
-                            className="flex items-center h-8 gap-2 py-1 px-2 rounded-md hover:bg-gray-100 transition-colors text-sm font-bold text-zoop-moss"
+                            className="flex items-center h-8 gap-2 py-1 px-2 rounded-md hover:bg-gray-100 dark:hover:bg-white/10 transition-colors text-sm font-bold text-zoop-moss"
                           >
                             <Box width={18} height={18} />
                             {user.verificationStatus === "approved"
@@ -669,14 +669,14 @@ const CustomerLayout = () => {
                         )}
                         <Link
                           to="/profile"
-                          className="flex items-center h-8 gap-2 py-1 px-2 rounded-md hover:bg-gray-100 transition-colors text-sm font-bold text-gray-700 dark:text-gray-300"
+                          className="flex items-center h-8 gap-2 py-1 px-2 rounded-md hover:bg-gray-100 dark:hover:bg-white/10 transition-colors text-sm font-bold text-gray-700 dark:text-gray-300"
                         >
                           <User width={18} height={18} />
                           My Profile
                         </Link>
                         <Link
                           to="/history"
-                          className="flex items-center h-8 gap-2 py-1 px-0 rounded-md hover:bg-gray-100 transition-colors text-sm font-bold text-gray-700 dark:text-gray-300"
+                          className="flex items-center h-8 gap-2 py-1 px-0 rounded-md hover:bg-gray-100 dark:hover:bg-white/10 transition-colors text-sm font-bold text-gray-700 dark:text-gray-300"
                         >
                           <Box width={18} height={18} />
                           My Orders
@@ -737,36 +737,51 @@ const CustomerLayout = () => {
                 </>
               ) : (
                 <>
-                  <Link
-                    to="/seller/signup"
-                    className="hidden lg:block hover:text-zoop-moss text-zoop-obsidian dark:text-white transition-colors"
-                  >
-                    Become a Seller
-                  </Link>
-                  <Link
-                    to="/login"
-                    className="hidden sm:block bg-zoop-moss text-zoop-obsidian dark:text-white px-4 py-2 rounded-sm font-black hover:bg-white hover:scale-105 transition-all shadow-lg dark:shadow-[0_12px_32px_rgba(0,0,0,0.5)] text-xs md:text-sm"
-                  >
-                    Sign In
-                  </Link>
+                  {scrollDir === "down" ? (
+                    <Link
+                      to="/login"
+                      className="hidden md:flex items-center gap-2 bg-zoop-moss text-zoop-obsidian dark:text-white px-4 py-2 rounded-full font-black hover:bg-zoop-moss/85 transition-colors shadow-lg dark:shadow-[0_12px_32px_rgba(0,0,0,0.5)] text-xs"
+                      aria-label="Sign in"
+                    >
+                      <User width={16} height={16} className="stroke-current" />
+                      Login
+                    </Link>
+                  ) : (
+                    <>
+                      <Link
+                        to="/seller/signup"
+                        className="hidden lg:block hover:text-zoop-moss text-zoop-obsidian dark:text-white transition-colors"
+                      >
+                        Become a Seller
+                      </Link>
+                      <Link
+                        to="/login"
+                        className="hidden sm:block bg-zoop-moss text-zoop-obsidian dark:text-white px-4 py-2 rounded-sm font-black hover:bg-white hover:scale-105 transition-all shadow-lg dark:shadow-[0_12px_32px_rgba(0,0,0,0.5)] text-xs md:text-sm"
+                      >
+                        Sign In
+                      </Link>
+                    </>
+                  )}
                 </>
               )}
-
-
-
-              <div className="hidden md:flex items-center gap-4">
-                <Link
-                  to="/wishlist"
-                  className="hover:scale-110 active:scale-95 transition-transform text-zoop-obsidian dark:text-white"
-                >
-                  <Heart width={24} height={24} className="stroke-current" />
-                </Link>
-                <AnimatedCartIcon stroke="#1a1a1a" className="text-zoop-obsidian dark:text-white active:scale-95 transition-transform" />
-              </div>
+              {scrollDir !== "down" && (
+                <div className="hidden md:flex items-center gap-4">
+                  <Link
+                    to="/wishlist"
+                    className="hover:scale-110 active:scale-95 transition-transform text-zoop-obsidian dark:text-white"
+                  >
+                    <Heart width={24} height={24} className="stroke-current" />
+                  </Link>
+                  <AnimatedCartIcon
+                    stroke="#1a1a1a"
+                    className="text-zoop-obsidian dark:text-white active:scale-95 transition-transform"
+                  />
+                </div>
+              )}
               <button onClick={() => setSidebarOpen(true)} className="block">
                 <div className="relative group">
-                  <div className="h-10 w-10 bg-zoop-moss hover:bg-zoop-obsidian dark:hover:bg-white rounded-xl flex items-center justify-center cursor-pointer transition-all group shadow-lg dark:shadow-[0_12px_32px_rgba(0,0,0,0.5)]">
-                    <Menu width={24} height={24} className="stroke-zoop-obsidian hover:stroke-zoop-moss dark:stroke-zoop-obsidian " />
+                  <div className="h-10 w-10 bg-zoop-moss/80 hover:bg-white/10 dark:hover:bg-white/10 rounded-xl flex items-center justify-center cursor-pointer transition-all group shadow-lg dark:shadow-[0_12px_32px_rgba(0,0,0,0.5)]">
+                    <Menu width={24} height={24} className="stroke-zoop-obsidian dark:stroke-zoop-obsidian" />
                   </div>
                   <span className="absolute -top-1 right-0 flex h-3 w-3">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-zoop-moss opacity-75"></span>
@@ -966,7 +981,7 @@ const CustomerLayout = () => {
       />
 
       {/* --- SUB NAV --- */}
-      <nav className="bg-white dark:glass-card border-b border-gray-200 dark:border-white/10 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] z-30">
+      <nav className="bg-white mt-4 dark:glass-card dark:bg-black border-b border-gray-200 shadow-sm z-30">
         <div className="max-w-[1400px] mx-auto px-4 py-3">
           <div className="flex gap-4 md:gap-8 items-center overflow-x-auto whitespace-nowrap no-scrollbar text-sm">
             <NavLink
@@ -988,8 +1003,8 @@ const CustomerLayout = () => {
               className={({ isActive }) =>
                 `text-xs md:text-sm font-bold uppercase tracking-tighter transition-all flex-shrink-0 ${
                   isActive
-                    ? "text-zoop-copper border-b-2 border-zoop-copper pb-1"
-                    : "text-gray-500 hover:text-zoop-obsidian"
+                    ? "text-zoop-copper  border-b-2 border-zoop-copper pb-1"
+                    : "text-gray-500 dark:text-gray-300 hover:text-zoop-obsidian dark:hover:text-white hover:border-b-2 hover:border-zoop-moss pb-1 border-b-2 border-transparent"
                 }`
               }
             >
@@ -1004,7 +1019,7 @@ const CustomerLayout = () => {
                   `text-xs md:text-sm font-bold uppercase tracking-tighter transition-all flex-shrink-0 ${
                     isActive
                       ? "text-zoop-copper border-b-2 border-zoop-copper pb-1"
-                      : "text-gray-500 hover:text-zoop-obsidian"
+                      : "text-gray-500 dark:text-gray-300 hover:text-zoop-obsidian dark:hover:text-white hover:border-b-2 hover:border-zoop-moss pb-1 border-b-2 border-transparent"
                   }`
                 }
               >
@@ -1096,7 +1111,7 @@ const CustomerLayout = () => {
 
             <div>
               <h5 className="font-black text-xs uppercase tracking-widest text-zoop-moss mb-6">
-                Shop Zoop
+                Shop {brandName}
               </h5>
               <ul className="space-y-4 text-sm text-white/60">
                 <li>
