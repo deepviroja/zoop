@@ -97,38 +97,65 @@ const CustomerLayout = () => {
   const [scrollDir, setScrollDir] = useState("up");
   const [isCompact, setIsCompact] = useState(false);
   const lastScrollYRef = useRef(0);
+  const scrollDirRef = useRef("up");
+  const lastDirChangeYRef = useRef(0);
+  const scrollTickingRef = useRef(false);
+
+  useEffect(() => {
+    scrollDirRef.current = scrollDir;
+  }, [scrollDir]);
 
   useEffect(() => {
     const handleScroll = () => {
-      // Only apply auto-hide on desktop (≥768px)
-      if (window.innerWidth < 768) {
-        lastScrollYRef.current = window.scrollY;
-        setIsCompact(window.scrollY > 80);
-        return;
-      }
-      const currentScrollY = window.scrollY;
-      const delta = Math.abs(currentScrollY - lastScrollYRef.current);
+      if (scrollTickingRef.current) return;
+      scrollTickingRef.current = true;
 
-      setIsCompact(currentScrollY > 90);
+      window.requestAnimationFrame(() => {
+        const currentScrollY = window.scrollY;
 
-      // Always reveal when near top to avoid "stuck hidden" state
-      if (currentScrollY <= 8) {
-        setScrollDir("up");
+        // Compact header state (avoid redundant renders)
+        const nextCompact = currentScrollY > (window.innerWidth < 768 ? 80 : 90);
+        setIsCompact((prev) => (prev === nextCompact ? prev : nextCompact));
+
+        // Always reveal when near top to avoid "stuck hidden" state
+        if (currentScrollY <= 8) {
+          if (scrollDirRef.current !== "up") setScrollDir("up");
+          scrollDirRef.current = "up";
+          lastDirChangeYRef.current = currentScrollY;
+          lastScrollYRef.current = currentScrollY;
+          scrollTickingRef.current = false;
+          return;
+        }
+
+        const diff = currentScrollY - lastScrollYRef.current;
+        const absDiff = Math.abs(diff);
+
+        // Ignore tiny scroll jitter to prevent flicker
+        if (absDiff < 6) {
+          scrollTickingRef.current = false;
+          return;
+        }
+
+        const nextDir = diff > 0 ? "down" : "up";
+
+        // Add hysteresis: don't flip direction unless the user scrolls enough
+        const directionFlipDistance = window.innerWidth < 768 ? 18 : 24;
+        const sinceLastFlip = Math.abs(currentScrollY - lastDirChangeYRef.current);
+
+        if (nextDir !== scrollDirRef.current && sinceLastFlip >= directionFlipDistance) {
+          // Only start hiding after a small distance from top
+          if (nextDir === "down" && currentScrollY <= 50) {
+            scrollTickingRef.current = false;
+            return;
+          }
+          setScrollDir(nextDir);
+          scrollDirRef.current = nextDir;
+          lastDirChangeYRef.current = currentScrollY;
+        }
+
         lastScrollYRef.current = currentScrollY;
-        return;
-      }
-
-      // Ignore tiny scroll jitter to prevent flicker
-      if (delta < 6) {
-        return;
-      }
-
-      if (currentScrollY > lastScrollYRef.current && currentScrollY > 50) {
-        setScrollDir("down");
-      } else {
-        setScrollDir("up");
-      }
-      lastScrollYRef.current = currentScrollY;
+        scrollTickingRef.current = false;
+      });
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });

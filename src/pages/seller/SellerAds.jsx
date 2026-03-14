@@ -101,7 +101,12 @@ const SellerAds = () => {
             />
             <select
               value={form.slotId}
-              onChange={(e) => setForm((p) => ({ ...p, slotId: e.target.value }))}
+              onChange={(e) => {
+                const nextSlotId = e.target.value;
+                const selectedSlot = slots.find((s) => s.id === nextSlotId);
+                const required = Math.max(0, Number(selectedSlot?.price || 0));
+                setForm((p) => ({ ...p, slotId: nextSlotId, paidAmount: String(required) }));
+              }}
               className="w-full px-3 py-2 border border-gray-200 dark:border-white/10 rounded-xl"
             >
               {slots.length === 0 && <option value="home_top">Home Top</option>}
@@ -112,14 +117,22 @@ const SellerAds = () => {
                 </option>
               ))}
             </select>
-            <input
-              value={form.paidAmount}
-              onChange={(e) => setForm((p) => ({ ...p, paidAmount: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-200 dark:border-white/10 rounded-xl"
-              placeholder="Amount paid (as per slot price)"
-              type="number"
-              min="0"
-            />
+            <div className="rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 px-4 py-3">
+              {(() => {
+                const selectedSlot = slots.find((s) => s.id === form.slotId);
+                const required = Math.max(0, Number(selectedSlot?.price || 0));
+                return (
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-xs font-black uppercase tracking-widest text-gray-500">
+                      Amount to Pay
+                    </span>
+                    <span className="text-sm font-black text-zoop-obsidian dark:text-white tabular-nums whitespace-nowrap">
+                      Rs. {required.toLocaleString("en-IN")}
+                    </span>
+                  </div>
+                );
+              })()}
+            </div>
           </div>
 
           <div className="space-y-3">
@@ -215,7 +228,10 @@ const SellerAds = () => {
                 }
 
                 // Fallback: legacy manual amount entry (kept for backward compatibility)
-                await sellerApi.createMyAd(form);
+                await sellerApi.createMyAd({
+                  ...form,
+                  paidAmount: String(required),
+                });
                 setForm((prev) => ({
                   ...prev,
                   title: "",

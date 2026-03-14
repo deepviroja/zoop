@@ -205,7 +205,7 @@ const SellerDashboard = () => {
             </div>
           </div>
           
-          <div className="relative h-80 flex items-end justify-between gap-3 md:gap-6 px-2 custom-scrollbar overflow-x-auto pb-4 pt-10">
+          <div className="relative h-80 flex items-end justify-between gap-4 md:gap-6 px-2 custom-scrollbar overflow-x-auto pb-4 pt-10">
             {/* Grid Lines */}
             <div className="absolute inset-0 flex flex-col justify-between pointer-events-none pb-14 pt-10">
               {[0, 1, 2, 3, 4].map(i => (
@@ -228,7 +228,7 @@ const SellerDashboard = () => {
                   }
                   onFocus={() => setActiveBarIndex(i)}
                   onBlur={() => setActiveBarIndex(-1)}
-                  className="flex-1 min-w-[40px] flex flex-col items-center gap-4 group relative z-10 outline-none"
+                  className="flex-1 min-w-[56px] sm:min-w-[64px] flex flex-col items-center gap-4 px-4 group relative z-10 outline-none"
                   aria-label={`Sales ${point.label}: ${formatInrWithSymbol(point.value)}`}
                 >
                   {/* Tooltip */}
@@ -239,7 +239,7 @@ const SellerDashboard = () => {
                         : "opacity-0 translate-y-2 group-hover:opacity-100 group-hover:-translate-y-4"
                     }`}
                   >
-                    <div className="bg-zoop-obsidian text-white text-[10px] font-black px-3 py-2 rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.3)] flex flex-col items-center gap-0.5">
+                    <div className="bg-zoop-obsidian text-white text-[10px] font-black px-6 py-2 rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.3)] flex flex-col items-center gap-0.5">
                       <span className="text-zoop-moss">
                         {formatInrWithSymbol(point.value)}
                       </span>
@@ -252,7 +252,7 @@ const SellerDashboard = () => {
                   {/* Bar */}
                   <div className="w-full relative flex items-end justify-center h-56">
                     <div
-                      className={`w-full max-w-[24px] bg-gradient-to-t from-zoop-moss/20 via-zoop-moss/60 to-zoop-moss rounded-full group-hover:scale-x-110 group-hover:shadow-[0_0_30px_rgba(163,230,53,0.4)] transition-all duration-700 ease-out relative group/bar ${
+                      className={`w-full max-w-[24px] px-1 bg-gradient-to-t from-zoop-moss/20 via-zoop-moss/60 to-zoop-moss rounded-full group-hover:scale-x-110 group-hover:shadow-[0_0_30px_rgba(163,230,53,0.4)] transition-all duration-700 ease-out relative group/bar ${
                         isActive
                           ? "ring-2 ring-zoop-moss/60 shadow-[0_0_30px_rgba(163,230,53,0.35)]"
                           : ""
@@ -270,7 +270,7 @@ const SellerDashboard = () => {
 
                   {/* Label */}
                   <span
-                    className={`text-[9px] font-black uppercase tracking-widest transition-colors ${
+                    className={`text-[10px] font-black uppercase tracking-widest transition-colors whitespace-nowrap ${
                       isActive
                         ? "text-zoop-obsidian dark:text-white"
                         : "text-gray-400 group-hover:text-zoop-obsidian dark:group-hover:text-white"
@@ -286,7 +286,7 @@ const SellerDashboard = () => {
 
         {/* Tabbed Content */}
         <div className="space-y-8">
-          <div className="flex gap-1 bg-white/50 dark:bg-white/5 p-1.5 rounded-[1.5rem] border border-white dark:border-white/10 backdrop-blur-xl w-fit">
+          <div className="flex flex-wrap sm:flex-nowrap gap-1 bg-white/50 dark:bg-white/10 p-1.5 rounded-[1.5rem] border border-white dark:border-white/10 backdrop-blur-xl w-full sm:w-fit overflow-x-auto custom-scrollbar">
             {["overview", "products", "orders"].map((tab) => (
               <button key={tab} onClick={() => handleTabChange(tab)}
                 className={`px-8 py-3.5 rounded-xl font-black text-xs uppercase tracking-[0.1em] transition-all hover:bg-gray-50 dark:hover:bg-gray-50/10 ${activeTab === tab ? "bg-white dark:bg-zoop-moss text-zoop-obsidian shadow-xl" : "text-gray-400 hover:text-zoop-obsidian dark:hover:text-white"}`}>
@@ -340,6 +340,86 @@ const SellerDashboard = () => {
                   ))}
                 </div>
               </div>
+            </div>
+          )}
+
+          {activeTab === "products" && (
+            <div className="bg-white dark:bg-white/5 rounded-[2.5rem] p-8 border border-white dark:border-white/10 shadow-xl">
+              <div className="flex items-center justify-between gap-4 mb-6">
+                <h3 className="text-xl font-black text-zoop-obsidian dark:text-white">Products</h3>
+                <Link to="/seller/products" className="text-xs font-black text-zoop-moss uppercase tracking-widest hover:underline">
+                  Manage
+                </Link>
+              </div>
+              {tabLoading ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {[0, 1, 2, 3, 4, 5].map((i) => (
+                    <Skeleton key={i} className="h-24 rounded-[2rem]" />
+                  ))}
+                </div>
+              ) : products.length === 0 ? (
+                <p className="text-sm text-gray-500">No products found.</p>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {products.slice(0, 12).map((p) => (
+                    <div key={p.id} className="flex items-center gap-4 p-4 bg-gray-50 dark:bg-white/5 rounded-[2rem] border border-gray-100 dark:border-white/10 min-w-0">
+                      <img src={p.thumbnailUrl || p.image} alt="" className="w-14 h-14 rounded-2xl object-cover shrink-0 bg-white/10" />
+                      <div className="flex-1 min-w-0">
+                        <p className="font-black text-sm text-zoop-obsidian dark:text-white truncate">{p.name || p.title}</p>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 truncate">
+                          {p.category || "General"}
+                        </p>
+                      </div>
+                      <span className="text-[10px] font-black text-zoop-moss whitespace-nowrap">
+                        {formatInrWithSymbol(Number(p.price || 0), { maximumFractionDigits: 0 })}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === "orders" && (
+            <div className="bg-white dark:bg-white/5 rounded-[2.5rem] p-8 border border-white dark:border-white/10 shadow-xl">
+              <div className="flex items-center justify-between gap-4 mb-6">
+                <h3 className="text-xl font-black text-zoop-obsidian dark:text-white">Orders</h3>
+                <Link to="/seller/orders" className="text-xs font-black text-zoop-moss uppercase tracking-widest hover:underline">
+                  Ledger
+                </Link>
+              </div>
+              {tabLoading ? (
+                <div className="space-y-3">
+                  {[0, 1, 2, 3, 4].map((i) => (
+                    <Skeleton key={i} className="h-20 rounded-[2rem]" />
+                  ))}
+                </div>
+              ) : orders.length === 0 ? (
+                <p className="text-sm text-gray-500">No orders found.</p>
+              ) : (
+                <div className="space-y-3">
+                  {orders.slice(0, 12).map((o) => (
+                    <div key={o.id} className="flex flex-wrap items-center justify-between gap-4 p-4 bg-gray-50 dark:bg-white/5 rounded-[2rem] border border-gray-100 dark:border-white/10 min-w-0">
+                      <div className="min-w-0">
+                        <p className="font-black text-[14px] font-mono tracking-tight uppercase text-zoop-obsidian dark:text-white truncate">
+                          ORD-{String(o.id || "").slice(-6)}
+                        </p>
+                        <p className="text-[12px] font-bold text-gray-500">
+                          {o.createdAt ? new Date(o.createdAt).toLocaleDateString() : "-"}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="font-black text-sm whitespace-nowrap">
+                          {formatInrWithSymbol(Number(o.totalAmount || 0), { maximumFractionDigits: 0 })}
+                        </span>
+                        <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-xl ${statusColor(o.status)}`}>
+                          {o.status || "unknown"}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
           

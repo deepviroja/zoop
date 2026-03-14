@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { LayoutDashboard } from "../assets/icons/LayoutDashboard";
 import { ShieldCheck } from "../assets/icons/ShieldCheck";
 import { FileText } from "../assets/icons/FileText";
@@ -10,7 +10,7 @@ import { Users } from "../assets/icons/Users";
 import { Store } from "../assets/icons/Store";
 import { User } from "../assets/icons/User";
 import { ShoppingCart } from "../assets/icons/ShoppingCart";
-import { NavLink, Outlet, Link } from "react-router-dom";
+import { NavLink, Outlet, Link, useLocation } from "react-router-dom";
 
 import { useNavigate } from "react-router-dom";
 import { getAuth, signOut } from "firebase/auth";
@@ -27,6 +27,16 @@ const AdminLayout = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
   const { siteConfig } = useSiteConfig();
+  const location = useLocation();
+  const mainRef = useRef(null);
+
+  useEffect(() => {
+    if (mainRef.current && typeof mainRef.current.scrollTo === "function") {
+      mainRef.current.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [location.pathname]);
 
   const { data: notificationsData } = useQuery({
     queryKey: ["notifications", "my", "admin"],
@@ -173,7 +183,10 @@ const AdminLayout = () => {
       </aside>
 
       {/* --- MAIN CONTENT --- */}
-      <main className="flex-1 w-full overflow-y-auto overscroll-contain custom-scrollbar p-4 pt-20 md:p-8 md:pt-8">
+      <main
+        ref={mainRef}
+        className="flex-1 w-full overflow-y-auto overscroll-contain custom-scrollbar p-4 pt-20 md:p-8 md:pt-8"
+      >
         <div className="mb-4 flex items-center justify-between bg-white dark:glass-card border border-gray-100 dark:border-white/10 rounded-xl px-4 py-3 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
           <p className="text-xs font-black uppercase tracking-widest text-gray-500">
             Admin Console

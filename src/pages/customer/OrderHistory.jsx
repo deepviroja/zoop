@@ -145,7 +145,7 @@ const OrderHistory = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-zoop-canvas flex items-center justify-center p-6">
+      <div className="min-h-screen bg-zoop-canvas dark:bg-black flex items-center justify-center p-6">
         <div className="bg-white dark:glass-card rounded-2xl p-8 text-center max-w-lg shadow-lg dark:shadow-[0_12px_32px_rgba(0,0,0,0.5)]">
           <div className="text-5xl mb-4 text-zoop-obsidian dark:text-white inline-flex items-center justify-center">
             <Box width={46} height={46} />
@@ -169,7 +169,7 @@ const OrderHistory = () => {
   }
 
   return (
-    <div className="min-h-screen bg-zoop-canvas py-8 md:py-12 px-4 md:px-6">
+    <div className="min-h-screen bg-zoop-canvas dark:bg-black py-8 md:py-12 px-4 md:px-6">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8">

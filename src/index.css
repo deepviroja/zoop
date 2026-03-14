@@ -144,43 +144,45 @@ body,
 
 /* Premium Component Utilities */
 @utility glass {
-  background: rgba(255, 255, 255, 0.7) !important;
-  backdrop-filter: blur(12px) !important;
-  -webkit-backdrop-filter: blur(12px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(18px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.32) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
 }
 
 .dark .glass {
-  background: rgba(26, 26, 26, 0.4) !important;
-  border-color: rgba(255, 255, 255, 0.08) !important;
+  background: rgba(18, 18, 18, 0.48) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.55) !important;
 }
 
 @utility glass-card {
-  background: rgba(0,0,0,0.7) !important;
-  border: 1px solid rgba(255, 255, 255, 0.5) !important;
-  box-shadow: 0 4px 6px -1px rgba(255, 255, 255, 0.1) !important;
+  background: rgba(0, 0, 0, 0.65) !important;
+  border: 1px solid rgba(255, 255, 255, 0.28) !important;
+  box-shadow: 0 14px 50px rgba(0, 0, 0, 0.10) !important;
   border-radius: var(--radius-zoop) !important;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
+  backdrop-filter: blur(22px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(180%) !important;
 
   &:hover {
     border-color: rgba(163, 230, 53, 0.4) !important;
-    transform: translateY(-4px);
-    box-shadow: 0 12px 24px -4px rgba(0, 0, 0, 0.05) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 18px 64px rgba(0, 0, 0, 0.14) !important;
   }
 }
 
 .dark .glass-card {
-  background: rgba(20, 20, 20, 0.6) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6) !important;
+  background: rgba(16, 16, 16, 0.55) !important;
+  backdrop-filter: blur(22px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(160%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.10) !important;
+  box-shadow: 0 22px 72px rgba(0, 0, 0, 0.70) !important;
 
   &:hover {
     border-color: rgba(163, 230, 53, 0.4) !important;
-    box-shadow: 0 12px 48px 0 rgba(0, 0, 0, 0.8) !important;
+    box-shadow: 0 28px 92px rgba(0, 0, 0, 0.82) !important;
   }
 }
 

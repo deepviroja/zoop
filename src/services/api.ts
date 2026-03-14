@@ -202,6 +202,7 @@ export const adminApi = {
   getOffers: () => get<any[]>('/content/admin/offers'),
   createOffer: (data: any) => post<any>('/content/admin/offers', data),
   updateOffer: (id: string, data: any) => put<any>(`/content/admin/offers/${id}`, data),
+  deleteOffer: (id: string) => del<any>(`/content/admin/offers/${id}`),
   updateSupportTicketStatus: (id: string, status: string, reply?: string) =>
     put<any>(`/content/admin/support-tickets/${id}/status`, { status, reply }),
   getMonetizationOverview: () => get<any>('/content/admin/monetization'),

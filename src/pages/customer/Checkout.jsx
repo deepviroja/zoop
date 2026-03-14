@@ -435,7 +435,7 @@ const Checkout = () => {
   // Order Success Screen
   if (orderPlaced) {
     return (
-      <div className="min-h-screen bg-zoop-canvas flex items-center justify-center p-4">
+      <div className="min-h-screen bg-zoop-canvas dark:bg-black flex items-center justify-center p-4">
         <div className="bg-white dark:glass-card rounded-3xl p-8 md:p-12 max-w-2xl w-full text-center shadow-2xl dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)]">
           <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <Check width={40} height={40} className="text-green-600" />
@@ -476,7 +476,7 @@ const Checkout = () => {
   }
 
   return (
-    <div className="min-h-screen bg-zoop-canvas py-8">
+    <div className="min-h-screen bg-zoop-canvas dark:bg-black py-8">
       <div className="max-w-[1200px] mx-auto px-4">
         {/* Progress Steps */}
         <div className="bg-white dark:glass-card rounded-2xl p-6 mb-8 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]">

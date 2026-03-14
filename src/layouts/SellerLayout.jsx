@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { NavLink, Outlet, Navigate, useNavigate, Link } from "react-router-dom";
+import React, { useEffect, useRef, useState } from "react";
+import { NavLink, Outlet, Navigate, useLocation, useNavigate, Link } from "react-router-dom";
 import { useUser } from "../context/UserContext";
 import { auth } from "../firebase";
 import { signOut } from "firebase/auth";
@@ -27,6 +27,16 @@ const SellerLayout = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
   const { siteConfig, replaceBrandText } = useSiteConfig();
+  const location = useLocation();
+  const mainRef = useRef(null);
+
+  useEffect(() => {
+    if (mainRef.current && typeof mainRef.current.scrollTo === "function") {
+      mainRef.current.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [location.pathname]);
 
   const { data: notificationsData } = useQuery({
     queryKey: ["notifications", "my", user?.uid || user?.id || user?.email || "anon"],
@@ -214,7 +224,10 @@ const SellerLayout = () => {
       </aside>
 
       {/* --- MAIN CONTENT --- */}
-      <main className="flex-1 w-full overflow-y-auto overscroll-contain custom-scrollbar p-4 pt-20 md:p-10 md:pt-10">
+      <main
+        ref={mainRef}
+        className="flex-1 w-full overflow-y-auto overscroll-contain custom-scrollbar p-4 pt-20 md:p-10 md:pt-10"
+      >
         <div className="mb-4 flex items-center justify-between bg-white dark:glass-card border border-gray-100 dark:border-white/10 rounded-xl px-4 py-3 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
           <p className="text-xs font-black uppercase tracking-widest text-gray-500">
             Seller Workspace

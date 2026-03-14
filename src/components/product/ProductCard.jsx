@@ -358,9 +358,11 @@ const ProductCard = ({ product, view = "grid" }) => {
         {/* Product Info */}
         <div className="p-4">
           {/* Category & Brand */}
-          <div className="flex justify-between items-center text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">
-            <span>{product.gender || product.category}</span>
-            <span className="text-zoop-copper">{product.brand}</span>
+          <div className="flex items-center justify-between gap-2 min-w-0 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">
+            <span className="truncate">{product.gender || product.category}</span>
+            <span className="text-zoop-copper truncate max-w-[55%] text-right">
+              {product.brand}
+            </span>
           </div>
 
           {/* Product Name */}
@@ -381,8 +383,8 @@ const ProductCard = ({ product, view = "grid" }) => {
           </div>
 
           {/* Price & Mobile Add */}
-          <div className="flex items-center justify-between mt-3">
-            <div className="flex items-baseline gap-2">
+          <div className="flex flex-wrap items-center justify-between gap-3 mt-3">
+            <div className="flex items-baseline gap-2 min-w-0">
               <span className="text-xl font-black text-zoop-obsidian dark:text-white">
                 {formatInrWithSymbol(product.price || 0, {
                   maximumFractionDigits: 0,

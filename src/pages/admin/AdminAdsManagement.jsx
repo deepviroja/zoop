@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { adminApi } from "../../services/api";
+import { ImageUpload } from "../../components/common/ImageUpload";
 
 const AdCard = ({ ad, load, setError, handleDeleteAd }) => {
   const [duration, setDuration] = useState(7);
@@ -358,14 +359,18 @@ const AdminAdsManagement = () => {
             className="w-full px-3 py-2 border border-gray-200 dark:border-white/10 rounded-xl"
             placeholder="title"
           />
-          <input
-            value={adForm.mediaUrl}
-            onChange={(e) =>
-              setAdForm((p) => ({ ...p, mediaUrl: e.target.value }))
-            }
-            className="w-full px-3 py-2 border border-gray-200 dark:border-white/10 rounded-xl"
-            placeholder="media URL"
-          />
+          <div className="rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 p-4">
+            <p className="text-xs font-black uppercase tracking-widest text-gray-500 mb-3">
+              Ad Media (image/video)
+            </p>
+            <ImageUpload
+              maxFiles={1}
+              initialUrls={adForm.mediaUrl ? [adForm.mediaUrl] : []}
+              onUpload={(urls) =>
+                setAdForm((p) => ({ ...p, mediaUrl: urls?.[0] || "" }))
+              }
+            />
+          </div>
           <input
             value={adForm.targetUrl}
             onChange={(e) =>

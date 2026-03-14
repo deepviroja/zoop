@@ -16,6 +16,7 @@ const Monetization = () => {
   const [overview, setOverview] = useState({ totals: {}, commissionStructure: [], payouts: [] });
   const [commission, setCommission] = useState([]);
   const [offers, setOffers] = useState([]);
+  const [editingOffer, setEditingOffer] = useState(null);
   const [offerDraft, setOfferDraft] = useState({
     title: "",
     description: "",
@@ -75,6 +76,18 @@ const Monetization = () => {
     }
   };
 
+  const deleteOffer = async (offer) => {
+    if (!offer?.id) return;
+    if (!window.confirm(`Remove offer "${offer.title || offer.code || offer.id}"?`)) return;
+    try {
+      await adminApi.deleteOffer(offer.id);
+      if (editingOffer?.id === offer.id) setEditingOffer(null);
+      await load();
+    } catch (e) {
+      setError(e?.message || "Could not remove offer");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0b] p-6 lg:p-10 space-y-10 transition-colors duration-500">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
@@ -131,9 +144,11 @@ const Monetization = () => {
              <h3 className="text-xl font-black text-zoop-obsidian dark:text-white mb-6">Create Campaign</h3>
              <div className="space-y-4">
                <input value={offerDraft.title} onChange={(e) => setOfferDraft({...offerDraft, title: e.target.value})} className="w-full bg-gray-50 dark:bg-white/5 border border-transparent focus:border-zoop-moss p-4 rounded-2xl outline-none transition-all dark:text-white font-bold text-sm" placeholder="Campaign Title (e.g. Summer Sale)" />
-               <div className="grid grid-cols-2 gap-4">
-                 <input value={offerDraft.code} onChange={(e) => setOfferDraft({...offerDraft, code: e.target.value.toUpperCase()})} className="w-full bg-gray-50 dark:bg-white/5 border border-transparent focus:border-zoop-moss p-4 rounded-2xl outline-none transition-all dark:text-white font-black text-sm" placeholder="COUPON_CODE" />
-                 <input type="number" value={offerDraft.discountValue} onChange={(e) => setOfferDraft({...offerDraft, discountValue: Number(e.target.value)})} className="w-full bg-gray-50 dark:bg-white/5 border border-transparent focus:border-zoop-moss p-4 rounded-2xl outline-none transition-all dark:text-white font-black text-sm" placeholder="Value" />
+               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                 <input value={offerDraft.code} onChange={(e) => setOfferDraft({...offerDraft, code: e.target.value.toUpperCase()})} className="w-full bg-gray-50 dark:bg-white/5 border border-transparent focus:border-zoop-moss p-4 rounded-2xl outline-none transition-all dark:text-white font-black text-sm" placeholder="COUPON_CODE (optional)" />
+                 <input type="number" value={offerDraft.discountValue} onChange={(e) => setOfferDraft({...offerDraft, discountValue: Number(e.target.value || 0)})} className="w-full bg-gray-50 dark:bg-white/5 border border-transparent focus:border-zoop-moss p-4 rounded-2xl outline-none transition-all dark:text-white font-black text-sm" placeholder="Discount value" />
+                 <input type="number" value={offerDraft.minOrderAmount} onChange={(e) => setOfferDraft({...offerDraft, minOrderAmount: Number(e.target.value || 0)})} className="w-full bg-gray-50 dark:bg-white/5 border border-transparent focus:border-zoop-moss p-4 rounded-2xl outline-none transition-all dark:text-white font-black text-sm" placeholder="Min order amount (e.g. 399)" />
+                 <input type="number" value={offerDraft.maxDiscountAmount} onChange={(e) => setOfferDraft({...offerDraft, maxDiscountAmount: Number(e.target.value || 0)})} className="w-full bg-gray-50 dark:bg-white/5 border border-transparent focus:border-zoop-moss p-4 rounded-2xl outline-none transition-all dark:text-white font-black text-sm" placeholder="Max discount cap (optional)" />
                </div>
                <textarea value={offerDraft.description} onChange={(e) => setOfferDraft({...offerDraft, description: e.target.value})} className="w-full bg-gray-50 dark:bg-white/5 border border-transparent focus:border-zoop-moss p-4 rounded-2xl outline-none transition-all dark:text-white text-sm" placeholder="Short description for customers..." rows={3} />
                <div className="grid grid-cols-2 gap-4">
@@ -171,7 +186,7 @@ const Monetization = () => {
                   {/* Decorative Elements */}
                   <div className="absolute top-0 right-0 w-32 h-32 bg-zoop-moss/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover/offer:bg-zoop-moss/20 transition-colors" />
                   
-                  <div className="flex justify-between items-start mb-10 relative z-10">
+                  <div className="flex justify-between items-start mb-10 relative z-10 gap-4">
                     <div className="flex flex-col gap-1">
                       <div className={`px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest w-fit ${offer.type === "coupon" ? "bg-amber-500/10 text-amber-600 dark:text-amber-400" : "bg-blue-500/10 text-blue-600 dark:text-blue-400"}`}>
                         {offer.type}
@@ -179,19 +194,49 @@ const Monetization = () => {
                       <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest ml-1">{offer.scope} Scope</span>
                     </div>
                     
-                    <button onClick={async () => {
-                      try {
-                        await adminApi.updateOffer(offer.id, { ...offer, active: !offer.active });
-                        void load();
-                      } catch (e) { setError(e.message); }
-                    }} className={`w-12 h-6 rounded-full relative transition-all duration-500 ${offer.active ? "bg-zoop-moss" : "bg-gray-200 dark:bg-white/10"}`}>
-                      <div className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow-sm transition-all duration-500 ${offer.active ? "right-1" : "left-1"}`} />
-                    </button>
+                    <div className="flex flex-col items-end gap-2 shrink-0">
+                      <button onClick={async () => {
+                        try {
+                          await adminApi.updateOffer(offer.id, { ...offer, active: !offer.active });
+                          void load();
+                        } catch (e) { setError(e.message); }
+                      }} className={`w-12 h-6 rounded-full relative transition-all duration-500 ${offer.active ? "bg-zoop-moss" : "bg-gray-200 dark:bg-white/10"}`}>
+                        <div className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow-sm transition-all duration-500 ${offer.active ? "right-1" : "left-1"}`} />
+                      </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setEditingOffer({ ...offer })}
+                          className="px-3 py-1 rounded-lg bg-gray-100 dark:bg-white/5 text-[10px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-300 hover:text-zoop-moss transition-colors"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => deleteOffer(offer)}
+                          className="px-3 py-1 rounded-lg bg-red-500/10 text-[10px] font-black uppercase tracking-widest text-red-600 hover:bg-red-500/15 transition-colors"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
                   </div>
                   
                   <div className="relative z-10">
                     <h4 className="text-2xl font-black text-zoop-obsidian dark:text-white leading-tight mb-2 group-hover/offer:text-zoop-moss transition-colors">{offer.title}</h4>
                     <p className="text-gray-500 text-xs font-medium mb-10 line-clamp-2">{offer.description || "No description provided for this campaign."}</p>
+                    <div className="mb-8 flex flex-wrap gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400">
+                      {Number(offer.minOrderAmount || 0) > 0 && (
+                        <span className="px-3 py-1 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10">
+                          Min {fmtInr(offer.minOrderAmount, { maximumFractionDigits: 0 })}
+                        </span>
+                      )}
+                      {Number(offer.maxDiscountAmount || 0) > 0 && (
+                        <span className="px-3 py-1 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10">
+                          Cap {fmtInr(offer.maxDiscountAmount, { maximumFractionDigits: 0 })}
+                        </span>
+                      )}
+                    </div>
 
                     <div className="flex items-end justify-between border-t border-dashed border-gray-100 dark:border-white/10 pt-8 mt-auto">
                       <div className="flex flex-col gap-1">
@@ -220,6 +265,128 @@ const Monetization = () => {
           </div>
         </div>
       </div>
+
+      {editingOffer && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => setEditingOffer(null)}
+          />
+          <div className="relative w-full max-w-2xl bg-white dark:bg-[#0f0f10] rounded-[2rem] border border-gray-100 dark:border-white/10 shadow-2xl p-6 md:p-8">
+            <div className="flex items-start justify-between gap-4 mb-6">
+              <div>
+                <h3 className="text-2xl font-black text-zoop-obsidian dark:text-white">Edit Campaign</h3>
+                <p className="text-xs text-gray-500 mt-1">Update coupon/offer rules and visibility.</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setEditingOffer(null)}
+                className="px-3 py-2 rounded-xl bg-gray-100 dark:bg-white/5 font-black text-gray-600 dark:text-gray-300"
+              >
+                Close
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <input
+                value={editingOffer.title || ""}
+                onChange={(e) => setEditingOffer((p) => ({ ...p, title: e.target.value }))}
+                className="w-full bg-gray-50 dark:bg-white/5 border border-transparent focus:border-zoop-moss p-4 rounded-2xl outline-none transition-all dark:text-white font-bold text-sm sm:col-span-2"
+                placeholder="Title"
+              />
+              <input
+                value={editingOffer.code || ""}
+                onChange={(e) => setEditingOffer((p) => ({ ...p, code: e.target.value.toUpperCase() }))}
+                className="w-full bg-gray-50 dark:bg-white/5 border border-transparent focus:border-zoop-moss p-4 rounded-2xl outline-none transition-all dark:text-white font-black text-sm"
+                placeholder="Code (optional)"
+              />
+              <input
+                type="number"
+                value={Number(editingOffer.discountValue || 0)}
+                onChange={(e) => setEditingOffer((p) => ({ ...p, discountValue: Number(e.target.value || 0) }))}
+                className="w-full bg-gray-50 dark:bg-white/5 border border-transparent focus:border-zoop-moss p-4 rounded-2xl outline-none transition-all dark:text-white font-black text-sm"
+                placeholder="Discount value"
+              />
+              <select
+                value={editingOffer.discountType || "percent"}
+                onChange={(e) => setEditingOffer((p) => ({ ...p, discountType: e.target.value }))}
+                className="bg-gray-50 dark:bg-white/5 p-4 rounded-2xl font-bold text-sm dark:text-white outline-none"
+              >
+                <option value="percent">% Percent</option>
+                <option value="flat">₹ Flat</option>
+              </select>
+              <select
+                value={editingOffer.scope || "order"}
+                onChange={(e) => setEditingOffer((p) => ({ ...p, scope: e.target.value }))}
+                className="bg-gray-50 dark:bg-white/5 p-4 rounded-2xl font-bold text-sm dark:text-white outline-none"
+              >
+                <option value="order">Order Total</option>
+                <option value="shipping">Shipping</option>
+              </select>
+              <input
+                type="number"
+                value={Number(editingOffer.minOrderAmount || 0)}
+                onChange={(e) => setEditingOffer((p) => ({ ...p, minOrderAmount: Number(e.target.value || 0) }))}
+                className="w-full bg-gray-50 dark:bg-white/5 border border-transparent focus:border-zoop-moss p-4 rounded-2xl outline-none transition-all dark:text-white font-black text-sm"
+                placeholder="Min order amount"
+              />
+              <input
+                type="number"
+                value={Number(editingOffer.maxDiscountAmount || 0)}
+                onChange={(e) => setEditingOffer((p) => ({ ...p, maxDiscountAmount: Number(e.target.value || 0) }))}
+                className="w-full bg-gray-50 dark:bg-white/5 border border-transparent focus:border-zoop-moss p-4 rounded-2xl outline-none transition-all dark:text-white font-black text-sm"
+                placeholder="Max discount cap"
+              />
+              <textarea
+                value={editingOffer.description || ""}
+                onChange={(e) => setEditingOffer((p) => ({ ...p, description: e.target.value }))}
+                className="w-full bg-gray-50 dark:bg-white/5 border border-transparent focus:border-zoop-moss p-4 rounded-2xl outline-none transition-all dark:text-white text-sm sm:col-span-2"
+                placeholder="Description"
+                rows={3}
+              />
+              <label className="flex items-center gap-3 px-4 py-3 border border-gray-200 dark:border-white/10 rounded-2xl sm:col-span-2">
+                <input
+                  type="checkbox"
+                  checked={editingOffer.active !== false}
+                  onChange={(e) => setEditingOffer((p) => ({ ...p, active: e.target.checked }))}
+                />
+                <span className="font-black text-xs uppercase tracking-widest text-gray-500">
+                  Active
+                </span>
+              </label>
+            </div>
+
+            <div className="mt-6 flex flex-wrap gap-3 justify-end">
+              <button
+                type="button"
+                onClick={() => deleteOffer(editingOffer)}
+                className="px-5 py-3 rounded-2xl bg-red-500/10 text-red-600 font-black text-xs uppercase tracking-widest"
+              >
+                Remove
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    setSaving(true);
+                    await adminApi.updateOffer(editingOffer.id, editingOffer);
+                    setEditingOffer(null);
+                    await load();
+                  } catch (e) {
+                    setError(e?.message || "Could not update offer");
+                  } finally {
+                    setSaving(false);
+                  }
+                }}
+                className="px-6 py-3 rounded-2xl bg-zoop-obsidian dark:bg-zoop-moss text-white dark:text-zoop-obsidian font-black text-xs uppercase tracking-widest disabled:opacity-60"
+                disabled={saving || !editingOffer.title}
+              >
+                {saving ? "Saving..." : "Save Changes"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Payout Table Section */}
       <div className="bg-white dark:bg-white/5 rounded-[3rem] border border-white dark:border-white/10 shadow-2xl overflow-hidden">

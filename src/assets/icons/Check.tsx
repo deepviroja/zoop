@@ -32,8 +32,8 @@ const checkVariants: Variants = {
 };
 
 const Check = ({
-  width = 28,
-  height = 28,
+  width = 24,
+  height = 24,
   strokeWidth = 2,
   stroke = "currentColor",
   ...props
@@ -49,39 +49,28 @@ const Check = ({
   };
 
   return (
-    <div
-      style={{
-        cursor: "pointer",
-        userSelect: "none",
-        padding: "8px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={width}
+      height={height}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke={stroke}
+      strokeWidth={strokeWidth}
+      strokeLinecap="round"
+      strokeLinejoin="round"
       onMouseEnter={handleHoverStart}
       onMouseLeave={handleHoverEnd}
+      {...props}
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width={width}
-        height={height}
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke={stroke}
-        strokeWidth={strokeWidth}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        {...props}
-      >
-        <motion.path
-          d="M20 6 9 17l-5-5"
-          variants={checkVariants}
-          initial="normal"
-          animate={controls}
-          style={{ transformOrigin: "center" }}
-        />
-      </svg>
-    </div>
+      <motion.path
+        d="M20 6 9 17l-5-5"
+        variants={checkVariants}
+        initial="normal"
+        animate={controls}
+        style={{ transformOrigin: "center" }}
+      />
+    </svg>
   );
 };
 

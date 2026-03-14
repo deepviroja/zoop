@@ -152,7 +152,7 @@ const AdminStats = () => {
               </div>
             </div>
             
-            <div className="relative h-80 flex items-end justify-between gap-3 md:gap-6 px-2 custom-scrollbar overflow-x-auto pb-4 pt-10">
+            <div className="relative h-80 flex items-end justify-between gap-4 md:gap-6 px-2 custom-scrollbar overflow-x-auto pb-4 pt-10">
               {/* Grid Lines */}
               <div className="absolute inset-0 flex flex-col justify-between pointer-events-none pb-14 pt-10">
                 {[0, 1, 2, 3, 4].map(i => (
@@ -166,7 +166,7 @@ const AdminStats = () => {
               </div>
 
               {salesData.map((data, i) => (
-                <div key={i} className="flex-1 min-w-[40px] flex flex-col items-center gap-4 group relative z-10">
+                <div key={i} className="flex-1 min-w-[56px] sm:min-w-[64px] flex flex-col items-center gap-4 group relative z-10">
                   {/* Tooltip */}
                   <div className="absolute -top-6 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:-translate-y-4 pointer-events-none">
                     <div className="bg-zoop-obsidian text-white text-[10px] font-black px-3 py-2 rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.3)] flex flex-col items-center gap-0.5">
@@ -184,7 +184,7 @@ const AdminStats = () => {
                   </div>
 
                   {/* Label */}
-                  <span className="text-[9px] font-black uppercase tracking-widest text-gray-400 group-hover:text-zoop-obsidian dark:group-hover:text-white transition-colors">
+                  <span className="text-[9px] font-black uppercase tracking-widest text-gray-400 group-hover:text-zoop-obsidian dark:group-hover:text-white transition-colors whitespace-nowrap">
                     {data.label}
                   </span>
                 </div>

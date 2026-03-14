@@ -124,8 +124,8 @@ const Cart = () => {
 
   if (cartItems.length === 0) {
     return (
-      <div className="min-h-screen bg-zoop-canvas py-12 px-6 flex items-center justify-center">
-        <div className="bg-white dark:glass-card rounded-[3rem] py-32 px-12 text-center border-2 border-dashed border-zoop-clay/30 max-w-2xl">
+      <div className="min-h-screen bg-zoop-canvas dark:bg-black py-12 px-6 flex items-center justify-center">
+        <div className="bg-white dark:glass-card dark:bg-black rounded-[3rem] py-32 px-12 text-center border-2 border-dashed border-zoop-clay/30 max-w-2xl">
           <div className="text-8xl mb-6">🛒</div>
           <h2 className="text-3xl font-black text-zoop-obsidian dark:text-white">
             Your Cart is Empty
@@ -145,7 +145,7 @@ const Cart = () => {
   }
 
   return (
-    <div className="min-h-screen bg-zoop-canvas py-8 md:py-12 px-4 md:px-6">
+    <div className="min-h-screen dark:bg-black bg-zoop-canvas py-8 md:py-12 px-4 md:px-6">
       <div className="max-w-[1200px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-10">
         {/* LEFT: ITEM LIST */}
         <div className="lg:col-span-8 space-y-6">
@@ -273,7 +273,7 @@ const Cart = () => {
 
                   {/* Controls */}
                   <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-50">
-                    <div className="flex items-center bg-zoop-canvas rounded-xl p-1 border border-gray-100 dark:border-white/10">
+                    <div className="flex items-center bg-zoop-canvas dark:glass-card rounded-xl p-1 border border-gray-100 dark:border-white/10">
                       <button
                         onClick={() =>
                           updateQuantity(
@@ -283,7 +283,7 @@ const Cart = () => {
                             item.selectedColor,
                           )
                         }
-                        className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center font-black text-zoop-obsidian dark:text-white hover:bg-white rounded-lg transition-colors"
+                        className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center font-black text-zoop-obsidian dark:text-white hover:bg-white dark:hover:bg-white/40 rounded-full transition-colors"
                         disabled={item.quantity <= 1}
                       >
                         –
@@ -300,7 +300,7 @@ const Cart = () => {
                             item.selectedColor,
                           )
                         }
-                        className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center font-black text-zoop-obsidian dark:text-white hover:bg-white rounded-lg transition-colors"
+                        className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center font-black text-zoop-obsidian dark:text-white hover:bg-white dark:hover:bg-white/40 rounded-full transition-colors"
                         disabled={item.stock && item.quantity >= item.stock}
                       >
                         +
@@ -310,7 +310,7 @@ const Cart = () => {
                     <div className="flex gap-3 md:gap-4">
                       <button
                         onClick={() => handleWishlistClick(item)}
-                        className="p-2 hover:bg-gray-50 rounded-lg transition-colors group"
+                        className="p-2 hover:bg-gray-50 hover:dark:bg-gray-50/50 rounded-lg transition-colors group"
                       >
                         <Heart
                           width={18}
@@ -326,7 +326,7 @@ const Cart = () => {
                             item.selectedColor,
                           )
                         }
-                        className="p-2 hover:bg-red-50 rounded-lg transition-colors group"
+                        className="p-2 hover:bg-red-50 dark:hover:bg-red-200/50 rounded-lg transition-colors group"
                       >
                         <Delete
                           width={18}

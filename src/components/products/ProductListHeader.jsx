@@ -17,8 +17,8 @@ const ProductListHeader = ({
 }) => {
   return (
     <div
-      className={`bg-white dark:glass-card rounded-2xl p-4 md:p-6 mb-6 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] sticky z-40 backdrop-blur-md bg-white/90 transition-all duration-700 ${
-        headerVisible ? "lg:top-[6.2rem] top-[6rem]" : "lg:top-19 top-16"
+      className={`rounded-2xl p-4 md:p-6 mb-6 shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)] sticky z-40 top-[8.2rem] lg:top-[6.2rem] backdrop-blur-xl bg-white/85 dark:glass-card transition-transform duration-500 will-change-transform ${
+        headerVisible ? "translate-y-0" : "-translate-y-10 md:-translate-y-6"
       }`}
     >
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -28,9 +28,9 @@ const ProductListHeader = ({
           </h1>
         </div>
 
-        <div className="flex items-center gap-3 w-full md:w-auto">
+        <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
           {/* Sort Dropdown */}
-          <div className="relative flex-1 md:flex-none">
+          <div className="relative flex-1 min-w-[10.5rem] md:flex-none md:min-w-0">
             <label htmlFor="product-sort" className="sr-only">
               Sort products
             </label>
@@ -67,11 +67,11 @@ const ProductListHeader = ({
           </div>
 
           {/* View Toggle */}
-          <div className="flex gap-1 bg-gray-100 dark:bg-white/10 p-1 rounded-lg">
+          <div className="flex gap-1 hidden md:flex  bg-gray-100 dark:bg-white/10 p-1 rounded-lg">
             <button
               onClick={() => setView("grid")}
               aria-label="Show products in grid view"
-              className={`p-2 rounded-md transition-all ${
+              className={`p-2  rounded-md transition-all ${
                 view === "grid" ? "bg-white dark:glass-card shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]" : "hover:bg-gray-200"
               }`}
               title="Grid View"
@@ -106,7 +106,7 @@ const ProductListHeader = ({
           <button
             onClick={() => setShowFilters(!showFilters)}
             aria-label={showFilters ? "Hide filters" : "Show filters"}
-            className="lg:hidden flex items-center gap-2 px-4 py-2 bg-zoop-obsidian text-white rounded-lg font-bold text-sm hover:bg-zoop-moss hover:text-zoop-obsidian transition-colors"
+            className="lg:hidden flex items-center gap-2 px-4 py-2 bg-zoop-obsidian text-white rounded-lg font-bold text-sm hover:bg-zoop-moss hover:text-zoop-obsidian transition-colors whitespace-nowrap"
           >
             <Filter width={16} height={16} />
             Filters {activeFiltersCount > 0 && `(${activeFiltersCount})`}

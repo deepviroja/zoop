@@ -5,6 +5,7 @@ import { DEFAULT_BRAND_NAME } from "../../utils/branding";
 import { useTheme } from "../../context/ThemeContext";
 import { Moon } from "../../assets/icons/Moon";
 import { Sun } from "../../assets/icons/Sun";
+import { ImageUpload } from "../../components/common/ImageUpload";
 
 const AdminWebsiteControl = () => {
   const { refreshSiteConfig } = useSiteConfig();
@@ -403,12 +404,18 @@ const AdminWebsiteControl = () => {
                     className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl"
                     placeholder="City"
                   />
-                  <input
-                    value={slide.img || ""}
-                    onChange={(e) => handleSlideChange(index, "img", e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-200 dark:border-white/10 rounded-xl md:col-span-2"
-                    placeholder="Image URL"
-                  />
+                  <div className="md:col-span-2 rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 p-4">
+                    <p className="text-xs font-black uppercase tracking-widest text-gray-500 mb-3">
+                      Slide Image (upload)
+                    </p>
+                    <ImageUpload
+                      maxFiles={1}
+                      initialUrls={slide.img ? [slide.img] : []}
+                      onUpload={(urls) =>
+                        handleSlideChange(index, "img", urls?.[0] || "")
+                      }
+                    />
+                  </div>
                   <textarea
                     value={slide.desc || ""}
                     onChange={(e) => handleSlideChange(index, "desc", e.target.value)}
